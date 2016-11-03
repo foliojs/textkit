@@ -12,7 +12,7 @@ const SVG_COMMANDS = {
 };
 
 // This constant is used to approximate a symmetrical arc using a cubic Bezier curve.
-const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0)
+const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0);
 
 /**
  * Path objects are returned by glyphs and represent the actual
@@ -26,6 +26,7 @@ export default class Path {
     this._bbox = null;
     this._cbox = null;
     this._bezier = false;
+    this._quadratic = false;
   }
 
   rect(x, y, width, height) {
@@ -62,7 +63,10 @@ export default class Path {
   }
 
   append(path) {
-    this.commands.push(...path.commands);
+    for (let {command, args} of path.commands) {
+      this[command](...args);
+    }
+
     return this;
   }
 
@@ -90,7 +94,7 @@ export default class Path {
   }
 
   /**
-   * Gets the "control box" of a path.
+   * Gets the 'control box' of a path.
    * This is like the bounding box, but it includes all points including
    * control points of bezier segments and is much faster to compute than
    * the real bounding box.
@@ -131,28 +135,22 @@ export default class Path {
         + Math.pow(t, 3) * p3[i]
     );
 
-    for (let c of this.commands) {
-      switch (c.command) {
+    for (let {command, args} of this.commands) {
+      switch (command) {
         case 'moveTo':
         case 'lineTo':
-          let [x, y] = c.args;
+          let [x, y] = args;
           bbox.addPoint(x, y);
           cx = x;
           cy = y;
           break;
 
         case 'quadraticCurveTo':
+          args = quadraticToBezier(cx, cy, ...args);
+          // fall through
+
         case 'bezierCurveTo':
-          if (c.command === 'quadraticCurveTo') {
-            // http://fontforge.org/bezier.html
-            var [qp1x, qp1y, p3x, p3y] = c.args;
-            var cp1x = cx + 2 / 3 * (qp1x - cx);    // CP1 = QP0 + 2/3 * (QP1-QP0)
-            var cp1y = cy + 2 / 3 * (qp1y - cy);
-            var cp2x = p3x + 2 / 3 * (qp1x - p3x);  // CP2 = QP2 + 2/3 * (QP1-QP2)
-            var cp2y = p3y + 2 / 3 * (qp1y - p3y);
-          } else {
-            var [cp1x, cp1y, cp2x, cp2y, p3x, p3y] = c.args;
-          }
+          let [cp1x, cp1y, cp2x, cp2y, p3x, p3y] = args;
 
           // http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
           bbox.addPoint(p3x, p3y);
@@ -165,7 +163,7 @@ export default class Path {
           for (var i = 0; i <= 1; i++) {
             let b = 6 * p0[i] - 12 * p1[i] + 6 * p2[i];
             let a = -3 * p0[i] + 9 * p1[i] - 9 * p2[i] + 3 * p3[i];
-            c = 3 * p1[i] - 3 * p0[i];
+            let c = 3 * p1[i] - 3 * p0[i];
 
             if (a === 0) {
               if (b === 0) {
@@ -255,6 +253,29 @@ export default class Path {
     return this.transform(scaleX, 0, 0, scaleY, 0, 0);
   }
 
+  quadraticToBezier() {
+    if (!this._quadratic) {
+      return this;
+    }
+
+    let path = new Path;
+    let x = 0, y = 0;
+    for (let c of this.commands) {
+      if (c.command === 'quadraticCurveTo') {
+        let quads = quadraticToBezier(x, y, ...c.args);
+
+        for (let i = 2; i < quads.length; i += 6) {
+          path.bezierCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3], quads[i + 4], quads[i + 5]);
+        }
+      } else {
+        path[c.command](...c.args);
+        x = c.args[c.args.length - 2] || 0;
+        y = c.args[c.args.length - 1] || 0;
+      }
+    }
+
+    return path;
+  }
 
   bezierToQuadratic() {
     if (!this._bezier) {
@@ -280,7 +301,15 @@ export default class Path {
     return path;
   }
 
+  get isFlat() {
+    return !this._bezier && !this._quadratic;
+  }
+
   flatten() {
+    if (this.isFlat) {
+      return this;
+    }
+
     let res = new Path;
     let cx = 0, cy = 0, sx = 0, sy = 0;
 
@@ -299,12 +328,7 @@ export default class Path {
           break;
 
         case 'quadraticCurveTo':
-          var [qp1x, qp1y, x, y] = args;
-          var cp1x = cx + 2 / 3 * (qp1x - cx);    // CP1 = QP0 + 2/3 * (QP1-QP0)
-          var cp1y = cy + 2 / 3 * (qp1y - cy);
-          var cp2x = x + 2 / 3 * (qp1x - x);  // CP2 = QP2 + 2/3 * (QP1-QP2)
-          var cp2y = y + 2 / 3 * (qp1y - y);
-          args = [cp1x, cp1y, cp2x, cp2y, x, y];
+          args = quadraticToBezier(cx, cy, ...args);
           // fall through!
 
         case 'bezierCurveTo':
@@ -327,11 +351,126 @@ export default class Path {
     return res;
   }
 
+  get isClockwise() {
+    // For each point, compute the cross-product magnitude of the two adjoining edges.
+    // If the sum is positive, the points are in clockwise order.
+    // http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+    let cx = 0;
+    let cy = 0;
+    let sx = 0;
+    let sy = 0;
+    let sum = 0;
+
+    let path = this.flatten();
+    for (let {command, args} of path.commands) {
+      let [x, y] = args;
+      switch (command) {
+        case 'moveTo':
+          sx = cx = x;
+          sy = cy = y;
+          break;
+
+        case 'lineTo':
+          if (cx !== x || cy !== y) {
+            sum += cx * y - cy * x;
+          }
+
+          cx = x;
+          cy = y;
+          break;
+
+        case 'closePath':
+          if (cx !== sx || cy !== sy) {
+            sum += cx * sy - cy * sx;
+          }
+          break;
+
+        default:
+          throw new Error(`Unknown path command: ${command}`);
+      }
+    }
+
+    sum += cx * sy - cy * sx;
+    return sum >= 0;
+  }
+
+  reverse() {
+    let commands = this.commands;
+    let start = commands[0];
+    let res = new Path;
+
+    for (let i = 1; i < commands.length; i++) {
+      let {command, args} = commands[i];
+      if (command !== 'moveTo' && i + 1 < commands.length) {
+        continue;
+      }
+
+      let closed = false;
+      let j = i;
+
+      if (command === 'moveTo') {
+        j--;
+      }
+
+      let move = commands[j].command === 'closePath' ? start : commands[j];
+      res.moveTo(move.args[0], move.args[1]);
+
+      for (; commands[j].command !== 'moveTo'; j--) {
+        let prev = commands[j - 1];
+        let cur = commands[j];
+        let px = prev.args[prev.args.length - 2];
+        let py = prev.args[prev.args.length - 1];
+
+        switch (cur.command) {
+          case 'lineTo':
+            if (closed && prev.command === 'moveTo') {
+              res.closePath();
+            } else {
+              res.lineTo(px, py);
+            }
+            break;
+
+          case 'bezierCurveTo':
+            res.bezierCurveTo(cur.args[2], cur.args[3], cur.args[0], cur.args[1], px, py);
+            if (closed && prev.command === 'moveTo') {
+              prev.closePath();
+            }
+            break;
+
+          case 'quadraticCurveTo':
+            res.quadraticCurveTo(cur.args[0], cur.args[1], px, py);
+            if (closed && prev.command === 'moveTo') {
+              prev.closePath();
+            }
+            break;
+
+          case 'closePath':
+            closed = true;
+            res.lineTo(px, py);
+            break;
+
+          default:
+            throw new Error(`Unknown path command: ${command}`);
+        }
+      }
+
+      start = commands[i];
+    }
+
+    return res;
+  }
+
   toPolygon() {
+    // Flatten and canonicalize the path.
+    let path = this.flatten();
+    if (!path.isClockwise) {
+      path = path.reverse();
+    }
+
     let contour = [];
     let polygon = new Polygon;
 
-    for (let {command, args} of this.commands) {
+    for (let {command, args} of path.commands) {
       switch (command) {
         case 'moveTo':
           if (contour.length) {
@@ -354,7 +493,7 @@ export default class Path {
           break;
 
         default:
-          throw new Error(`Unsupported path command: ${command}`)
+          throw new Error(`Unsupported path command: ${command}`);
       }
     }
 
@@ -372,10 +511,21 @@ for (let command of ['moveTo', 'lineTo', 'quadraticCurveTo', 'bezierCurveTo', 'c
 
     if (command === 'bezierCurveTo') {
       this._bezier = true;
+    } else if (command === 'quadraticCurveTo') {
+      this._quadratic = true;
     }
 
     return this;
   };
+}
+
+function quadraticToBezier(cx, cy, qp1x, qp1y, x, y) {
+  // http://fontforge.org/bezier.html
+  var cp1x = cx + 2 / 3 * (qp1x - cx); // CP1 = QP0 + 2/3 * (QP1-QP0)
+  var cp1y = cy + 2 / 3 * (qp1y - cy);
+  var cp2x = x + 2 / 3 * (qp1x - x);   // CP2 = QP2 + 2/3 * (QP1-QP2)
+  var cp2y = y + 2 / 3 * (qp1y - y);
+  return [cp1x, cp1y, cp2x, cp2y, x, y];
 }
 
 function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, cp2y, x, y) {
