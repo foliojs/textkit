@@ -12,6 +12,8 @@ import LineFragmentGenerator from './LineFragmentGenerator';
 import Rect from './geom/Rect';
 import Block from './models/Block';
 import JustificationEngine from './JustificationEngine';
+import ParagraphStyle from './models/ParagraphStyle';
+import GlyphString from './models/GlyphString';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
@@ -59,14 +61,15 @@ export default class LayoutEngine {
     let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.ascent - run.descent + run.lineGap), 0);
     let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
 
-    console.log(glyphRuns)
-    console.log(rect)
+    // console.log(glyphRuns)
+    // console.log(rect)
 
     let fragments = [];
     let pos = 0;
 
-    let run = glyphRuns[0];
-    console.log(run.run.glyphs.length, attributedString.string.length)
+    // let run = glyphRuns[0];
+    let glyphString = new GlyphString(attributedString.string, glyphRuns);
+    // console.log(run.run.glyphs.length, attributedString.string.length)
 
     while (rect.y < bbox.maxY && pos < attributedString.string.length) {
       let rects = gen.generateFragments(rect, path, exclusionPaths);
@@ -78,10 +81,10 @@ export default class LayoutEngine {
       }
 
       for (let r of rects) {
-        let bk = breaker.suggestLineBreak(attributedString.string.slice(pos), [run.slice(pos, run.run.glyphs.length)], r.width);
+        let bk = breaker.suggestLineBreak(attributedString.string.slice(pos), glyphString.slice(pos, glyphString.length), r.width);
         if (bk) {
           bk.position += pos;
-          console.log(bk, attributedString.string.slice(pos, bk.position));
+          // console.log(bk, attributedString.string.slice(pos, bk.position));
 
           let end = bk.position;
           while (attributedString.string[end - 1] === ' ') {
@@ -89,11 +92,11 @@ export default class LayoutEngine {
           }
 
           // break;
-          let frag = new LineFragment(r, [run.slice(pos, end)]);
+          let frag = new LineFragment(r, glyphString.slice(pos, end));
           just.justify(frag);
           fragments.push(frag);
           pos = bk.position;
-          console.log(pos, attributedString.string.length)
+          // console.log(pos, attributedString.string.length)
         }
 
         if (pos >= attributedString.string.length) {
@@ -102,15 +105,7 @@ export default class LayoutEngine {
       }
     }
 
-    console.log(fragments)
-    // return fragments[0]
-    return new Block(fragments);
-
-    // let lines = [];
-    // let lineHeight =
-
-    // let lines = this.lineBreaker.break(attributedString.string, glyphRuns);
-    // return new Block(lines, new ParagraphStyle(attributedString.runs[0].attributes));
+    return new Block(fragments, new ParagraphStyle(attributedString.runs[0].attributes));
   }
 
   resolveRuns(attributedString) {
