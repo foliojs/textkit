@@ -1,7 +1,7 @@
 export default class LineFragment {
-  constructor(rect, runs) {
+  constructor(rect, glyphString) {
     this.rect = rect;
-    this.runs = runs;
+    this.runs = glyphString.glyphRuns;
   }
 
   // @cache

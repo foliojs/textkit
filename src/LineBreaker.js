@@ -1,14 +1,13 @@
 import LineBreak from 'linebreak';
 
 export default class LineBreaker {
-  suggestLineBreak(string, glyphRuns, width) {
-    let breaker = new LineBreak(string);
+  suggestLineBreak(glyphString, width) {
     let bk = null;
     let last = null;
     let spaceLeft = width;
     let buffer = [];
 
-    let glyphIndex = glyphIndexAtOffset(glyphRuns, width);
+    let glyphIndex = glyphString.glyphIndexAtOffset(width);
     if (glyphIndex === -1) return;
 
     // let stringIndex = getStringIndexForGlyphIndex(glyphIndex);
@@ -18,35 +17,12 @@ export default class LineBreaker {
     //   return hardBreak;
     // }
 
-    if (glyphIndex === string.length) {
-      return {position: string.length, required: true};
+    if (glyphIndex === glyphString.length) {
+      return {position: glyphString.length, required: true};
     }
 
-    return findBreakPreceeding(string, glyphIndex);
+    return findBreakPreceeding(glyphString.string, glyphIndex);
   }
-}
-
-function glyphIndexAtOffset(glyphRuns, width) {
-  let offset = 0;
-  let index = 0;
-  for (let run of glyphRuns) {
-    if (offset + run.advanceWidth > width) {
-      for (let position of run.run.positions) {
-        let w = position.xAdvance * run.scale;
-        if (offset + w > width) {
-          return index;
-        } else {
-          offset += w;
-          index++;
-        }
-      }
-    } else {
-      offset += run.advanceWidth;
-      index += run.run.glyphs.length;
-    }
-  }
-
-  return index;
 }
 
 function findBreakPreceeding(string, index) {

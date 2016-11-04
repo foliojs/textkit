@@ -81,7 +81,7 @@ export default class LayoutEngine {
       }
 
       for (let r of rects) {
-        let bk = breaker.suggestLineBreak(attributedString.string.slice(pos), glyphString.slice(pos, glyphString.length), r.width);
+        let bk = breaker.suggestLineBreak(glyphString.slice(pos, glyphString.length), r.width);
         if (bk) {
           bk.position += pos;
           // console.log(bk, attributedString.string.slice(pos, bk.position));

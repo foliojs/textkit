@@ -42,6 +42,29 @@ export default class GlyphString {
       }
     }
 
-    return runs;
+    return new GlyphString(this.string.slice(start, end), runs);
+  }
+
+  glyphIndexAtOffset(width) {
+    let offset = 0;
+    let index = 0;
+    for (let run of this.glyphRuns) {
+      if (offset + run.advanceWidth > width) {
+        for (let position of run.run.positions) {
+          let w = position.xAdvance * run.scale;
+          if (offset + w > width) {
+            return index;
+          } else {
+            offset += w;
+            index++;
+          }
+        }
+      } else {
+        offset += run.advanceWidth;
+        index += run.run.glyphs.length;
+      }
+    }
+
+    return index;
   }
 }
