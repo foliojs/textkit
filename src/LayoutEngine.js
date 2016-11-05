@@ -58,51 +58,60 @@ export default class LayoutEngine {
     let just = new JustificationEngine;
 
     let bbox = path.bbox;
-    let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.ascent - run.descent + run.lineGap), 0);
+    let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
     let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
-
-    // console.log(glyphRuns)
-    // console.log(rect)
 
     let fragments = [];
     let pos = 0;
 
-    // let run = glyphRuns[0];
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
-    // console.log(run.run.glyphs.length, attributedString.string.length)
 
     while (rect.y < bbox.maxY && pos < attributedString.string.length) {
       let rects = gen.generateFragments(rect, path, exclusionPaths);
-      rect.y += lineHeight;
-      // console.log(rects)
 
       if (rects.length === 0) {
+        rect.y += lineHeight;
         continue;
       }
 
+      let lh = 0;
+      let lineFragments = [];
       for (let r of rects) {
         let bk = breaker.suggestLineBreak(glyphString.slice(pos, glyphString.length), r.width);
         if (bk) {
           bk.position += pos;
-          // console.log(bk, attributedString.string.slice(pos, bk.position));
 
           let end = bk.position;
           while (attributedString.string[end - 1] === ' ') {
             end--;
           }
 
-          // break;
           let frag = new LineFragment(r, glyphString.slice(pos, end));
           just.justify(frag);
-          fragments.push(frag);
+          lineFragments.push(frag);
           pos = bk.position;
-          // console.log(pos, attributedString.string.length)
+
+          lh = Math.max(lh, frag.height);
         }
 
         if (pos >= attributedString.string.length) {
           break;
         }
       }
+
+      // Update the fragments on this line with the computed line height
+      if (lh !== 0) {
+        lineHeight = lh;
+      }
+
+      for (let fragment of lineFragments) {
+        fragment.rect.height = lineHeight;
+      }
+
+      fragments.push(...lineFragments);
+
+      rect.y += lineHeight;
+      rect.height = lineHeight;
     }
 
     return new Block(fragments, new ParagraphStyle(attributedString.runs[0].attributes));
