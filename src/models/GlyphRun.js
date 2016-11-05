@@ -39,6 +39,10 @@ export default class GlyphRun extends Run {
     return this.attributes.font.lineGap * this.scale;
   }
 
+  get height() {
+    return this.ascent - this.descent + this.lineGap;
+  }
+
   slice(start, end) {
     let glyphs = this.run.glyphs.slice(start, end);
     let positions = this.run.positions.slice(start, end);

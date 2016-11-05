@@ -62,6 +62,11 @@ export default class BBox {
     }
   }
 
+  addRect(rect) {
+    this.addPoint(rect.x, rect.y);
+    this.addPoint(rect.maxX, rect.maxY);
+  }
+
   copy() {
     return new BBox(this.minX, this.minY, this.maxX, this.maxY);
   }
