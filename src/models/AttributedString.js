@@ -14,7 +14,7 @@ export default class AttributedString {
     for (let fragment of fragments) {
       string += fragment.string;
       runs.push(new Run(offset, offset + fragment.string.length, fragment.attributes));
-      offset += string.length;
+      offset += fragment.string.length;
     }
 
     return new AttributedString(string, runs);
