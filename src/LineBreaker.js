@@ -2,26 +2,21 @@ import LineBreak from 'linebreak';
 
 export default class LineBreaker {
   suggestLineBreak(glyphString, width) {
-    let bk = null;
-    let last = null;
-    let spaceLeft = width;
-    let buffer = [];
-
     let glyphIndex = glyphString.glyphIndexAtOffset(width);
     if (glyphIndex === -1) return;
-
-    // let stringIndex = getStringIndexForGlyphIndex(glyphIndex);
-
-    // let hardBreak = findHardBreak(string, stringIndex);
-    // if (hardBreak !== -1) {
-    //   return hardBreak;
-    // }
 
     if (glyphIndex === glyphString.length) {
       return {position: glyphString.length, required: true};
     }
 
-    return findBreakPreceeding(glyphString.string, glyphIndex);
+    let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
+    let bk = findBreakPreceeding(glyphString.string, stringIndex);
+
+    if (bk) {
+      bk.position = glyphString.glyphIndexForStringIndex(bk.position);
+    }
+
+    return bk;
   }
 }
 

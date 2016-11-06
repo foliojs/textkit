@@ -47,10 +47,13 @@ export default class LayoutEngine {
 
   layoutParagraph(attributedString, path, exclusionPaths) {
     let runs = this.resolveRuns(attributedString);
+    let glyphIndex = 0;
     let glyphRuns = runs.map(run => {
       let str = attributedString.string.slice(run.start, run.end);
       let g = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
-      return new GlyphRun(run.start, run.end, run.attributes, g);
+      let r = new GlyphRun(glyphIndex, glyphIndex + g.glyphs.length, run.attributes, g);
+      glyphIndex += g.glyphs.length;
+      return r;
     });
 
     let breaker = new LineBreaker;
@@ -66,7 +69,7 @@ export default class LayoutEngine {
 
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
-    while (rect.y < bbox.maxY && pos < attributedString.string.length) {
+    while (rect.y < bbox.maxY && pos < glyphString.length) {
       let rects = gen.generateFragments(rect, path, exclusionPaths);
 
       if (rects.length === 0) {
@@ -82,7 +85,7 @@ export default class LayoutEngine {
           bk.position += pos;
 
           let end = bk.position;
-          while (attributedString.string[end - 1] === ' ') {
+          while (glyphString.isWhiteSpace(end - 1)) {
             end--;
           }
 
@@ -94,7 +97,7 @@ export default class LayoutEngine {
           lh = Math.max(lh, frag.height);
         }
 
-        if (pos >= attributedString.string.length) {
+        if (pos >= glyphString.length) {
           break;
         }
       }
@@ -128,11 +131,9 @@ export default class LayoutEngine {
     ).reduce((p, r) => p.concat(r), []);
 
     let resolvedRuns = flattenRuns([...attributedString.runs, ...runs]);
-    console.log(attributedString.runs, runs)
     for (let run of resolvedRuns) {
       run.attributes = new RunStyle(run.attributes);
     }
-    console.log('ABC', resolvedRuns[0])
 
     return resolvedRuns;
   }
