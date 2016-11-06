@@ -62,20 +62,24 @@ export default class JustificationEngine {
       factors.push(...this.factor(run.run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
     }
 
+    factors[0].before = 0;
+    factors[factors.length - 1].after = 0;
+
     let distances = this.assign(gap, factors);
 
     // let changed = this.postprocess(glyphs, advances, distances);
 
+    let index = 0;
     for (let run of line.runs) {
       let scale = 1 / run.scale;
-      for (let index = 0; index < run.run.glyphs.length; index++) {
-        run.run.positions[index].xAdvance += distances[index] * scale;
+      for (let position of run.run.positions) {
+        position.xAdvance += distances[index++] * scale;
       }
     }
   }
 
-  factor(glyphs, gap) {
-    if (gap > 0) {
+  factor(glyphs, direction) {
+    if (direction === 'GROW') {
       var charFactor = _.clone(EXPAND_CHAR_FACTOR);
       var whitespaceFactor = _.clone(EXPAND_WHITESPACE_FACTOR);
     } else {
@@ -108,9 +112,6 @@ export default class JustificationEngine {
 
       factors.push(factor);
     }
-
-    factors[0].before = 0;
-    factors[factors.length - 1].after = 0;
 
     return factors;
   }
