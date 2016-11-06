@@ -43,8 +43,8 @@ export default class FontSubstitutionEngine {
         }
 
         if (font !== lastFont) {
-          if (lastIndex !== 0) {
-            res.push(new Run(lastIndex, index - 1, {font: lastFont, fontDescriptor: lastDescriptor}));
+          if (lastFont) {
+            res.push(new Run(lastIndex, index, {font: lastFont, fontDescriptor: lastDescriptor}));
           }
 
           lastFont = font;
