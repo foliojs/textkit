@@ -4,12 +4,13 @@ export default function flattenRuns(runs) {
   let res = [];
 
   let points = [];
-  for (let run of runs) {
-    points.push(['start', run.start, run.attributes]);
-    points.push(['end', run.end, run.attributes]);
+  for (let i = 0; i < runs.length; i++) {
+    let run = runs[i];
+    points.push(['start', run.start, run.attributes, i]);
+    points.push(['end', run.end, run.attributes, i]);
   }
 
-  points.sort((a, b) => a[1] - b[1]);
+  points.sort((a, b) => (a[1] - b[1]) || (a[3] - b[3]));
 
   let start = -1;
   let stack = [];
