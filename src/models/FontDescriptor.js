@@ -15,7 +15,7 @@ export default class FontDescriptor {
       return new FontDescriptor(attributes.fontDescriptor);
     }
 
-    let font = parseFont(attributes.font);
+    let font = parseFont(attributes.font || 'Helvetica');
     return new FontDescriptor({
       path: font.path,
       postscriptName: attributes.fontPostscriptName || font.postscriptName,
