@@ -12,8 +12,11 @@ export default class FontSubstitutionEngine {
       return this.fontCache.get(fontDescriptor.postscriptName);
     }
 
-    // TODO: don't always send postscriptName - only if font container...
-    let font = fontkit.openSync(fontDescriptor.path, fontDescriptor.postscriptName);
+    let font = fontkit.openSync(fontDescriptor.path);
+    if (font.postscriptName !== fontDescriptor.postscriptName) {
+      font = font.getFont(fontDescriptor.postscriptName);
+    }
+
     this.fontCache.set(font.postscriptName, font);
     return font;
   }
