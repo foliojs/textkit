@@ -57,10 +57,10 @@ export default class FontSubstitutionEngine {
 
         index += char.length;
       }
+    }
 
-      if (lastIndex < string.length) {
-        res.push(new Run(lastIndex, string.length, {font: lastFont, fontDescriptor: lastDescriptor}));
-      }
+    if (lastIndex < string.length) {
+      res.push(new Run(lastIndex, string.length, {font: lastFont, fontDescriptor: lastDescriptor}));
     }
 
     return res;
