@@ -82,6 +82,13 @@ export default class GlyphString {
     return run.run.glyphs[index - run.start];
   }
 
+  getGlyphWidth(index) {
+    index += this.start;
+    let runIndex = this.runIndexAtGlyphIndex(index);
+    let run = this.glyphRuns[runIndex];
+    return run.run.glyphs[index - run.start].advanceWidth * run.scale;
+  }
+
   glyphIndexAtOffset(width) {
     let offset = 0;
     let index = 0;

@@ -14,6 +14,7 @@ import Block from './models/Block';
 import JustificationEngine from './JustificationEngine';
 import ParagraphStyle from './models/ParagraphStyle';
 import GlyphString from './models/GlyphString';
+import Typesetter from './Typesetter';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
@@ -37,6 +38,8 @@ export default class LayoutEngine {
       new FontSubstitutionEngine,
       new ScriptItemizer
     ];
+
+    this.typesetter = new Typesetter;
   }
 
   layout(attributedString, path, exclusionPaths = []) {
@@ -56,10 +59,6 @@ export default class LayoutEngine {
       return r;
     });
 
-    let breaker = new LineBreaker;
-    let gen = new LineFragmentGenerator;
-    let just = new JustificationEngine;
-
     let bbox = path.bbox;
     let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
     let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
@@ -70,51 +69,12 @@ export default class LayoutEngine {
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
     while (rect.y < bbox.maxY && pos < glyphString.length) {
-      let rects = gen.generateFragments(rect, path, exclusionPaths);
-
-      if (rects.length === 0) {
-        rect.y += lineHeight;
-        continue;
-      }
-
-      let lh = 0;
-      let lineFragments = [];
-      for (let r of rects) {
-        let bk = breaker.suggestLineBreak(glyphString.slice(pos, glyphString.length), r.width);
-        if (bk) {
-          bk.position += pos;
-
-          let end = bk.position;
-          while (glyphString.isWhiteSpace(end - 1)) {
-            end--;
-          }
-
-          let frag = new LineFragment(r, glyphString.slice(pos, end));
-          just.justify(frag);
-          lineFragments.push(frag);
-          pos = bk.position;
-
-          lh = Math.max(lh, frag.height);
-        }
-
-        if (pos >= glyphString.length) {
-          break;
-        }
-      }
-
-      // Update the fragments on this line with the computed line height
-      if (lh !== 0) {
-        lineHeight = lh;
-      }
-
-      for (let fragment of lineFragments) {
-        fragment.rect.height = lineHeight;
-      }
+      let lineFragments = this.typesetter.layoutLineFragments(rect, glyphString.slice(pos, glyphString.length), path, exclusionPaths);
 
       fragments.push(...lineFragments);
+      rect.y += rect.height;
 
-      rect.y += lineHeight;
-      rect.height = lineHeight;
+      pos = lineFragments[lineFragments.length - 1].end;
     }
 
     return new Block(fragments, new ParagraphStyle(attributedString.runs[0].attributes));
