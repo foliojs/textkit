@@ -4,13 +4,22 @@ export default class GlyphString {
   constructor(string, glyphRuns) {
     this.string = string;
     this.glyphRuns = glyphRuns;
-    this.start = 0;
+  }
+
+  get start() {
+    return this.glyphRuns.length > 0
+      ? this.glyphRuns[0].start
+      : 0;
+  }
+
+  get end() {
+    return this.glyphRuns.length > 0
+      ? this.glyphRuns[this.glyphRuns.length - 1].end
+      : 0;
   }
 
   get length() {
-    return this.glyphRuns.length > 0
-      ? this.glyphRuns[this.glyphRuns.length - 1].end - this.glyphRuns[0].start
-      : 0;
+    return this.end - this.start;
   }
 
   get advanceWidth() {
@@ -20,6 +29,15 @@ export default class GlyphString {
     }
 
     return width;
+  }
+
+  get height() {
+    let height = 0;
+    for (let run of this.glyphRuns) {
+      height = Math.max(height, run.height);
+    }
+
+    return height;
   }
 
   runIndexAtGlyphIndex(index) {
@@ -54,10 +72,7 @@ export default class GlyphString {
       }
     }
 
-    let res = new GlyphString(this.string.slice(this.stringIndexForGlyphIndex(start - this.start), this.stringIndexForGlyphIndex(end - this.start)), runs);
-
-    res.start = start;
-    return res;
+    return new GlyphString(this.string.slice(this.stringIndexForGlyphIndex(start - this.start), this.stringIndexForGlyphIndex(end - this.start)), runs);
   }
 
   glyphAtIndex(index) {

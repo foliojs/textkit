@@ -57,7 +57,7 @@ export default class JustificationEngine {
     }
 
     let factors = [];
-    for (let run of line.runs) {
+    for (let run of line.glyphRuns) {
       // let engine = run.font._justEngine;
       factors.push(...this.factor(run.run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
     }
@@ -70,7 +70,7 @@ export default class JustificationEngine {
     // let changed = this.postprocess(glyphs, advances, distances);
 
     let index = 0;
-    for (let run of line.runs) {
+    for (let run of line.glyphRuns) {
       let scale = 1 / run.scale;
       for (let position of run.run.positions) {
         position.xAdvance += distances[index++] * scale;
