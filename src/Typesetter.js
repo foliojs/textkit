@@ -60,5 +60,15 @@ export default class Typesetter {
     while (lineFragment.isWhiteSpace(end - 1)) {
       lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
     }
+
+    while (lineFragment.isHangingPunctuationStart(start)) {
+      let w = lineFragment.getGlyphWidth(start++);
+      lineFragment.rect.x -= w;
+      lineFragment.rect.width += w;
+    }
+
+    while (lineFragment.isHangingPunctuationEnd(end - 1)) {
+      lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
+    }
   }
 }

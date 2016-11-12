@@ -7,5 +7,6 @@ export default class ParagraphStyle {
     this.align = attributes.align || 'left';
     this.justificationFactor = attributes.justificationFactor || 1;
     this.lineSpacing = attributes.lineSpacing || 0;
+    this.hangingPunctuation = attributes.hangingPunctuation || false;
   }
 }

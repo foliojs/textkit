@@ -1,5 +1,24 @@
 import unicode from 'unicode-properties';
 
+// https://www.w3.org/TR/css-text-3/#hanging-punctuation
+const HANGING_PUNCTUATION_START_CATEGORIES = new Set(['Ps', 'Pi', 'Pf']);
+const HANGING_PUNCTUATION_END_CATEGORIES = new Set(['Pe', 'Pi', 'Pf']);
+const HANGING_PUNCTUATION_END_CODEPOINTS = new Set([
+  0x002C, // COMMA
+  0x002E, // FULL STOP
+  0x060C, // ARABIC COMMA
+  0x06D4, // ARABIC FULL STOP
+  0x3001, // IDEOGRAPHIC COMMA
+  0x3002, // IDEOGRAPHIC FULL STOP
+  0xFF0C, // FULLWIDTH COMMA
+  0xFF0E, // FULLWIDTH FULL STOP
+  0xFE50, // SMALL COMMA
+  0xFE51, // SMALL IDEOGRAPHIC COMMA
+  0xFE52, // SMALL FULL STOP
+  0xFF61, // HALFWIDTH IDEOGRAPHIC FULL STOP
+  0xFF64, // HALFWIDTH IDEOGRAPHIC COMMA
+]);
+
 export default class GlyphString {
   constructor(string, glyphRuns) {
     this.string = string;
@@ -152,8 +171,22 @@ export default class GlyphString {
     return glyphIndex;
   }
 
+  getUnicodeCategory(index) {
+    let glyph = this.glyphAtIndex(index);
+    return glyph ? unicode.getCategory(glyph.codePoints[0]) : null;
+  }
+
   isWhiteSpace(index) {
     let glyph = this.glyphAtIndex(index);
     return glyph && unicode.isWhiteSpace(glyph.codePoints[0]);
+  }
+
+  isHangingPunctuationStart(index) {
+    return HANGING_PUNCTUATION_START_CATEGORIES.has(this.getUnicodeCategory(index));
+  }
+
+  isHangingPunctuationEnd(index) {
+    return HANGING_PUNCTUATION_END_CATEGORIES.has(this.getUnicodeCategory(index))
+      || HANGING_PUNCTUATION_END_CODEPOINTS.has(this.glyphAtIndex(index).codePoints[0]);
   }
 }
