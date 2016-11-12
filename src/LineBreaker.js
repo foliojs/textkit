@@ -10,7 +10,7 @@ export default class LineBreaker {
     }
 
     let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
-    let bk = findBreakPreceeding(glyphString.string, stringIndex);
+    let bk = this.findBreakPreceeding(glyphString.string, stringIndex);
 
     if (bk) {
       bk.position = glyphString.glyphIndexForStringIndex(bk.position);
@@ -18,24 +18,24 @@ export default class LineBreaker {
 
     return bk;
   }
-}
 
-function findBreakPreceeding(string, index) {
-  let breaker = new LineBreak(string);
-  let last = null;
-  let bk = null;
+  findBreakPreceeding(string, index) {
+    let breaker = new LineBreak(string);
+    let last = null;
+    let bk = null;
 
-  while (bk = breaker.nextBreak()) {
-    if (bk.position > index) {
-      return last;
+    while (bk = breaker.nextBreak()) {
+      if (bk.position > index) {
+        return last;
+      }
+
+      if (bk.required) {
+        return bk;
+      }
+
+      last = bk;
     }
 
-    if (bk.required) {
-      return bk;
-    }
-
-    last = bk;
+    return null;
   }
-
-  return null;
 }
