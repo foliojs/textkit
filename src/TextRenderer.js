@@ -43,9 +43,17 @@ export default class TextRenderer {
       this.ctx.rect(0, 0, run.advanceWidth, run.height).stroke();
     }
 
+    let x = 0, y = 0;
+
     for (let i = 0; i < run.run.glyphs.length; i++) {
+      let position = run.run.positions[i];
+
+      this.ctx.save();
+      this.ctx.translate(position.xOffset * run.scale, position.yOffset * run.scale);
       run.run.glyphs[i].render(this.ctx, run.attributes.fontSize);
-      this.ctx.translate(run.run.positions[i].xAdvance * run.scale, 0)
+      this.ctx.restore();
+
+      this.ctx.translate(position.xAdvance * run.scale, position.yAdvance * run.scale);
     }
   }
 }
