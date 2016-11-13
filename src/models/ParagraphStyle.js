@@ -9,6 +9,7 @@ export default class ParagraphStyle {
     this.align = attributes.align || 'left';
     this.alignLastLine = attributes.alignLastLine || 'left';
     this.justificationFactor = attributes.justificationFactor || 1;
+    this.hyphenationFactor = attributes.hyphenationFactor || 0;
     this.lineSpacing = attributes.lineSpacing || 0;
     this.hangingPunctuation = attributes.hangingPunctuation || false;
   }

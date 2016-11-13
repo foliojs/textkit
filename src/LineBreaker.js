@@ -1,7 +1,12 @@
 import LineBreak from 'linebreak';
+import Hyphenator from 'hypher';
+import en_US from 'hyphenation.en-us';
+
+const hyphenator = new Hyphenator(en_US);
+const HYPHEN = 0x002D;
 
 export default class LineBreaker {
-  suggestLineBreak(glyphString, width) {
+  suggestLineBreak(glyphString, width, hyphenationFactor = 0) {
     let glyphIndex = glyphString.glyphIndexAtOffset(width);
     if (glyphIndex === -1) return;
 
@@ -13,7 +18,20 @@ export default class LineBreaker {
     let bk = this.findBreakPreceeding(glyphString.string, stringIndex);
 
     if (bk) {
-      bk.position = glyphString.glyphIndexForStringIndex(bk.position);
+      let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
+
+      if (bk.next != null && this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)) {
+        let point = this.findHyphenationPoint(glyphString.string.slice(bk.position, bk.next), stringIndex - bk.position);
+        bk.position += point;
+        bk.hyphenated = point > 0;
+      }
+
+      if (bk.hyphenated) {
+        bk.position = glyphString.glyphIndexForStringIndex(bk.position);
+        glyphString.insertGlyph(bk.position++, HYPHEN);
+      } else {
+        bk.position = breakIndex;
+      }
     }
 
     return bk;
@@ -26,6 +44,10 @@ export default class LineBreaker {
 
     while (bk = breaker.nextBreak()) {
       if (bk.position > index) {
+        if (last) {
+          last.next = bk.position;
+        }
+
         return last;
       }
 
@@ -37,5 +59,24 @@ export default class LineBreaker {
     }
 
     return null;
+  }
+
+  shouldHyphenate(glyphString, glyphIndex, width, hyphenationFactor) {
+    let lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
+    return (lineWidth / width) < hyphenationFactor;
+  }
+
+  findHyphenationPoint(string, index) {
+    let parts = hyphenator.hyphenate(string);
+    let count = 0;
+    for (let part of parts) {
+      if (count + part.length > index) {
+        break;
+      }
+
+      count += part.length;
+    }
+
+    return count;
   }
 }
