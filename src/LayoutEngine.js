@@ -86,7 +86,7 @@ export default class LayoutEngine {
       );
 
       fragments.push(...lineFragments);
-      rect.y += rect.height;
+      rect.y += rect.height + paragraphStyle.lineSpacing;
 
       if (lineFragments.length > 0) {
         pos = lineFragments[lineFragments.length - 1].end;
