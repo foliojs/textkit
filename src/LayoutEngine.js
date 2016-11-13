@@ -63,10 +63,16 @@ export default class LayoutEngine {
 
     let bbox = path.bbox;
     let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
-    let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
+    let rect = new Rect(
+      path.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
+      path.bbox.minY,
+      path.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      lineHeight
+    );
 
     let fragments = [];
     let pos = 0;
+    let firstLine = true;
 
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
@@ -84,6 +90,12 @@ export default class LayoutEngine {
 
       if (lineFragments.length > 0) {
         pos = lineFragments[lineFragments.length - 1].end;
+
+        if (firstLine) {
+          rect.x -= paragraphStyle.indent;
+          rect.width += paragraphStyle.indent;
+          firstLine = false;
+        }
       }
     }
 
