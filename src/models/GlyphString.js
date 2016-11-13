@@ -185,6 +185,22 @@ export default class GlyphString {
     return glyphIndex;
   }
 
+  offsetAtGlyphIndex(glyphIndex) {
+    let offset = 0;
+    for (let run of this.glyphRuns) {
+      for (let glyph of run.run.glyphs) {
+        if (glyphIndex === 0) {
+          return offset;
+        }
+
+        offset += glyph.advanceWidth * run.scale;
+        glyphIndex--;
+      }
+    }
+
+    return offset;
+  }
+
   getUnicodeCategory(index) {
     let glyph = this.glyphAtIndex(index);
     return glyph ? unicode.getCategory(glyph.codePoints[0]) : null;
