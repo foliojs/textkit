@@ -3,6 +3,13 @@ import LineFragment from './models/LineFragment';
 import LineFragmentGenerator from './LineFragmentGenerator';
 import JustificationEngine from './JustificationEngine';
 
+const ALIGNMENT_FACTORS = {
+  left: 0,
+  center: 0.5,
+  right: 1,
+  justify: 0
+};
+
 export default class Typesetter {
   constructor() {
     this.lineBreaker = new LineBreaker;
@@ -54,6 +61,7 @@ export default class Typesetter {
     let start = 0;
     let end = lineFragment.length;
 
+    // Ignore whitespace at the start and end of a line for alignment
     while (lineFragment.isWhiteSpace(start)) {
       let w = lineFragment.getGlyphWidth(start++);
       lineFragment.rect.x -= w;
@@ -64,6 +72,7 @@ export default class Typesetter {
       lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
     }
 
+    // Adjust line rect for hanging punctuation
     if (paragraphStyle.hangingPunctuation) {
       if (paragraphStyle.align === 'left' || paragraphStyle.align === 'justify') {
         while (lineFragment.isHangingPunctuationStart(start)) {
@@ -79,5 +88,9 @@ export default class Typesetter {
         }
       }
     }
+
+    // Adjust line offset for alignment
+    let remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
+    lineFragment.rect.x += remainingWidth * ALIGNMENT_FACTORS[paragraphStyle.align];
   }
 }
