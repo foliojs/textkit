@@ -59,6 +59,8 @@ export default class LayoutEngine {
       return r;
     });
 
+    let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
+
     let bbox = path.bbox;
     let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
     let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
@@ -69,15 +71,23 @@ export default class LayoutEngine {
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
     while (rect.y < bbox.maxY && pos < glyphString.length) {
-      let lineFragments = this.typesetter.layoutLineFragments(rect, glyphString.slice(pos, glyphString.length), path, exclusionPaths);
+      let lineFragments = this.typesetter.layoutLineFragments(
+        rect,
+        glyphString.slice(pos, glyphString.length),
+        path,
+        exclusionPaths,
+        paragraphStyle
+      );
 
       fragments.push(...lineFragments);
       rect.y += rect.height;
 
-      pos = lineFragments[lineFragments.length - 1].end;
+      if (lineFragments.length > 0) {
+        pos = lineFragments[lineFragments.length - 1].end;
+      }
     }
 
-    return new Block(fragments, new ParagraphStyle(attributedString.runs[0].attributes));
+    return new Block(fragments, paragraphStyle);
   }
 
   resolveRuns(attributedString) {

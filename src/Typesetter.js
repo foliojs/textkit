@@ -11,7 +11,7 @@ export default class Typesetter {
 
   }
 
-  layoutLineFragments(lineRect, glyphString, path, exclusionPaths) {
+  layoutLineFragments(lineRect, glyphString, path, exclusionPaths, paragraphStyle) {
     let fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, path, exclusionPaths);
     if (fragmentRects.length === 0) {
       return [];
@@ -23,9 +23,12 @@ export default class Typesetter {
       let bk = this.lineBreaker.suggestLineBreak(glyphString, fragmentRect.width);
       if (bk) {
         let lineFragment = new LineFragment(fragmentRect, glyphString.slice(0, bk.position));
-        this.adjustLineFragmentRectangle(lineFragment);
+        this.adjustLineFragmentRectangle(lineFragment, paragraphStyle);
 
-        this.justificationEngine.justify(lineFragment);
+        if (paragraphStyle.align === 'justify') {
+          this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
+        }
+
         lineFragments.push(lineFragment);
         lineHeight = Math.max(lineHeight, lineFragment.height);
 
@@ -47,7 +50,7 @@ export default class Typesetter {
     return lineFragments;
   }
 
-  adjustLineFragmentRectangle(lineFragment) {
+  adjustLineFragmentRectangle(lineFragment, paragraphStyle) {
     let start = 0;
     let end = lineFragment.length;
 
@@ -61,14 +64,20 @@ export default class Typesetter {
       lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
     }
 
-    while (lineFragment.isHangingPunctuationStart(start)) {
-      let w = lineFragment.getGlyphWidth(start++);
-      lineFragment.rect.x -= w;
-      lineFragment.rect.width += w;
-    }
+    if (paragraphStyle.hangingPunctuation) {
+      if (paragraphStyle.align === 'left' || paragraphStyle.align === 'justify') {
+        while (lineFragment.isHangingPunctuationStart(start)) {
+          let w = lineFragment.getGlyphWidth(start++);
+          lineFragment.rect.x -= w;
+          lineFragment.rect.width += w;
+        }
+      }
 
-    while (lineFragment.isHangingPunctuationEnd(end - 1)) {
-      lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
+      if (paragraphStyle.align === 'right' || paragraphStyle.align === 'justify') {
+        while (lineFragment.isHangingPunctuationEnd(end - 1)) {
+          lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
+        }
+      }
     }
   }
 }
