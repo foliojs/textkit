@@ -153,7 +153,9 @@ export default class GlyphString {
     let stringIndex = 0;
     for (let run of this.glyphRuns) {
       for (let glyph of run.run.glyphs) {
-        stringIndex += String.fromCodePoint(...glyph.codePoints).length;
+        if (!glyph.inserted) {
+          stringIndex += String.fromCodePoint(...glyph.codePoints).length;
+        }
         glyphIndex--;
 
         if (glyphIndex === 0) {
@@ -226,7 +228,7 @@ export default class GlyphString {
     let run = this._glyphRuns[runIndex];
 
     let glyph = run.attributes.font.glyphForCodePoint(codePoint);
-    glyph.codePoints = []; // TODO: fix
+    glyph.inserted = true; // TODO: don't do this
     run.run.glyphs.splice(index - run.start, 0, glyph);
     run.run.positions.splice(index - run.start, 0, {
       xAdvance: glyph.advanceWidth,
