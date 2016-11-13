@@ -86,7 +86,7 @@ export default class Typesetter {
     // Adjust line rect for hanging punctuation
     if (paragraphStyle.hangingPunctuation) {
       if (align === 'left' || align === 'justify') {
-        while (lineFragment.isHangingPunctuationStart(start)) {
+        if (lineFragment.isHangingPunctuationStart(start)) {
           let w = lineFragment.getGlyphWidth(start++);
           lineFragment.rect.x -= w;
           lineFragment.rect.width += w;
@@ -94,7 +94,7 @@ export default class Typesetter {
       }
 
       if (align === 'right' || align === 'justify') {
-        while (lineFragment.isHangingPunctuationEnd(end - 1)) {
+        if (lineFragment.isHangingPunctuationEnd(end - 1)) {
           lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
         }
       }
