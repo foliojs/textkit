@@ -35,8 +35,8 @@ export default class GlyphString {
       return this._glyphRunsCache;
     }
 
-    let startRunIndex = this.runIndexAtGlyphIndex(this.start);
-    let endRunIndex = this.runIndexAtGlyphIndex(this.end);
+    let startRunIndex = this.runIndexAtGlyphIndex(0);
+    let endRunIndex = this.runIndexAtGlyphIndex(this.length);
 
     let startRun = this._glyphRuns[startRunIndex];
     let endRun = this._glyphRuns[endRunIndex];
@@ -91,6 +91,7 @@ export default class GlyphString {
   }
 
   runIndexAtGlyphIndex(index) {
+    index += this.start;
     for (let i = 0; i < this._glyphRuns.length; i++) {
       if (this._glyphRuns[i].start <= index && index < this._glyphRuns[i].end) {
         return i;
@@ -98,6 +99,10 @@ export default class GlyphString {
     }
 
     return this._glyphRuns.length - 1;
+  }
+
+  runAtGlyphIndex(index) {
+    return this._glyphRuns[this.runIndexAtGlyphIndex(index)];
   }
 
   slice(start, end) {
@@ -110,17 +115,13 @@ export default class GlyphString {
   }
 
   glyphAtIndex(index) {
-    index += this.start;
-    let runIndex = this.runIndexAtGlyphIndex(index);
-    let run = this._glyphRuns[runIndex];
-    return run.run.glyphs[index - run.start];
+    let run = this.runAtGlyphIndex(index);
+    return run.run.glyphs[this.start + index - run.start];
   }
 
   getGlyphWidth(index) {
-    index += this.start;
-    let runIndex = this.runIndexAtGlyphIndex(index);
-    let run = this._glyphRuns[runIndex];
-    return run.run.positions[index - run.start].xAdvance * run.scale;
+    let run = this.runAtGlyphIndex(index);
+    return run.run.positions[this.start + index - run.start].xAdvance * run.scale;
   }
 
   glyphIndexAtOffset(width) {
@@ -224,14 +225,13 @@ export default class GlyphString {
   }
 
   insertGlyph(index, codePoint) {
-    index += this.start;
     let runIndex = this.runIndexAtGlyphIndex(index);
     let run = this._glyphRuns[runIndex];
 
     let glyph = run.attributes.font.glyphForCodePoint(codePoint);
     glyph.inserted = true; // TODO: don't do this
-    run.run.glyphs.splice(index - run.start, 0, glyph);
-    run.run.positions.splice(index - run.start, 0, {
+    run.run.glyphs.splice(this.start + index - run.start, 0, glyph);
+    run.run.positions.splice(this.start + index - run.start, 0, {
       xAdvance: glyph.advanceWidth,
       yAdvance: 0,
       xOffset: 0,
