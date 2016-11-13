@@ -15,7 +15,6 @@ export default class Typesetter {
     this.lineBreaker = new LineBreaker;
     this.lineFragmentGenerator = new LineFragmentGenerator;
     this.justificationEngine = new JustificationEngine;
-
   }
 
   layoutLineFragments(lineRect, glyphString, path, exclusionPaths, paragraphStyle) {
@@ -26,10 +25,18 @@ export default class Typesetter {
 
     let lineHeight = 0;
     let lineFragments = [];
+    let pos = 0;
     for (let fragmentRect of fragmentRects) {
-      let bk = this.lineBreaker.suggestLineBreak(glyphString, fragmentRect.width);
+      let bk = this.lineBreaker.suggestLineBreak(
+        glyphString.slice(pos, glyphString.length),
+        fragmentRect.width,
+        paragraphStyle.hyphenationFactor
+      );
+
       if (bk) {
-        let lineFragment = new LineFragment(fragmentRect, glyphString.slice(0, bk.position));
+        bk.position += pos;
+
+        let lineFragment = new LineFragment(fragmentRect, glyphString.slice(pos, bk.position));
         let isLastLine = bk.position >= glyphString.length;
         let align = isLastLine ? paragraphStyle.alignLastLine : paragraphStyle.align;
 
@@ -42,7 +49,8 @@ export default class Typesetter {
         lineFragments.push(lineFragment);
         lineHeight = Math.max(lineHeight, lineFragment.height);
 
-        if (bk.position >= glyphString.length) {
+        pos = bk.position;
+        if (pos >= glyphString.length) {
           break;
         }
       }
