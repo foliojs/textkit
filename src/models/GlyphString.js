@@ -20,20 +20,42 @@ const HANGING_PUNCTUATION_END_CODEPOINTS = new Set([
 ]);
 
 export default class GlyphString {
-  constructor(string, glyphRuns) {
+  constructor(string, glyphRuns, start, end) {
     this.string = string;
-    this.glyphRuns = glyphRuns;
+    this._glyphRuns = glyphRuns;
+    this.start = start || 0;
+    this._end = end;
   }
 
-  get start() {
-    return this.glyphRuns.length > 0
-      ? this.glyphRuns[0].start
-      : 0;
+  get glyphRuns() {
+    let startRunIndex = this.runIndexAtGlyphIndex(this.start);
+    let endRunIndex = this.runIndexAtGlyphIndex(this.end);
+
+    let startRun = this._glyphRuns[startRunIndex];
+    let endRun = this._glyphRuns[endRunIndex];
+
+    let runs = [];
+
+    runs.push(startRun.slice(this.start - startRun.start, this.end - startRun.start));
+
+    if (endRunIndex !== startRunIndex) {
+      runs.push(...this._glyphRuns.slice(startRunIndex + 1, endRunIndex));
+
+      if (this.end - endRun.start !== 0) {
+        runs.push(endRun.slice(0, this.end - endRun.start));
+      }
+    }
+
+    return runs;
   }
 
   get end() {
-    return this.glyphRuns.length > 0
-      ? this.glyphRuns[this.glyphRuns.length - 1].end
+    if (this._end != null) {
+      return this._end;
+    }
+
+    return this._glyphRuns.length > 0
+      ? this._glyphRuns[this._glyphRuns.length - 1].end
       : 0;
   }
 
@@ -60,52 +82,36 @@ export default class GlyphString {
   }
 
   runIndexAtGlyphIndex(index) {
-    for (let i = 0; i < this.glyphRuns.length; i++) {
-      if (this.glyphRuns[i].start <= index && index < this.glyphRuns[i].end) {
+    for (let i = 0; i < this._glyphRuns.length; i++) {
+      if (this._glyphRuns[i].start <= index && index < this._glyphRuns[i].end) {
         return i;
       }
     }
 
-    return this.glyphRuns.length - 1;
+    return this._glyphRuns.length - 1;
   }
 
   slice(start, end) {
-    start += this.start;
-    end += this.start;
-
-    let startRunIndex = this.runIndexAtGlyphIndex(start);
-    let endRunIndex = this.runIndexAtGlyphIndex(end);
-
-    let startRun = this.glyphRuns[startRunIndex];
-    let endRun = this.glyphRuns[endRunIndex];
-
-    let runs = [];
-
-    runs.push(startRun.slice(start - startRun.start, end - startRun.start));
-
-    if (endRunIndex !== startRunIndex) {
-      runs.push(...this.glyphRuns.slice(startRunIndex + 1, endRunIndex));
-
-      if (end - endRun.start !== 0) {
-        runs.push(endRun.slice(0, end - endRun.start));
-      }
-    }
-
-    return new GlyphString(this.string.slice(this.stringIndexForGlyphIndex(start - this.start), this.stringIndexForGlyphIndex(end - this.start)), runs);
+    return new GlyphString(
+      this.string.slice(this.stringIndexForGlyphIndex(start), this.stringIndexForGlyphIndex(end)),
+      this._glyphRuns,
+      start + this.start,
+      end + this.start
+    );
   }
 
   glyphAtIndex(index) {
     index += this.start;
     let runIndex = this.runIndexAtGlyphIndex(index);
-    let run = this.glyphRuns[runIndex];
+    let run = this._glyphRuns[runIndex];
     return run.run.glyphs[index - run.start];
   }
 
   getGlyphWidth(index) {
     index += this.start;
     let runIndex = this.runIndexAtGlyphIndex(index);
-    let run = this.glyphRuns[runIndex];
-    return run.run.glyphs[index - run.start].advanceWidth * run.scale;
+    let run = this._glyphRuns[runIndex];
+    return run.run.positions[index - run.start].xAdvance * run.scale;
   }
 
   glyphIndexAtOffset(width) {
@@ -159,12 +165,12 @@ export default class GlyphString {
     let glyphIndex = 0;
     for (let run of this.glyphRuns) {
       for (let glyph of run.run.glyphs) {
-        stringIndex -= String.fromCodePoint(...glyph.codePoints).length;
-        glyphIndex++;
-
-        if (stringIndex <= 0) {
+        if (stringIndex <= 0 && glyph.codePoints.length > 0) {
           return glyphIndex;
         }
+
+        stringIndex -= String.fromCodePoint(...glyph.codePoints).length;
+        glyphIndex++;
       }
     }
 
