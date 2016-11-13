@@ -219,4 +219,31 @@ export default class GlyphString {
     return HANGING_PUNCTUATION_END_CATEGORIES.has(this.getUnicodeCategory(index))
       || HANGING_PUNCTUATION_END_CODEPOINTS.has(this.glyphAtIndex(index).codePoints[0]);
   }
+
+  insertGlyph(index, codePoint) {
+    index += this.start;
+    let runIndex = this.runIndexAtGlyphIndex(index);
+    let run = this._glyphRuns[runIndex];
+
+    let glyph = run.attributes.font.glyphForCodePoint(codePoint);
+    glyph.codePoints = []; // TODO: fix
+    run.run.glyphs.splice(index - run.start, 0, glyph);
+    run.run.positions.splice(index - run.start, 0, {
+      xAdvance: glyph.advanceWidth,
+      yAdvance: 0,
+      xOffset: 0,
+      yOffset: 0
+    });
+
+    run.end++;
+
+    for (let i = runIndex + 1; i < this._glyphRuns.length; i++) {
+      this._glyphRuns[i].start++;
+      this._glyphRuns[i].end++;
+    }
+
+    if (this._end != null) {
+      this._end++;
+    }
+  }
 }
