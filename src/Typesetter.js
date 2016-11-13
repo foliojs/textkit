@@ -30,9 +30,12 @@ export default class Typesetter {
       let bk = this.lineBreaker.suggestLineBreak(glyphString, fragmentRect.width);
       if (bk) {
         let lineFragment = new LineFragment(fragmentRect, glyphString.slice(0, bk.position));
-        this.adjustLineFragmentRectangle(lineFragment, paragraphStyle);
+        let isLastLine = bk.position >= glyphString.length;
+        let align = isLastLine ? paragraphStyle.alignLastLine : paragraphStyle.align;
 
-        if (paragraphStyle.align === 'justify') {
+        this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
+
+        if (align === 'justify') {
           this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
         }
 
@@ -57,7 +60,7 @@ export default class Typesetter {
     return lineFragments;
   }
 
-  adjustLineFragmentRectangle(lineFragment, paragraphStyle) {
+  adjustLineFragmentRectangle(lineFragment, paragraphStyle, align) {
     let start = 0;
     let end = lineFragment.length;
 
@@ -74,7 +77,7 @@ export default class Typesetter {
 
     // Adjust line rect for hanging punctuation
     if (paragraphStyle.hangingPunctuation) {
-      if (paragraphStyle.align === 'left' || paragraphStyle.align === 'justify') {
+      if (align === 'left' || align === 'justify') {
         while (lineFragment.isHangingPunctuationStart(start)) {
           let w = lineFragment.getGlyphWidth(start++);
           lineFragment.rect.x -= w;
@@ -82,7 +85,7 @@ export default class Typesetter {
         }
       }
 
-      if (paragraphStyle.align === 'right' || paragraphStyle.align === 'justify') {
+      if (align === 'right' || align === 'justify') {
         while (lineFragment.isHangingPunctuationEnd(end - 1)) {
           lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
         }
@@ -91,6 +94,6 @@ export default class Typesetter {
 
     // Adjust line offset for alignment
     let remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
-    lineFragment.rect.x += remainingWidth * ALIGNMENT_FACTORS[paragraphStyle.align];
+    lineFragment.rect.x += remainingWidth * ALIGNMENT_FACTORS[align];
   }
 }
