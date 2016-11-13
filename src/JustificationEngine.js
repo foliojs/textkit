@@ -102,9 +102,9 @@ export default class JustificationEngine {
         }
 
       } else if (glyph.isMark && index > 0) {
-        var factor = _.clone(factors[i - 1]);
+        var factor = _.clone(factors[index - 1]);
         factor.before = 0;
-        factors[i - 1].after = 0;
+        factors[index - 1].after = 0;
 
       } else {
         var factor = _.clone(charFactor);
