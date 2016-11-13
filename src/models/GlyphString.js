@@ -25,9 +25,15 @@ export default class GlyphString {
     this._glyphRuns = glyphRuns;
     this.start = start || 0;
     this._end = end;
+    this._glyphRunsCache = null;
+    this._glyphRunsCacheEnd = null;
   }
 
   get glyphRuns() {
+    if (this._glyphRunsCache && this._glyphRunsCacheEnd === this.end) {
+      return this._glyphRunsCache;
+    }
+
     let startRunIndex = this.runIndexAtGlyphIndex(this.start);
     let endRunIndex = this.runIndexAtGlyphIndex(this.end);
 
@@ -46,6 +52,8 @@ export default class GlyphString {
       }
     }
 
+    this._glyphRunsCache = runs;
+    this._glyphRunsCacheEnd = this.end;
     return runs;
   }
 
