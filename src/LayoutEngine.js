@@ -73,10 +73,11 @@ export default class LayoutEngine {
     let fragments = [];
     let pos = 0;
     let firstLine = true;
+    let lines = 0;
 
     let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
-    while (rect.y < bbox.maxY && pos < glyphString.length) {
+    while (rect.y < bbox.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
       let lineFragments = this.typesetter.layoutLineFragments(
         rect,
         glyphString.slice(pos, glyphString.length),
@@ -85,11 +86,12 @@ export default class LayoutEngine {
         paragraphStyle
       );
 
-      fragments.push(...lineFragments);
       rect.y += rect.height + paragraphStyle.lineSpacing;
 
       if (lineFragments.length > 0) {
+        fragments.push(...lineFragments);
         pos = lineFragments[lineFragments.length - 1].end;
+        lines++;
 
         if (firstLine) {
           rect.x -= paragraphStyle.indent;
@@ -97,6 +99,14 @@ export default class LayoutEngine {
           firstLine = false;
         }
       }
+    }
+
+    let isTruncated = pos < glyphString.length;
+    for (let i = 0; i < fragments.length; i++) {
+      let fragment = fragments[i];
+      let isLastFragment = i === fragments.length - 1;
+
+      this.typesetter.finalizeLineFragment(fragment, paragraphStyle, isLastFragment, isTruncated);
     }
 
     return new Block(fragments, paragraphStyle);

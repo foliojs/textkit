@@ -248,5 +248,35 @@ export default class GlyphString {
     if (this._end != null) {
       this._end++;
     }
+
+    this._glyphRunsCache = null;
+  }
+
+  deleteGlyph(index) {
+    if (index < 0 || index >= this.length) {
+      return;
+    }
+
+    let runIndex = this.runIndexAtGlyphIndex(index);
+    let run = this._glyphRuns[runIndex];
+    let glyphIndex = this.start + index - run.start;
+
+    run.run.glyphs.splice(glyphIndex, 1);
+    run.run.positions.splice(glyphIndex, 1);
+
+    // TODO: fix string indexes
+
+    run.end--;
+
+    for (let i = runIndex + 1; i < this._glyphRuns.length; i++) {
+      this._glyphRuns[i].start--;
+      this._glyphRuns[i].end--;
+    }
+
+    if (this._end != null) {
+      this._end--;
+    }
+
+    this._glyphRunsCache = null;
   }
 }

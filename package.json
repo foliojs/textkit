@@ -12,7 +12,7 @@
     "babel-preset-node6": "^11.0.0",
     "cubic2quad": "^1.1.0",
     "font-manager": "^0.2.0",
-    "grapheme-breaker": "^0.1.2",
+    "grapheme-breaker": "^0.3.2",
     "hyphenation.en-us": "^0.2.1",
     "hypher": "^0.2.4",
     "iconv-lite": "^0.4.13",

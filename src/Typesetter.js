@@ -2,6 +2,7 @@ import LineBreaker from './LineBreaker';
 import LineFragment from './models/LineFragment';
 import LineFragmentGenerator from './LineFragmentGenerator';
 import JustificationEngine from './JustificationEngine';
+import TruncationEngine from './TruncationEngine';
 
 const ALIGNMENT_FACTORS = {
   left: 0,
@@ -15,6 +16,7 @@ export default class Typesetter {
     this.lineBreaker = new LineBreaker;
     this.lineFragmentGenerator = new LineFragmentGenerator;
     this.justificationEngine = new JustificationEngine;
+    this.truncationEngine = new TruncationEngine;
   }
 
   layoutLineFragments(lineRect, glyphString, path, exclusionPaths, paragraphStyle) {
@@ -37,15 +39,6 @@ export default class Typesetter {
         bk.position += pos;
 
         let lineFragment = new LineFragment(fragmentRect, glyphString.slice(pos, bk.position));
-        let isLastLine = bk.position >= glyphString.length;
-        let align = isLastLine ? paragraphStyle.alignLastLine : paragraphStyle.align;
-
-        this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
-
-        if (align === 'justify') {
-          this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
-        }
-
         lineFragments.push(lineFragment);
         lineHeight = Math.max(lineHeight, lineFragment.height);
 
@@ -66,6 +59,20 @@ export default class Typesetter {
     }
 
     return lineFragments;
+  }
+
+  finalizeLineFragment(lineFragment, paragraphStyle, isLastFragment, isTruncated) {
+    let align = isLastFragment && !isTruncated ? paragraphStyle.alignLastLine : paragraphStyle.align;
+
+    if (isLastFragment && isTruncated && paragraphStyle.truncationMode) {
+      this.truncationEngine.truncate(lineFragment, paragraphStyle.truncationMode);
+    }
+
+    this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
+
+    if (align === 'justify') {
+      this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
+    }
   }
 
   adjustLineFragmentRectangle(lineFragment, paragraphStyle, align) {

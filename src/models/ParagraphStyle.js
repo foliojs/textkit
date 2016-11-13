@@ -12,5 +12,7 @@ export default class ParagraphStyle {
     this.hyphenationFactor = attributes.hyphenationFactor || 0;
     this.lineSpacing = attributes.lineSpacing || 0;
     this.hangingPunctuation = attributes.hangingPunctuation || false;
+    this.truncationMode = attributes.truncationMode || (attributes.truncate ? 'right' : null);
+    this.maxLines = attributes.maxLines || Infinity;
   }
 }
