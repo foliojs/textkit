@@ -90,6 +90,15 @@ export default class GlyphString {
     return height;
   }
 
+  get ascent() {
+    let height = 0;
+    for (let run of this.glyphRuns) {
+      height = Math.max(height, run.ascent);
+    }
+
+    return height;
+  }
+
   runIndexAtGlyphIndex(index) {
     index += this.start;
     for (let i = 0; i < this._glyphRuns.length; i++) {

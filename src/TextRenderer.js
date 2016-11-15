@@ -28,7 +28,7 @@ export default class TextRenderer {
     }
 
     this.ctx.save();
-    this.ctx.translate(line.rect.x, line.rect.maxY);
+    this.ctx.translate(line.rect.x, line.rect.y + line.ascent);
     this.ctx.scale(1, -1, {});
 
     for (let run of line.glyphRuns) {
