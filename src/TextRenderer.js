@@ -36,6 +36,15 @@ export default class TextRenderer {
     }
 
     this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.translate(line.rect.x, line.rect.y);
+
+    for (let decorationLine of line.decorationLines) {
+      this.renderDecorationLine(decorationLine);
+    }
+
+    this.ctx.restore();
   }
 
   renderRun(run) {
@@ -55,5 +64,14 @@ export default class TextRenderer {
 
       this.ctx.translate(position.xAdvance * run.scale, position.yAdvance * run.scale);
     }
+  }
+
+  renderDecorationLine(line) {
+    let y = line.y + Math.max(1, Math.ceil(line.thickness / 2));
+
+    this.ctx.lineWidth(line.thickness);
+    this.ctx.moveTo(line.startX, y);
+    this.ctx.lineTo(line.endX, y);
+    this.ctx.stroke(line.color);
   }
 }
