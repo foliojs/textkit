@@ -70,9 +70,12 @@ export default class Typesetter {
 
     this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
 
-    if (align === 'justify') {
+    if (align === 'justify' || lineFragment.advanceWidth > lineFragment.rect.width) {
       this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
     }
+
+    this.createDecorationLines(lineFragment);
+    console.log(lineFragment.decorationLines);
   }
 
   adjustLineFragmentRectangle(lineFragment, paragraphStyle, align) {
@@ -81,31 +84,30 @@ export default class Typesetter {
 
     // Ignore whitespace at the start and end of a line for alignment
     while (lineFragment.isWhiteSpace(start)) {
-      let w = lineFragment.getGlyphWidth(start++);
-      lineFragment.rect.x -= w;
-      lineFragment.rect.width += w;
+      lineFragment.overflowLeft += lineFragment.getGlyphWidth(start++);
     }
 
     while (lineFragment.isWhiteSpace(end - 1)) {
-      lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
+      lineFragment.overflowRight +=  lineFragment.getGlyphWidth(--end);
     }
 
     // Adjust line rect for hanging punctuation
     if (paragraphStyle.hangingPunctuation) {
       if (align === 'left' || align === 'justify') {
         if (lineFragment.isHangingPunctuationStart(start)) {
-          let w = lineFragment.getGlyphWidth(start++);
-          lineFragment.rect.x -= w;
-          lineFragment.rect.width += w;
+          lineFragment.overflowLeft += lineFragment.getGlyphWidth(start++);
         }
       }
 
       if (align === 'right' || align === 'justify') {
         if (lineFragment.isHangingPunctuationEnd(end - 1)) {
-          lineFragment.rect.width += lineFragment.getGlyphWidth(--end);
+          lineFragment.overflowRight += lineFragment.getGlyphWidth(--end);
         }
       }
     }
+
+    lineFragment.rect.x -= lineFragment.overflowLeft;
+    lineFragment.rect.width += lineFragment.overflowLeft + lineFragment.overflowRight;
 
     // Adjust line offset for alignment
     let remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
