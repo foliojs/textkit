@@ -122,7 +122,14 @@ export default class LayoutEngine {
       engine.getRuns(attributedString.string, r)
     ).reduce((p, r) => p.concat(r), []);
 
-    let resolvedRuns = flattenRuns([...attributedString.runs, ...runs]);
+    let styles = attributedString.runs.map(run => {
+      let attrs = Object.assign({}, run.attributes);
+      delete attrs.font;
+      delete attrs.fontDescriptor;
+      return new Run(run.start, run.end, attrs);
+    });
+
+    let resolvedRuns = flattenRuns([...styles, ...runs]);
     for (let run of resolvedRuns) {
       run.attributes = new RunStyle(run.attributes);
     }
