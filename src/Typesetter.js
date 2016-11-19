@@ -3,7 +3,7 @@ import LineFragment from './models/LineFragment';
 import LineFragmentGenerator from './LineFragmentGenerator';
 import JustificationEngine from './JustificationEngine';
 import TruncationEngine from './TruncationEngine';
-import DecorationLine from './models/DecorationLine';
+import TextDecorationEngine from './TextDecorationEngine';
 
 const ALIGNMENT_FACTORS = {
   left: 0,
@@ -18,6 +18,7 @@ export default class Typesetter {
     this.lineFragmentGenerator = new LineFragmentGenerator;
     this.justificationEngine = new JustificationEngine;
     this.truncationEngine = new TruncationEngine;
+    this.decorationEngine = new TextDecorationEngine;
   }
 
   layoutLineFragments(lineRect, glyphString, path, exclusionPaths, paragraphStyle) {
@@ -75,8 +76,7 @@ export default class Typesetter {
       this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
     }
 
-    this.createDecorationLines(lineFragment);
-    console.log(lineFragment.decorationLines);
+    this.decorationEngine.createDecorationLines(lineFragment);
   }
 
   adjustLineFragmentRectangle(lineFragment, paragraphStyle, align) {
@@ -113,27 +113,5 @@ export default class Typesetter {
     // Adjust line offset for alignment
     let remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
     lineFragment.rect.x += remainingWidth * ALIGNMENT_FACTORS[align];
-  }
-
-  createDecorationLines(lineFragment) {
-    let x = lineFragment.overflowLeft;
-    let maxX = lineFragment.rect.width - lineFragment.overflowRight;
-
-    for (let run of lineFragment.glyphRuns) {
-      let endY = x + run.advanceWidth;
-
-      if (run.attributes.underline) {
-        let line = new DecorationLine(x, Math.min(maxX, endY), lineFragment.ascent, run.attributes);
-        lineFragment.addDecorationLine(line);
-      }
-
-      if (run.attributes.strike) {
-        let y = 2 * lineFragment.ascent / 3;
-        let line = new DecorationLine(x, Math.min(maxX, endY), y, run.attributes);
-        lineFragment.addDecorationLine(line);
-      }
-
-      x = endY;
-    }
   }
 }

@@ -1,24 +1,27 @@
-const BASE_FONT_SIZE = 16;
+import Rect from '../geom/Rect';
 
 export default class DecorationLine {
-  constructor(startX, endX, y, attributes) {
-    this.startX = startX;
-    this.endX = endX;
-    this.y = y;
-    this.color = attributes.underlineColor || attributes.color || 'black';
-    this.thickness = Math.max(0.5, Math.floor(attributes.fontSize / BASE_FONT_SIZE));
+  constructor(rect, type, color) {
+    this.rect = rect;
+    this.type = type;
+    this.color = color || 'black';
   }
 
   merge(line) {
-    if (this.endX === line.startX && this.y === line.y) {
-      this.thickness = line.thickness = Math.max(this.thickness, line.thickness);
+    if (this.rect.maxX === line.rect.x && this.rect.y === line.rect.y) {
+      this.rect.height = line.rect.height = Math.max(this.rect.height, line.rect.height);
 
       if (this.color === line.color) {
-        this.endX = line.endX;
+        this.rect.width += line.rect.width;
         return true;
       }
     }
 
     return false;
+  }
+
+  slice(startX, endX) {
+    let rect = new Rect(startX, this.rect.y, endX - startX, this.rect.height);
+    return new DecorationLine(rect, this.type, this.color);
   }
 }

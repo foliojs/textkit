@@ -67,11 +67,9 @@ export default class TextRenderer {
   }
 
   renderDecorationLine(line) {
-    let y = line.y + Math.max(1, Math.ceil(line.thickness / 2));
-
-    this.ctx.lineWidth(line.thickness);
-    this.ctx.moveTo(line.startX, y);
-    this.ctx.lineTo(line.endX, y);
+    this.ctx.lineWidth(line.rect.height);
+    this.ctx.moveTo(line.rect.x, line.rect.y);
+    this.ctx.lineTo(line.rect.maxX, line.rect.y);
     this.ctx.stroke(line.color);
   }
 }
