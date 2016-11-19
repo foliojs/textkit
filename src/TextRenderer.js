@@ -75,12 +75,34 @@ export default class TextRenderer {
       this.ctx.dash(line.rect.height);
     }
 
-    this.ctx.moveTo(line.rect.x, line.rect.y);
-    this.ctx.lineTo(line.rect.maxX, line.rect.y);
+    if (/wavy/.test(line.style)) {
+      let dist = Math.max(2, line.rect.height);
+      let step = 1.1 * dist;
+      let stepCount = Math.floor(line.rect.width / (2 * step));
 
-    if (/double/.test(line.style)) {
-      this.ctx.moveTo(line.rect.x, line.rect.y + line.rect.height * 2);
-      this.ctx.lineTo(line.rect.maxX, line.rect.y + line.rect.height * 2);
+      // Adjust step to fill entire width
+      let remainingWidth = line.rect.width - (stepCount * 2 * step);
+      let adjustment = remainingWidth / stepCount / 2;
+      step += adjustment;
+
+      let cp1y = line.rect.y + dist;
+      let cp2y = line.rect.y - dist;
+      let x = line.rect.x;
+
+      this.ctx.moveTo(line.rect.x, line.rect.y);
+
+      for (let i = 0; i < stepCount; i++) {
+        this.ctx.bezierCurveTo(x + step, cp1y, x + step, cp2y, x + 2 * step, line.rect.y);
+        x += 2 * step;
+      }
+    } else {
+      this.ctx.moveTo(line.rect.x, line.rect.y);
+      this.ctx.lineTo(line.rect.maxX, line.rect.y);
+
+      if (/double/.test(line.style)) {
+        this.ctx.moveTo(line.rect.x, line.rect.y + line.rect.height * 2);
+        this.ctx.lineTo(line.rect.maxX, line.rect.y + line.rect.height * 2);
+      }
     }
 
     this.ctx.stroke(line.color);
