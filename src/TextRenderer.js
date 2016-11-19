@@ -68,8 +68,21 @@ export default class TextRenderer {
 
   renderDecorationLine(line) {
     this.ctx.lineWidth(line.rect.height);
+
+    if (/dashed/.test(line.style)) {
+      this.ctx.dash(3 * line.rect.height);
+    } else if (/dotted/.test(line.style)) {
+      this.ctx.dash(line.rect.height);
+    }
+
     this.ctx.moveTo(line.rect.x, line.rect.y);
     this.ctx.lineTo(line.rect.maxX, line.rect.y);
+
+    if (/double/.test(line.style)) {
+      this.ctx.moveTo(line.rect.x, line.rect.y + line.rect.height * 2);
+      this.ctx.lineTo(line.rect.maxX, line.rect.y + line.rect.height * 2);
+    }
+
     this.ctx.stroke(line.color);
   }
 }

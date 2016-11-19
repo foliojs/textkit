@@ -18,14 +18,14 @@ export default class TextDecorationEngine {
 
       if (run.attributes.underline) {
         let rect = new Rect(x, lineFragment.ascent, width, thickness);
-        let line = new DecorationLine(rect, 'underline', run.attributes.underlineColor || run.attributes.color);
+        let line = new DecorationLine(rect, run.attributes.underlineColor, run.attributes.underlineStyle);
         this.addDecorationLine(line, underlines);
       }
 
       if (run.attributes.strike) {
         let y = lineFragment.ascent - run.ascent / 3;
         let rect = new Rect(x, y, width, thickness);
-        let line = new DecorationLine(rect, 'strike', run.attributes.strikeColor || run.attributes.color);
+        let line = new DecorationLine(rect, run.attributes.strikeColor, run.attributes.strikeStyle);
         this.addDecorationLine(line, lineFragment.decorationLines);
       }
 

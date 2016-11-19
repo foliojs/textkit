@@ -1,10 +1,10 @@
 import Rect from '../geom/Rect';
 
 export default class DecorationLine {
-  constructor(rect, type, color) {
+  constructor(rect, color, style) {
     this.rect = rect;
-    this.type = type;
     this.color = color || 'black';
+    this.style = style || 'solid';
   }
 
   merge(line) {
@@ -22,6 +22,6 @@ export default class DecorationLine {
 
   slice(startX, endX) {
     let rect = new Rect(startX, this.rect.y, endX - startX, this.rect.height);
-    return new DecorationLine(rect, this.type, this.color);
+    return new DecorationLine(rect, this.color, this.style);
   }
 }

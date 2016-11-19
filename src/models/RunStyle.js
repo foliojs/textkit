@@ -7,7 +7,11 @@ export default class RunStyle {
     this.font = attributes.font || null;
     this.fontSize = attributes.fontSize || 12;
     this.underline = attributes.underline || false;
+    this.underlineColor = attributes.underlineColor || this.color;
+    this.underlineStyle = attributes.underlineStyle || 'solid';
     this.strike = attributes.strike || false;
+    this.strikeColor = attributes.strikeColor || this.color;
+    this.strikeStyle = attributes.strikeStyle || 'solid';
     this.link = attributes.link || null;
     this.fill = attributes.fill !== false;
     this.stroke = attributes.stroke || false;
