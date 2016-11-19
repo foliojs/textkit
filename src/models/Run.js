@@ -1,9 +1,8 @@
-import RunStyle from './RunStyle';
+import Range from './Range';
 
-export default class Run {
+export default class Run extends Range {
   constructor(start, end, attributes = {}) {
-    this.start = start;
-    this.end = end;
+    super(start, end);
     this.attributes = attributes;
   }
 }
