@@ -21,8 +21,8 @@ export default class Typesetter {
     this.decorationEngine = new TextDecorationEngine;
   }
 
-  layoutLineFragments(lineRect, glyphString, path, exclusionPaths, paragraphStyle) {
-    let fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, path, exclusionPaths);
+  layoutLineFragments(lineRect, glyphString, container, paragraphStyle) {
+    let fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, container);
     if (fragmentRects.length === 0) {
       return [];
     }

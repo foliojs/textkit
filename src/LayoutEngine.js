@@ -48,7 +48,7 @@ export default class LayoutEngine {
     return new Container(blocks);
   }
 
-  layoutParagraph(attributedString, path, exclusionPaths) {
+  layoutParagraph(attributedString, container) {
     let runs = this.resolveRuns(attributedString);
     let glyphIndex = 0;
     let glyphRuns = runs.map(run => {
@@ -61,12 +61,12 @@ export default class LayoutEngine {
 
     let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
 
-    let bbox = path.bbox;
+    let bbox = container.bbox;
     let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
     let rect = new Rect(
-      path.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
-      path.bbox.minY,
-      path.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      container.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
+      container.bbox.minY,
+      container.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
       lineHeight
     );
 
@@ -81,8 +81,7 @@ export default class LayoutEngine {
       let lineFragments = this.typesetter.layoutLineFragments(
         rect,
         glyphString.slice(pos, glyphString.length),
-        path,
-        exclusionPaths,
+        container,
         paragraphStyle
       );
 
