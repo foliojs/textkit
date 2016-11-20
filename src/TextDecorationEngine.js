@@ -9,7 +9,7 @@ export default class TextDecorationEngine {
   createDecorationLines(lineFragment) {
     // Create initial underline and strikethrough lines
     let x = lineFragment.overflowLeft;
-    let maxX = lineFragment.rect.width - lineFragment.overflowRight;
+    let maxX = lineFragment.advanceWidth - lineFragment.overflowRight;
     let underlines = [];
 
     for (let run of lineFragment.glyphRuns) {
