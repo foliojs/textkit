@@ -3,7 +3,7 @@ export default class ParagraphStyle {
     this.indent = attributes.indent || 0;
     this.bullet = attributes.bullet || null;
     this.paddingTop = attributes.paddingTop || attributes.padding || 0;
-    this.paddingBottom = attributes.paddingBottom || attributes.padding || 0;
+    this.paragraphSpacing = attributes.paragraphSpacing || 0;
     this.marginLeft = attributes.marginLeft || attributes.margin || 0;
     this.marginRight = attributes.marginRight || attributes.margin || 0;
     this.align = attributes.align || 'left';

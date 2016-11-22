@@ -42,14 +42,47 @@ export default class LayoutEngine {
     this.typesetter = new Typesetter;
   }
 
-  layout(attributedString, path, exclusionPaths = []) {
-    let paragraphs = splitParagraphs(attributedString);
-    let blocks = paragraphs.map(paragraph => this.layoutParagraph(paragraph));
-    return new Container(blocks);
+  layout(attributedString, containers) {
+    // let paragraphs = splitParagraphs(attributedString);
+    // let blocks = paragraphs.map(paragraph => this.layoutParagraph(paragraph));
+
+    let start = 0;
+
+    for (let container of containers) {
+      console.log("NEXT CONTAINER", start, attributedString.string.length)
+      let y = container.bbox.minY;
+
+      while (start < attributedString.string.length && y < container.bbox.maxY) {
+        let next = attributedString.string.indexOf('\n', start);
+        if (next === -1) {
+          next = attributedString.string.length;
+        }
+
+        let paragraph = attributedString.slice(start, next);
+        console.log(paragraph, y)
+
+        let block = this.layoutParagraph(paragraph, container, y);
+        container.blocks.push(block);
+
+        y += block.bbox.height + block.style.paragraphSpacing;
+        console.log(start, block.lines.length)
+        // start = block.lines.length ? start + block.lines[block.lines.length - 1].end + 1 : next + 1;
+        if (block.lines.length) {
+          console.log(block.lines)
+          start += block.stringLength;
+          if (attributedString.string[start] === '\n')
+            start++;
+          console.log('start', start, block.stringLength)
+        } else {
+          break;
+        }
+      }
+    }
   }
 
-  layoutParagraph(attributedString, container) {
+  layoutParagraph(attributedString, container, y) {
     let runs = this.resolveRuns(attributedString);
+    // console.log(runs)
     let glyphIndex = 0;
     let glyphRuns = runs.map(run => {
       let str = attributedString.string.slice(run.start, run.end);
@@ -60,22 +93,23 @@ export default class LayoutEngine {
     });
 
     let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
+    let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
     let bbox = container.bbox;
-    let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
+    let lineHeight = glyphString.height;
     let rect = new Rect(
       container.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
-      container.bbox.minY,
+      y,
       container.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
       lineHeight
     );
+
+    console.log(container.bbox)
 
     let fragments = [];
     let pos = 0;
     let firstLine = true;
     let lines = 0;
-
-    let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
     while (rect.y < bbox.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
       let lineFragments = this.typesetter.layoutLineFragments(

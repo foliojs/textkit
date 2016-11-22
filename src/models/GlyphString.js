@@ -157,24 +157,31 @@ export default class GlyphString {
   }
 
   stringIndexForGlyphIndex(glyphIndex) {
+    let gid = glyphIndex;
     if (glyphIndex === 0) {
       return 0;
     }
 
     let stringIndex = 0;
+    let s = '';
     for (let run of this.glyphRuns) {
       for (let glyph of run.run.glyphs) {
         if (!glyph.inserted) {
           stringIndex += String.fromCodePoint(...glyph.codePoints).length;
+          s += String.fromCodePoint(...glyph.codePoints);
         }
         glyphIndex--;
 
         if (glyphIndex === 0) {
+          if (glyph.inserted) {
+            console.log('stringIndexForGlyphIndex', s, gid, stringIndex, glyph.inserted, new Error().stack)
+          }
           return stringIndex;
         }
       }
     }
 
+    console.log('stringIndexForGlyphIndex', s)
     return stringIndex;
   }
 
@@ -186,6 +193,11 @@ export default class GlyphString {
     let glyphIndex = 0;
     for (let run of this.glyphRuns) {
       for (let glyph of run.run.glyphs) {
+        if (glyph.inserted) {
+          glyphIndex++;
+          continue;
+        }
+
         if (stringIndex <= 0 && glyph.codePoints.length > 0) {
           return glyphIndex;
         }

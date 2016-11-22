@@ -49,7 +49,7 @@ doc.stroke();
 let string = AttributedString.fromFragments([
   {
     string: '“Lorem ipsum dolor sit amet,\n',
-    attributes: {font: 'Hoefler Text', bold: true, fontSize: 14, align: 'justify', justificationFactor: 0.2, hangingPunctuation: true, margin: 0, indent: 0, lineSpacing: 5, hyphenationFactor: 0.9, truncationMode: 'right', maxLines: Infinity, underline: true, strike: true, underlineStyle: 'wavy'}
+    attributes: {font: 'Hoefler Text', bold: true, fontSize: 14, align: 'justify', justificationFactor: 0.2, hangingPunctuation: true, margin: 0, indent: 0, lineSpacing: 5, hyphenationFactor: 0.9, truncationMode: 'right', maxLines: Infinity, underline: true, strike: true, paragraphSpacing: 20}
   },
   {
     string: 'consectetur adipiscing elit, ',
@@ -70,13 +70,21 @@ let string = AttributedString.fromFragments([
 
 console.log(string)
 
+let path2 = new Path;
+path2.rect(50, 600, 300, 150);
+path2.toFunction()(doc);
+doc.stroke('green');
+
 let l = new LayoutEngine;
 // let block = l.layoutParagraph(string, path, [exclusion, exclusion.scale(0.5).translate(100, 220)]);
-let block = l.layoutParagraph(string, new Container(path, [exclusion]));
+let container = new Container(path, [exclusion]);
+let container2 = new Container(path2);
+l.layout(string, [container, container2]);
 
 let renderer = new TextRenderer(doc, {outlineLines: false});
-renderer.renderBlock(block);
+renderer.render(container);
+renderer.render(container2);
 
-console.log(block)
+console.log(container, container2)
 
 doc.end();

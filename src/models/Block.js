@@ -14,4 +14,13 @@ export default class Block {
 
     return bbox;
   }
+
+  get stringLength() {
+    let length = 0;
+    for (let line of this.lines) {
+      length += line.string.length;
+    }
+
+    return length;
+  }
 }
