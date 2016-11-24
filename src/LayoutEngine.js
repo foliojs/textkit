@@ -14,6 +14,7 @@ import Block from './models/Block';
 import JustificationEngine from './JustificationEngine';
 import ParagraphStyle from './models/ParagraphStyle';
 import GlyphString from './models/GlyphString';
+import Typesetter from './Typesetter';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
@@ -37,16 +38,51 @@ export default class LayoutEngine {
       new FontSubstitutionEngine,
       new ScriptItemizer
     ];
+
+    this.typesetter = new Typesetter;
   }
 
-  layout(attributedString, path, exclusionPaths = []) {
-    let paragraphs = splitParagraphs(attributedString);
-    let blocks = paragraphs.map(paragraph => this.layoutParagraph(paragraph));
-    return new Container(blocks);
+  layout(attributedString, containers) {
+    // let paragraphs = splitParagraphs(attributedString);
+    // let blocks = paragraphs.map(paragraph => this.layoutParagraph(paragraph));
+
+    let start = 0;
+
+    for (let container of containers) {
+      console.log("NEXT CONTAINER", start, attributedString.string.length)
+      let y = container.bbox.minY;
+
+      while (start < attributedString.string.length && y < container.bbox.maxY) {
+        let next = attributedString.string.indexOf('\n', start);
+        if (next === -1) {
+          next = attributedString.string.length;
+        }
+
+        let paragraph = attributedString.slice(start, next);
+        console.log(paragraph, y)
+
+        let block = this.layoutParagraph(paragraph, container, y);
+        container.blocks.push(block);
+
+        y += block.bbox.height + block.style.paragraphSpacing;
+        console.log(start, block.lines.length)
+        // start = block.lines.length ? start + block.lines[block.lines.length - 1].end + 1 : next + 1;
+        if (block.lines.length) {
+          console.log(block.lines)
+          start += block.stringLength;
+          if (attributedString.string[start] === '\n')
+            start++;
+          console.log('start', start, block.stringLength)
+        } else {
+          break;
+        }
+      }
+    }
   }
 
-  layoutParagraph(attributedString, path, exclusionPaths) {
+  layoutParagraph(attributedString, container, y) {
     let runs = this.resolveRuns(attributedString);
+    // console.log(runs)
     let glyphIndex = 0;
     let glyphRuns = runs.map(run => {
       let str = attributedString.string.slice(run.start, run.end);
@@ -56,68 +92,57 @@ export default class LayoutEngine {
       return r;
     });
 
-    let breaker = new LineBreaker;
-    let gen = new LineFragmentGenerator;
-    let just = new JustificationEngine;
+    let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
+    let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
-    let bbox = path.bbox;
-    let lineHeight = glyphRuns.reduce((h, run) => Math.max(h, run.height), 0);
-    let rect = new Rect(path.bbox.minX, path.bbox.minY, path.bbox.width, lineHeight);
+    let bbox = container.bbox;
+    let lineHeight = glyphString.height;
+    let rect = new Rect(
+      container.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
+      y,
+      container.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      lineHeight
+    );
+
+    console.log(container.bbox)
 
     let fragments = [];
     let pos = 0;
+    let firstLine = true;
+    let lines = 0;
 
-    let glyphString = new GlyphString(attributedString.string, glyphRuns);
+    while (rect.y < bbox.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
+      let lineFragments = this.typesetter.layoutLineFragments(
+        rect,
+        glyphString.slice(pos, glyphString.length),
+        container,
+        paragraphStyle
+      );
 
-    while (rect.y < bbox.maxY && pos < glyphString.length) {
-      let rects = gen.generateFragments(rect, path, exclusionPaths);
+      rect.y += rect.height + paragraphStyle.lineSpacing;
 
-      if (rects.length === 0) {
-        rect.y += lineHeight;
-        continue;
-      }
+      if (lineFragments.length > 0) {
+        fragments.push(...lineFragments);
+        pos = lineFragments[lineFragments.length - 1].end;
+        lines++;
 
-      let lh = 0;
-      let lineFragments = [];
-      for (let r of rects) {
-        let bk = breaker.suggestLineBreak(glyphString.slice(pos, glyphString.length), r.width);
-        if (bk) {
-          bk.position += pos;
-
-          let end = bk.position;
-          while (glyphString.isWhiteSpace(end - 1)) {
-            end--;
-          }
-
-          let frag = new LineFragment(r, glyphString.slice(pos, end));
-          just.justify(frag);
-          lineFragments.push(frag);
-          pos = bk.position;
-
-          lh = Math.max(lh, frag.height);
-        }
-
-        if (pos >= glyphString.length) {
-          break;
+        if (firstLine) {
+          rect.x -= paragraphStyle.indent;
+          rect.width += paragraphStyle.indent;
+          firstLine = false;
         }
       }
-
-      // Update the fragments on this line with the computed line height
-      if (lh !== 0) {
-        lineHeight = lh;
-      }
-
-      for (let fragment of lineFragments) {
-        fragment.rect.height = lineHeight;
-      }
-
-      fragments.push(...lineFragments);
-
-      rect.y += lineHeight;
-      rect.height = lineHeight;
     }
 
-    return new Block(fragments, new ParagraphStyle(attributedString.runs[0].attributes));
+    let isTruncated = pos < glyphString.length;
+    for (let i = 0; i < fragments.length; i++) {
+      let fragment = fragments[i];
+      let isLastFragment = i === fragments.length - 1;
+
+      this.typesetter.finalizeLineFragment(fragment, paragraphStyle, isLastFragment, isTruncated);
+    }
+
+    return new Block(fragments, paragraphStyle);
   }
 
   resolveRuns(attributedString) {
@@ -130,7 +155,14 @@ export default class LayoutEngine {
       engine.getRuns(attributedString.string, r)
     ).reduce((p, r) => p.concat(r), []);
 
-    let resolvedRuns = flattenRuns([...attributedString.runs, ...runs]);
+    let styles = attributedString.runs.map(run => {
+      let attrs = Object.assign({}, run.attributes);
+      delete attrs.font;
+      delete attrs.fontDescriptor;
+      return new Run(run.start, run.end, attrs);
+    });
+
+    let resolvedRuns = flattenRuns([...styles, ...runs]);
     for (let run of resolvedRuns) {
       run.attributes = new RunStyle(run.attributes);
     }

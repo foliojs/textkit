@@ -1,26 +1,11 @@
-export default class LineFragment {
+import GlyphString from './GlyphString';
+
+export default class LineFragment extends GlyphString {
   constructor(rect, glyphString) {
+    super(glyphString.string, glyphString.glyphRuns, glyphString.start, glyphString.end);
     this.rect = rect;
-    this.runs = glyphString.glyphRuns;
-  }
-
-  // @cache
-  get advanceWidth() {
-    let width = 0;
-    for (let run of this.runs) {
-      width += run.advanceWidth;
-    }
-
-    return width;
-  }
-
-  // @cache
-  get height() {
-    let height = 0;
-    for (let run of this.runs) {
-      height = Math.max(height, run.height);
-    }
-
-    return height;
+    this.decorationLines = [];
+    this.overflowLeft = 0;
+    this.overflowRight = 0;
   }
 }

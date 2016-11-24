@@ -16,20 +16,14 @@ const LEFT = 0;
 const RIGHT = 1;
 
 export default class LineFragmentGenerator {
-  generateFragments(lineRect, path, exclusionPaths = []) {
-    let rects = this.splitLineRect(lineRect, path.toPolygon(), 'INTERIOR');
+  generateFragments(lineRect, container) {
+    let rects = this.splitLineRect(lineRect, container.polygon, 'INTERIOR');
+    let exclusion = container.exclusionPolygon;
 
-    if (exclusionPaths.length) {
-      let excluded = new Path;
-      for (let p of exclusionPaths) {
-        excluded.append(p);
-      }
-
-      let excludedPolygon = excluded.toPolygon();
-
+    if (exclusion) {
       let res = [];
       for (let rect of rects) {
-        res.push(...this.splitLineRect(rect, excludedPolygon, 'EXTERIOR'));
+        res.push(...this.splitLineRect(rect, exclusion, 'EXTERIOR'));
       }
 
       return res;
