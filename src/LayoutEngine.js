@@ -1,11 +1,4 @@
-// import BidiEngine from './BidiEngine';
-import FontSubstitutionEngine from './FontSubstitutionEngine';
-import ScriptItemizer from './ScriptItemizer';
-import flattenRuns from './flattenRuns';
 import AttributedString from './models/AttributedString';
-import RunStyle from './models/RunStyle';
-import Run from './models/Run';
-import GlyphRun from './models/GlyphRun';
 import LineBreaker from './LineBreaker';
 import LineFragment from './models/LineFragment';
 import LineFragmentGenerator from './LineFragmentGenerator';
@@ -13,8 +6,8 @@ import Rect from './geom/Rect';
 import Block from './models/Block';
 import JustificationEngine from './JustificationEngine';
 import ParagraphStyle from './models/ParagraphStyle';
-import GlyphString from './models/GlyphString';
 import Typesetter from './Typesetter';
+import GlyphGenerator from './GlyphGenerator';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
@@ -33,12 +26,7 @@ import Typesetter from './Typesetter';
 
 export default class LayoutEngine {
   constructor() {
-    this.engines = [
-      // new BidiEngine,
-      new FontSubstitutionEngine,
-      new ScriptItemizer
-    ];
-
+    this.glyphGenerator = new GlyphGenerator;
     this.typesetter = new Typesetter;
   }
 
@@ -48,11 +36,13 @@ export default class LayoutEngine {
 
     let start = 0;
 
-    for (let container of containers) {
+    for (let i = 0; i < containers.length && start < attributedString.length; i++) {
       console.log("NEXT CONTAINER", start, attributedString.string.length)
+      let container = containers[i];
+      let isLastContainer = i === containers.length - 1;
       let y = container.bbox.minY;
 
-      while (start < attributedString.string.length && y < container.bbox.maxY) {
+      while (start < attributedString.length && y < container.bbox.maxY) {
         let next = attributedString.string.indexOf('\n', start);
         if (next === -1) {
           next = attributedString.string.length;
@@ -61,7 +51,7 @@ export default class LayoutEngine {
         let paragraph = attributedString.slice(start, next);
         console.log(paragraph, y)
 
-        let block = this.layoutParagraph(paragraph, container, y);
+        let block = this.layoutParagraph(paragraph, container, y, isLastContainer);
         container.blocks.push(block);
 
         y += block.bbox.height + block.style.paragraphSpacing;
@@ -80,20 +70,9 @@ export default class LayoutEngine {
     }
   }
 
-  layoutParagraph(attributedString, container, y) {
-    let runs = this.resolveRuns(attributedString);
-    // console.log(runs)
-    let glyphIndex = 0;
-    let glyphRuns = runs.map(run => {
-      let str = attributedString.string.slice(run.start, run.end);
-      let g = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
-      let r = new GlyphRun(glyphIndex, glyphIndex + g.glyphs.length, run.attributes, g);
-      glyphIndex += g.glyphs.length;
-      return r;
-    });
-
+  layoutParagraph(attributedString, container, y, isLastContainer) {
+    let glyphString = this.glyphGenerator.generateGlyphs(attributedString);
     let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
-    let glyphString = new GlyphString(attributedString.string, glyphRuns);
 
     let bbox = container.bbox;
     let lineHeight = glyphString.height;
@@ -134,39 +113,14 @@ export default class LayoutEngine {
       }
     }
 
-    let isTruncated = pos < glyphString.length;
+    let isTruncated = isLastContainer && pos < glyphString.length;
     for (let i = 0; i < fragments.length; i++) {
       let fragment = fragments[i];
-      let isLastFragment = i === fragments.length - 1;
+      let isLastFragment = i === fragments.length - 1 && pos === glyphString.length;
 
       this.typesetter.finalizeLineFragment(fragment, paragraphStyle, isLastFragment, isTruncated);
     }
 
     return new Block(fragments, paragraphStyle);
-  }
-
-  resolveRuns(attributedString) {
-    let r = attributedString.runs.map(run => {
-      return new Run(run.start, run.end, new RunStyle(run.attributes))
-    });
-
-    // Resolve runs using engines
-    let runs = this.engines.map(engine =>
-      engine.getRuns(attributedString.string, r)
-    ).reduce((p, r) => p.concat(r), []);
-
-    let styles = attributedString.runs.map(run => {
-      let attrs = Object.assign({}, run.attributes);
-      delete attrs.font;
-      delete attrs.fontDescriptor;
-      return new Run(run.start, run.end, attrs);
-    });
-
-    let resolvedRuns = flattenRuns([...styles, ...runs]);
-    for (let run of resolvedRuns) {
-      run.attributes = new RunStyle(run.attributes);
-    }
-
-    return resolvedRuns;
   }
 }

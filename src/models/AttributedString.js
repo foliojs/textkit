@@ -4,6 +4,7 @@ export default class AttributedString {
   constructor(string = '', runs = [], start, end) {
     this.string = string;
     this.runs = runs;
+    this.length = string.length;
     this.start = start || 0;
     this.end = end || this.string.length - this.start + 1;
   }
