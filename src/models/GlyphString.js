@@ -99,6 +99,23 @@ export default class GlyphString {
     return height;
   }
 
+  *[Symbol.iterator]() {
+    let x = 0;
+    for (let run of this.glyphRuns) {
+      for (let i = 0; i < run.run.glyphs.length; i++) {
+        yield {
+          glyph: run.run.glyphs[i],
+          position: run.run.positions[i],
+          run: run,
+          x: x,
+          index: run.start + i
+        };
+
+        x += run.run.positions[i].xAdvance * run.scale;
+      }
+    }
+  }
+
   runIndexAtGlyphIndex(index) {
     index += this.start;
     for (let i = 0; i < this._glyphRuns.length; i++) {
