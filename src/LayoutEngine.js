@@ -31,13 +31,9 @@ export default class LayoutEngine {
   }
 
   layout(attributedString, containers) {
-    // let paragraphs = splitParagraphs(attributedString);
-    // let blocks = paragraphs.map(paragraph => this.layoutParagraph(paragraph));
-
     let start = 0;
 
     for (let i = 0; i < containers.length && start < attributedString.length; i++) {
-      console.log("NEXT CONTAINER", start, attributedString.string.length)
       let container = containers[i];
       let isLastContainer = i === containers.length - 1;
       let y = container.bbox.minY;
@@ -49,21 +45,20 @@ export default class LayoutEngine {
         }
 
         let paragraph = attributedString.slice(start, next);
-        console.log(paragraph, y)
+        console.log("PARA", y, container.bbox.maxY)
 
         let block = this.layoutParagraph(paragraph, container, y, isLastContainer);
         container.blocks.push(block);
 
         y += block.bbox.height + block.style.paragraphSpacing;
-        console.log(start, block.lines.length)
-        // start = block.lines.length ? start + block.lines[block.lines.length - 1].end + 1 : next + 1;
-        if (block.lines.length) {
-          console.log(block.lines)
-          start += block.stringLength;
-          if (attributedString.string[start] === '\n')
-            start++;
-          console.log('start', start, block.stringLength)
-        } else {
+        start += block.stringLength;
+
+        if (attributedString.string[start] === '\n') {
+          start++;
+        }
+
+        // If entire paragraph did not fit, move on to the next container.
+        if (start < next) {
           break;
         }
       }
