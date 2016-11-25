@@ -243,6 +243,17 @@ export default class GlyphString {
     return offset;
   }
 
+  indexOf(string, index = 0) {
+    let stringIndex = this.stringIndexForGlyphIndex(index);
+    let nextIndex = this.string.indexOf(string, stringIndex);
+
+    if (nextIndex === -1) {
+      return this.length;
+    }
+
+    return this.glyphIndexForStringIndex(nextIndex);
+  }
+
   getUnicodeCategory(index) {
     let glyph = this.glyphAtIndex(index);
     return glyph ? unicode.getCategory(glyph.codePoints[0]) : null;
