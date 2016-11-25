@@ -7,6 +7,12 @@ import Run from './models/Run';
 import RunStyle from './models/RunStyle';
 import ScriptItemizer from './ScriptItemizer';
 
+/**
+ * A GlyphGenerator is responsible for mapping characters in
+ * an AttributedString to glyphs in a GlyphString. It resolves
+ * style attributes such as the font and Unicode script and
+ * directionality properties, and creates GlyphRuns using fontkit.
+ */
 export default class GlyphGenerator {
   constructor() {
     this.resolvers = [

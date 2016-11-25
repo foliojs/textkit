@@ -15,23 +15,11 @@ export default class GlyphRun extends Run {
   // @cache
   get ascent() {
     return this.attributes.font.ascent * this.scale;
-    // let ascent = -Infinity;
-    // for (let glyph of this.run.glyphs) {
-    //   ascent = Math.max(ascent, glyph.ascent * this.scale);
-    // }
-    //
-    // return ascent;
   }
 
   // @cache
   get descent() {
     return this.attributes.font.descent * this.scale;
-    // let descent = Infinity;
-    // for (let glyph of this.run.glyphs) {
-    //   descent = Math.min(descent, glyph.descent * this.scale);
-    // }
-    //
-    // return descent;
   }
 
   // @cache

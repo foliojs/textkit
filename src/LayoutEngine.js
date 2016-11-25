@@ -78,8 +78,6 @@ export default class LayoutEngine {
       lineHeight
     );
 
-    console.log(container.bbox)
-
     let fragments = [];
     let pos = 0;
     let firstLine = true;

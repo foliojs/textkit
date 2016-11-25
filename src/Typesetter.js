@@ -13,6 +13,13 @@ const ALIGNMENT_FACTORS = {
   justify: 0
 };
 
+/**
+ * A Typesetter performs glyph line layout, including line breaking,
+ * hyphenation, justification, truncation, hanging punctuation,
+ * and text decoration. It uses several underlying objects to perform
+ * these tasks, which could be overridden in order to customize the
+ * typesetter's behavior.
+ */
 export default class Typesetter {
   constructor() {
     this.lineBreaker = new LineBreaker;

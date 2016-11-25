@@ -5,12 +5,12 @@ const BELOW = 1;
 const INSIDE = 2;
 const ABOVE = 3;
 
-const BELOW_TO_INSIDE = BELOW << 4 | INSIDE;
-const BELOW_TO_ABOVE = BELOW << 4 | ABOVE;
+const BELOW_TO_INSIDE = BELOW  << 4 | INSIDE;
+const BELOW_TO_ABOVE =  BELOW  << 4 | ABOVE;
 const INSIDE_TO_BELOW = INSIDE << 4 | BELOW;
 const INSIDE_TO_ABOVE = INSIDE << 4 | ABOVE;
-const ABOVE_TO_INSIDE = ABOVE << 4 | INSIDE;
-const ABOVE_TO_BELOW = ABOVE << 4 | BELOW;
+const ABOVE_TO_INSIDE = ABOVE  << 4 | INSIDE;
+const ABOVE_TO_BELOW =  ABOVE  << 4 | BELOW;
 
 const LEFT = 0;
 const RIGHT = 1;
