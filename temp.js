@@ -7,6 +7,7 @@ import LayoutEngine from './src/LayoutEngine';
 import AttributedString from './src/models/AttributedString';
 import TextRenderer from './src/TextRenderer';
 import Container from './src/models/Container';
+import TabStop from './src/models/TabStop';
 
 let path = new Path;
 // path.circle(150, 150, 120);
@@ -77,7 +78,9 @@ doc.stroke('green');
 
 let l = new LayoutEngine;
 // let block = l.layoutParagraph(string, path, [exclusion, exclusion.scale(0.5).translate(100, 220)]);
-let container = new Container(path, [exclusion]);
+let container = new Container(path, {
+  tabStops: [new TabStop(100, 'decimal'), new TabStop(150, 'left'), new TabStop(250, 'right')]
+});
 let container2 = new Container(path2);
 l.layout(string, [container, container2]);
 
@@ -86,5 +89,14 @@ renderer.render(container);
 renderer.render(container2);
 
 console.log(container, container2)
+
+
+for (let stop of container.tabStops) {
+  doc.moveTo(container.bbox.minX + stop.x, path.bbox.minY - 10)
+     .lineTo(container.bbox.minX + stop.x, path.bbox.minY + 10)
+     .stroke('blue');
+}
+
+doc.strokeColor('green');
 
 doc.end();

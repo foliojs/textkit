@@ -4,6 +4,7 @@ import LineFragmentGenerator from './LineFragmentGenerator';
 import JustificationEngine from './JustificationEngine';
 import TruncationEngine from './TruncationEngine';
 import TextDecorationEngine from './TextDecorationEngine';
+import TabEngine from './TabEngine';
 
 const ALIGNMENT_FACTORS = {
   left: 0,
@@ -19,6 +20,7 @@ export default class Typesetter {
     this.justificationEngine = new JustificationEngine;
     this.truncationEngine = new TruncationEngine;
     this.decorationEngine = new TextDecorationEngine;
+    this.tabEngine = new TabEngine;
   }
 
   layoutLineFragments(lineRect, glyphString, container, paragraphStyle) {
@@ -31,8 +33,11 @@ export default class Typesetter {
     let lineFragments = [];
     let pos = 0;
     for (let fragmentRect of fragmentRects) {
+      let line = glyphString.slice(pos, glyphString.length);
+      this.tabEngine.processLineFragment(line, container);
+
       let bk = this.lineBreaker.suggestLineBreak(
-        glyphString.slice(pos, glyphString.length),
+        line,
         fragmentRect.width,
         paragraphStyle.hyphenationFactor
       );

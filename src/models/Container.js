@@ -1,9 +1,11 @@
 import Path from '../geom/Path';
 
 export default class Container {
-  constructor(path, exclusionPaths = []) {
+  constructor(path, options = {}) {
     this.path = path;
-    this.exclusionPaths = exclusionPaths;
+    this.exclusionPaths = options.exclusionPaths || [];
+    this.tabStops = options.tabStops || [];
+    this.tabStopInterval = options.tabStopInterval || 80;
     this.blocks = [];
   }
 
