@@ -15,6 +15,10 @@ const ABOVE_TO_BELOW =  ABOVE  << 4 | BELOW;
 const LEFT = 0;
 const RIGHT = 1;
 
+/**
+ * A LineFragmentGenerator splits line rectangles into fragments,
+ * wrapping inside a container's polygon, and outside its exclusion polygon.
+ */
 export default class LineFragmentGenerator {
   generateFragments(lineRect, container) {
     let rects = this.splitLineRect(lineRect, container.polygon, 'INTERIOR');

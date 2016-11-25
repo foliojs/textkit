@@ -34,8 +34,11 @@ const SHRINK_CHAR_FACTOR = {
   unconstrained: false
 };
 
-// Based on a description of Apple's justification algorithm
-// from a PDF in the Apple Font Tools package
+/**
+ * A JustificationEngine is used by a Typesetter to perform line fragment
+ * justification. This implementation is based on a description of Apple's
+ * justification algorithm from a PDF in the Apple Font Tools package.
+ */
 export default class JustificationEngine {
   justify(line, options = {}) {
     // if (line.length === 0) {

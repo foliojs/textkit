@@ -24,6 +24,13 @@ import GlyphGenerator from './GlyphGenerator';
 // 4. bidi reordering
 // 5. justification
 
+/**
+ * A LayoutEngine is the main object that performs text layout.
+ * It accepts an AttributedString and a list of Container objects
+ * to layout text into, and uses several helper objects to perform
+ * various layout tasks. These objects can be overridden to customize
+ * layout behavior.
+ */
 export default class LayoutEngine {
   constructor() {
     this.glyphGenerator = new GlyphGenerator;

@@ -5,6 +5,11 @@ import Rect from './geom/Rect';
 // The base font size used for calculating underline thickness.
 const BASE_FONT_SIZE = 16;
 
+/**
+ * A TextDecorationEngine is used by a Typesetter to generate
+ * DecorationLines for a line fragment, including underlines
+ * and strikes.
+ */
 export default class TextDecorationEngine {
   createDecorationLines(lineFragment) {
     // Create initial underline and strikethrough lines

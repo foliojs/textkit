@@ -2,6 +2,11 @@ import FontManager from 'font-manager';
 import fontkit from 'fontkit';
 import Run from './models/Run';
 
+/**
+ * A FontSubstitutionEngine is used by a GlyphGenerator to resolve
+ * font runs in an AttributedString, performing font substitution
+ * where necessary.
+ */
 export default class FontSubstitutionEngine {
   constructor() {
     this.fontCache = new Map;

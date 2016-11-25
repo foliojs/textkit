@@ -5,6 +5,10 @@ import en_US from 'hyphenation.en-us';
 const hyphenator = new Hyphenator(en_US);
 const HYPHEN = 0x002D;
 
+/**
+ * A LineBreaker is used by the Typesetter to perform
+ * Unicode line breaking and hyphenation.
+ */
 export default class LineBreaker {
   suggestLineBreak(glyphString, width, hyphenationFactor = 0) {
     let glyphIndex = glyphString.glyphIndexAtOffset(width);

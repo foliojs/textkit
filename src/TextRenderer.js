@@ -1,3 +1,6 @@
+/**
+ * A TextRenderer renders text layout objects to a graphics context.
+ */
 export default class TextRenderer {
   constructor(ctx, options = {}) {
     this.ctx = ctx;

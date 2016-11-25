@@ -14,6 +14,11 @@ const ALIGN_TERMINATORS = {
   decimal: '.'
 };
 
+/**
+ * A TabEngine handles aligning lines containing tab characters
+ * with tab stops defined on a container. Text can be left, center,
+ * right, or decimal point aligned with tab stops.
+ */
 export default class TabEngine {
   processLineFragment(glyphString, container) {
     for (let {glyph, position, run, x, index} of glyphString) {

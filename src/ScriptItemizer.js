@@ -1,6 +1,10 @@
 import unicode from 'unicode-properties';
 import Run from './models/Run';
 
+/**
+ * A ScriptItemizer is used by a GlyphGenerator to resolve
+ * Unicode script runs in an AttributedString.
+ */
 export default class ScriptItemizer {
   getRuns(string) {
     let lastIndex = 0;

@@ -7,6 +7,10 @@ const OFFSET_FACTORS = {
   right: 1
 };
 
+/**
+ * A TruncationEngine is used by a Typesetter to perform
+ * line truncation and ellipsization.
+ */
 export default class TruncationEngine {
   truncate(lineFragment, mode = 'right') {
     let glyphIndex = Math.floor(lineFragment.length * OFFSET_FACTORS[mode]);
