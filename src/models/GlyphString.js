@@ -230,12 +230,12 @@ export default class GlyphString {
   offsetAtGlyphIndex(glyphIndex) {
     let offset = 0;
     for (let run of this.glyphRuns) {
-      for (let glyph of run.run.glyphs) {
+      for (let i = 0; i < run.run.glyphs.length; i++) {
         if (glyphIndex === 0) {
           return offset;
         }
 
-        offset += glyph.advanceWidth * run.scale;
+        offset += run.run.positions[i].xAdvance * run.scale;
         glyphIndex--;
       }
     }
