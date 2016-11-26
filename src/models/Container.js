@@ -6,6 +6,8 @@ export default class Container {
     this.exclusionPaths = options.exclusionPaths || [];
     this.tabStops = options.tabStops || [];
     this.tabStopInterval = options.tabStopInterval || 80;
+    this.columns = options.columns || 1;
+    this.columnGap = options.columnGap || 18; // 1/4 inch
     this.blocks = [];
   }
 

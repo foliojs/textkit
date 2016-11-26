@@ -43,46 +43,57 @@ export default class LayoutEngine {
     for (let i = 0; i < containers.length && start < attributedString.length; i++) {
       let container = containers[i];
       let isLastContainer = i === containers.length - 1;
-      let y = container.bbox.minY;
 
-      while (start < attributedString.length && y < container.bbox.maxY) {
-        let next = attributedString.string.indexOf('\n', start);
-        if (next === -1) {
-          next = attributedString.string.length;
-        }
+      let bbox = container.bbox;
+      let columnWidth = (bbox.width - (container.columnGap * (container.columns - 1))) / container.columns;
+      let rect = new Rect(bbox.minX, bbox.minY, columnWidth, bbox.height);
 
-        let paragraph = attributedString.slice(start, next);
-        console.log("PARA", y, container.bbox.maxY)
-
-        let block = this.layoutParagraph(paragraph, container, y, isLastContainer);
-        container.blocks.push(block);
-
-        y += block.bbox.height + block.style.paragraphSpacing;
-        start += block.stringLength;
-
-        if (attributedString.string[start] === '\n') {
-          start++;
-        }
-
-        // If entire paragraph did not fit, move on to the next container.
-        if (start < next) {
-          break;
-        }
+      for (let j = 0; j < container.columns && start < attributedString.length; j++) {
+        start = this.layoutColumn(attributedString, start, container, rect.copy(), isLastContainer);
+        rect.x += columnWidth + container.columnGap;
       }
     }
   }
 
-  layoutParagraph(attributedString, container, y, isLastContainer) {
+  layoutColumn(attributedString, start, container, rect, isLastContainer) {
+    while (start < attributedString.length && rect.height > 0) {
+      let next = attributedString.string.indexOf('\n', start);
+      if (next === -1) {
+        next = attributedString.string.length;
+      }
+
+      let paragraph = attributedString.slice(start, next);
+      let block = this.layoutParagraph(paragraph, container, rect, isLastContainer);
+      container.blocks.push(block);
+
+      let height = block.bbox.height + block.style.paragraphSpacing;
+
+      rect.y += height;
+      rect.height -= height;
+      start += block.stringLength;
+
+      if (attributedString.string[start] === '\n') {
+        start++;
+      }
+
+      // If entire paragraph did not fit, move on to the next column or container.
+      if (start < next) {
+        break;
+      }
+    }
+
+    return start;
+  }
+
+  layoutParagraph(attributedString, container, rect, isLastContainer) {
     let glyphString = this.glyphGenerator.generateGlyphs(attributedString);
     let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
 
-    let bbox = container.bbox;
-    let lineHeight = glyphString.height;
-    let rect = new Rect(
-      container.bbox.minX + paragraphStyle.marginLeft + paragraphStyle.indent,
-      y,
-      container.bbox.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
-      lineHeight
+    let lineRect = new Rect(
+      rect.x + paragraphStyle.marginLeft + paragraphStyle.indent,
+      rect.y,
+      rect.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      glyphString.height
     );
 
     let fragments = [];
@@ -90,15 +101,15 @@ export default class LayoutEngine {
     let firstLine = true;
     let lines = 0;
 
-    while (rect.y < bbox.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
+    while (lineRect.y < rect.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
       let lineFragments = this.typesetter.layoutLineFragments(
-        rect,
+        lineRect,
         glyphString.slice(pos, glyphString.length),
         container,
         paragraphStyle
       );
 
-      rect.y += rect.height + paragraphStyle.lineSpacing;
+      lineRect.y += lineRect.height + paragraphStyle.lineSpacing;
 
       if (lineFragments.length > 0) {
         fragments.push(...lineFragments);
@@ -106,8 +117,8 @@ export default class LayoutEngine {
         lines++;
 
         if (firstLine) {
-          rect.x -= paragraphStyle.indent;
-          rect.width += paragraphStyle.indent;
+          lineRect.x -= paragraphStyle.indent;
+          lineRect.width += paragraphStyle.indent;
           firstLine = false;
         }
       }
