@@ -1,3 +1,5 @@
+import Attachment from './models/Attachment';
+
 /**
  * A TextRenderer renders text layout objects to a graphics context.
  */
@@ -7,6 +9,7 @@ export default class TextRenderer {
     this.outlineBlocks = options.outlineBlocks || false;
     this.outlineLines = options.outlineLines || false;
     this.outlineRuns = options.outlineRuns || false;
+    this.outlineAttachments = options.outlineAttachments || false;
   }
 
   render(container) {
@@ -59,13 +62,41 @@ export default class TextRenderer {
 
     for (let i = 0; i < run.run.glyphs.length; i++) {
       let position = run.run.positions[i];
+      let glyph = run.run.glyphs[i];
 
       this.ctx.save();
       this.ctx.translate(position.xOffset * run.scale, position.yOffset * run.scale);
-      run.run.glyphs[i].render(this.ctx, run.attributes.fontSize);
+
+      if (glyph.codePoints[0] === Attachment.CODEPOINT && run.attributes.attachment) {
+        this.renderAttachment(run.attributes.attachment);
+      } else {
+        glyph.render(this.ctx, run.attributes.fontSize);
+      }
+
       this.ctx.restore();
 
       this.ctx.translate(position.xAdvance * run.scale, position.yAdvance * run.scale);
+    }
+  }
+
+  renderAttachment(attachment) {
+    this.ctx.scale(1, -1, {});
+    this.ctx.translate(0, -attachment.height);
+
+    if (this.outlineAttachments) {
+      this.ctx.rect(0, 0, attachment.width, attachment.height).stroke();
+    }
+
+    if (typeof attachment.render === 'function') {
+      this.ctx.rect(0, 0, attachment.width, attachment.height);
+      this.ctx.clip();
+      attachment.render(this.ctx);
+    } else if (attachment.image) {
+      this.ctx.image(attachment.image, 0, 0, {
+        fit: [attachment.width, attachment.height],
+        align: 'center',
+        valign: 'bottom'
+      });
     }
   }
 

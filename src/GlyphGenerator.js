@@ -6,6 +6,7 @@ import GlyphString from './models/GlyphString';
 import Run from './models/Run';
 import RunStyle from './models/RunStyle';
 import ScriptItemizer from './ScriptItemizer';
+import Attachment from './models/Attachment';
 
 /**
  * A GlyphGenerator is responsible for mapping characters in
@@ -32,7 +33,10 @@ export default class GlyphGenerator {
       let str = attributedString.string.slice(run.start, run.end);
       let glyphRun = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
       let end = glyphIndex + glyphRun.glyphs.length;
+
       let res = new GlyphRun(glyphIndex, end, run.attributes, glyphRun);
+      this.resolveAttachments(res);
+
       glyphIndex = end;
       return res;
     });
@@ -68,5 +72,20 @@ export default class GlyphGenerator {
     }
 
     return resolvedRuns;
+  }
+
+  resolveAttachments(glyphRun) {
+    let attachment = glyphRun.attributes.attachment;
+    if (!attachment) {
+      return;
+    }
+
+    for (let i = 0; i < glyphRun.length; i++) {
+      let glyph = glyphRun.run.glyphs[i];
+      let position = glyphRun.run.positions[i];
+      if (glyph.codePoints[0] === Attachment.CODEPOINT) {
+        position.xAdvance = attachment.width / glyphRun.scale;
+      }
+    }
   }
 }

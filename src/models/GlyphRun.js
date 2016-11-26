@@ -1,10 +1,15 @@
 import Run from './Run';
+import Attachment from './Attachment';
 
 export default class GlyphRun extends Run {
   constructor(start, end, attributes, run) {
     super(start, end, attributes);
     this.run = run;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
+  }
+
+  get length() {
+    return this.run.glyphs.length;
   }
 
   // @cache
@@ -14,7 +19,12 @@ export default class GlyphRun extends Run {
 
   // @cache
   get ascent() {
-    return this.attributes.font.ascent * this.scale;
+    let ascent = this.attributes.font.ascent * this.scale;
+    if (this.attributes.attachment && this.hasAttachmentGlyphs) {
+      return Math.max(ascent, this.attributes.attachment.height);
+    }
+
+    return ascent;
   }
 
   // @cache
@@ -29,6 +39,10 @@ export default class GlyphRun extends Run {
 
   get height() {
     return this.ascent - this.descent + this.lineGap;
+  }
+
+  get hasAttachmentGlyphs() {
+    return this.run.glyphs.some(g => g.codePoints[0] === Attachment.CODEPOINT);
   }
 
   slice(start, end) {
