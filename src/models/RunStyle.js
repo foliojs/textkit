@@ -3,6 +3,7 @@ import FontDescriptor from './FontDescriptor';
 export default class RunStyle {
   constructor(attributes = {}) {
     this.color = attributes.color || 'black';
+    this.backgroundColor = attributes.backgroundColor || null;
     this.fontDescriptor = FontDescriptor.fromAttributes(attributes);
     this.font = attributes.font || null;
     this.fontSize = attributes.fontSize || 12;

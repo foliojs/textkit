@@ -1,4 +1,5 @@
 import Attachment from './models/Attachment';
+import Rect from './geom/Rect';
 
 /**
  * A TextRenderer renders text layout objects to a graphics context.
@@ -38,7 +39,12 @@ export default class TextRenderer {
     this.ctx.scale(1, -1, {});
 
     for (let run of line.glyphRuns) {
-      this.renderRun(run);
+      if (run.attributes.backgroundColor) {
+        let backgroundRect = new Rect(0, line.descent, run.advanceWidth, line.height);
+        this.renderBackground(backgroundRect, run.attributes.backgroundColor);
+      }
+
+      this.renderRun(run, line);
     }
 
     this.ctx.restore();
@@ -53,10 +59,12 @@ export default class TextRenderer {
     this.ctx.restore();
   }
 
-  renderRun(run) {
+  renderRun(run, line) {
     if (this.outlineRuns) {
       this.ctx.rect(0, 0, run.advanceWidth, run.height).stroke();
     }
+
+    this.ctx.fillColor(run.attributes.color);
 
     let x = 0, y = 0;
 
@@ -77,6 +85,11 @@ export default class TextRenderer {
 
       this.ctx.translate(position.xAdvance * run.scale, position.yAdvance * run.scale);
     }
+  }
+
+  renderBackground(rect, backgroundColor) {
+    this.ctx.rect(rect.x, rect.y, rect.width, rect.height);
+    this.ctx.fill(backgroundColor);
   }
 
   renderAttachment(attachment) {

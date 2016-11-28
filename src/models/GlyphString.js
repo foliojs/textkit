@@ -99,6 +99,15 @@ export default class GlyphString {
     return height;
   }
 
+  get descent() {
+    let height = 0;
+    for (let run of this.glyphRuns) {
+      height = Math.min(height, run.descent);
+    }
+
+    return height;
+  }
+
   *[Symbol.iterator]() {
     let x = 0;
     for (let run of this.glyphRuns) {
