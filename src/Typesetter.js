@@ -31,6 +31,10 @@ export default class Typesetter {
   }
 
   layoutLineFragments(lineRect, glyphString, container, paragraphStyle) {
+    // Guess the line height using the full line before intersecting with the container.
+    lineRect.height = glyphString.slice(0, glyphString.glyphIndexAtOffset(lineRect.width)).height;
+
+    // Generate line fragment rectangles by intersecting with the container.
     let fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, container);
     if (fragmentRects.length === 0) {
       return [];
