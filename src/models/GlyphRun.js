@@ -51,8 +51,9 @@ export default class GlyphRun extends Run {
     end = Math.min(end, this.start + this.run.glyphs.length);
 
     let glyphs = this.run.glyphs.slice(start - this.start, end - this.start);
-    let positions = this.run.positions.slice(start - this.start, end - this.start);
-    let run = new this.run.constructor(glyphs, positions);
+    let run = new this.run.constructor(glyphs);
+    run.positions = this.run.positions.slice(start - this.start, end - this.start);
+
     return new GlyphRun(start, end, this.attributes, run);
   }
 }
