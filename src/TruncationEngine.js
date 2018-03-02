@@ -25,7 +25,7 @@ export default class TruncationEngine {
     let run = lineFragment.runAtGlyphIndex(glyphIndex);
     let font = run.attributes.font;
     let ellipsisGlyph = font.glyphForCodePoint(ELLIPSIS);
-    let ellipsisWidth = ellipsisGlyph.advanceWidth * run.scale;
+    let ellipsisWidth = ellipsisGlyph.advanceWidth;
 
     while (lineFragment.advanceWidth + ellipsisWidth > lineFragment.rect.width) {
       let nextGlyph;

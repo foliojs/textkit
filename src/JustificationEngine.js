@@ -60,9 +60,11 @@ export default class JustificationEngine {
     }
 
     let factors = [];
+    let start = 0;
     for (let run of line.glyphRuns) {
       // let engine = run.font._justEngine;
-      factors.push(...this.factor(run.run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
+      factors.push(...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
+      start += run.glyphs.length;
     }
 
     factors[0].before = 0;
@@ -74,14 +76,13 @@ export default class JustificationEngine {
 
     let index = 0;
     for (let run of line.glyphRuns) {
-      let scale = 1 / run.scale;
-      for (let position of run.run.positions) {
-        position.xAdvance += distances[index++] * scale;
+      for (let position of run.positions) {
+        position.xAdvance += distances[index++];
       }
     }
   }
 
-  factor(glyphs, direction) {
+  factor(line, start, glyphs, direction) {
     if (direction === 'GROW') {
       var charFactor = _.clone(EXPAND_CHAR_FACTOR);
       var whitespaceFactor = _.clone(EXPAND_WHITESPACE_FACTOR);
@@ -93,7 +94,7 @@ export default class JustificationEngine {
     let factors = [];
     for (let index = 0; index < glyphs.length; index++) {
       let glyph = glyphs[index];
-      if (unicode.isWhiteSpace(glyph.codePoints[0])) {
+      if (line.isWhiteSpace(start + index)) {
         var factor = _.clone(whitespaceFactor);
 
         if (index === glyphs.length - 1) {

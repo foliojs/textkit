@@ -76,7 +76,7 @@ doc.stroke();
 let string = AttributedString.fromFragments([
   {
     string: '“Lorem ipsum dolor sit \ufffc amet, ',
-    attributes: {font: 'Hoefler Text', fontSize: 14, bold: true, align: 'justify', hyphenationFactor: 0.9, hangingPunctuation: true, lineSpacing: 5, underline: true, underlineStyle: 'wavy', underlineColor: 'red', truncate: true, attachment: new Attachment(50, 50, {image: '/Users/devongovett/Downloads/Slack for iOS Upload (1).jpg'})}
+    attributes: {font: 'Hoefler Text', fontSize: 14, bold: true, align: 'justify', hyphenationFactor: 0.9, hangingPunctuation: true, lineSpacing: 5, underline: true, underlineStyle: 'wavy', underlineColor: 'red', truncate: true}
   },
   {
     string: 'consectetur adipiscing elit, ',
@@ -110,7 +110,7 @@ let l = new LayoutEngine;
 let container = new Container(path, {
   exclusionPaths: [exclusion],
   tabStops: [new TabStop(100, 'decimal'), new TabStop(150, 'left'), new TabStop(250, 'right')],
-  columns: 2
+  // columns: 2
 });
 let container2 = new Container(path2);
 l.layout(string, [container]);

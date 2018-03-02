@@ -34,7 +34,7 @@ export default class GlyphGenerator {
       let glyphRun = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
       let end = glyphIndex + glyphRun.glyphs.length;
 
-      let res = new GlyphRun(glyphIndex, end, run.attributes, glyphRun);
+      let res = new GlyphRun(glyphIndex, end, run.attributes, glyphRun.glyphs, glyphRun.positions, glyphRun.stringIndices);
       this.resolveAttachments(res);
 
       glyphIndex = end;
@@ -81,10 +81,10 @@ export default class GlyphGenerator {
     }
 
     for (let i = 0; i < glyphRun.length; i++) {
-      let glyph = glyphRun.run.glyphs[i];
-      let position = glyphRun.run.positions[i];
+      let glyph = glyphRun.glyphs[i];
+      let position = glyphRun.positions[i];
       if (glyph.codePoints[0] === Attachment.CODEPOINT) {
-        position.xAdvance = attachment.width / glyphRun.scale;
+        position.xAdvance = attachment.width;
       }
     }
   }

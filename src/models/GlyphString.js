@@ -111,16 +111,16 @@ export default class GlyphString {
   *[Symbol.iterator]() {
     let x = 0;
     for (let run of this.glyphRuns) {
-      for (let i = 0; i < run.run.glyphs.length; i++) {
+      for (let i = 0; i < run.glyphs.length; i++) {
         yield {
-          glyph: run.run.glyphs[i],
-          position: run.run.positions[i],
+          glyph: run.glyphs[i],
+          position: run.positions[i],
           run: run,
           x: x,
           index: run.start + i
         };
 
-        x += run.run.positions[i].xAdvance * run.scale;
+        x += run.positions[i].xAdvance;
       }
     }
   }
@@ -140,6 +140,21 @@ export default class GlyphString {
     return this._glyphRuns[this.runIndexAtGlyphIndex(index)];
   }
 
+  runIndexAtStringIndex(index) {
+    index += this._glyphRuns[0].stringStart;
+    for (let i = 0; i < this._glyphRuns.length; i++) {
+      if (this._glyphRuns[i].stringStart <= index && index < this._glyphRuns[i].stringEnd) {
+        return i;
+      }
+    }
+
+    return this._glyphRuns.length - 1;
+  }
+
+  runAtStringIndex(index) {
+    return this._glyphRuns[this.runIndexAtStringIndex(index)];
+  }
+
   slice(start, end) {
     return new GlyphString(
       this.string.slice(this.stringIndexForGlyphIndex(start), this.stringIndexForGlyphIndex(end)),
@@ -151,12 +166,12 @@ export default class GlyphString {
 
   glyphAtIndex(index) {
     let run = this.runAtGlyphIndex(index);
-    return run.run.glyphs[this.start + index - run.start];
+    return run.glyphs[this.start + index - run.start];
   }
 
   getGlyphWidth(index) {
     let run = this.runAtGlyphIndex(index);
-    return run.run.positions[this.start + index - run.start].xAdvance * run.scale;
+    return run.positions[this.start + index - run.start].xAdvance;
   }
 
   glyphIndexAtOffset(width) {
@@ -164,8 +179,8 @@ export default class GlyphString {
     let index = 0;
     for (let run of this.glyphRuns) {
       if (offset + run.advanceWidth > width) {
-        for (let position of run.run.positions) {
-          let w = position.xAdvance * run.scale;
+        for (let position of run.positions) {
+          let w = position.xAdvance;
           if (offset + w > width) {
             return index;
           } else {
@@ -175,7 +190,7 @@ export default class GlyphString {
         }
       } else {
         offset += run.advanceWidth;
-        index += run.run.glyphs.length;
+        index += run.glyphs.length;
       }
     }
 
@@ -183,68 +198,85 @@ export default class GlyphString {
   }
 
   stringIndexForGlyphIndex(glyphIndex) {
-    let gid = glyphIndex;
-    if (glyphIndex === 0) {
-      return 0;
+    let run = this.runAtGlyphIndex(glyphIndex);
+    if (glyphIndex >= run.end) {
+      return -1;
     }
+    console.log(glyphIndex, run.start, this.start + glyphIndex - run.start, run.stringIndices.length, run.stringIndices[glyphIndex - run.start], this.glyphRuns[0].stringStart)
+    return run.stringIndices[glyphIndex - run.start] - this.glyphRuns[0].stringStart;
 
-    let stringIndex = 0;
-    let s = '';
-    for (let run of this.glyphRuns) {
-      for (let glyph of run.run.glyphs) {
-        if (!glyph.inserted) {
-          stringIndex += String.fromCodePoint(...glyph.codePoints).length;
-          s += String.fromCodePoint(...glyph.codePoints);
-        }
-        glyphIndex--;
-
-        if (glyphIndex === 0) {
-          if (glyph.inserted) {
-            console.log('stringIndexForGlyphIndex', s, gid, stringIndex, glyph.inserted, new Error().stack)
-          }
-          return stringIndex;
-        }
-      }
-    }
-
-    console.log('stringIndexForGlyphIndex', s)
-    return stringIndex;
+    // let gid = glyphIndex;
+    // if (glyphIndex === 0) {
+    //   return 0;
+    // }
+    //
+    // let stringIndex = 0;
+    // let s = '';
+    // for (let run of this.glyphRuns) {
+    //   for (let glyph of run.glyphs) {
+    //     if (!glyph.inserted) {
+    //       stringIndex += String.fromCodePoint(...glyph.codePoints).length;
+    //       s += String.fromCodePoint(...glyph.codePoints);
+    //     }
+    //     glyphIndex--;
+    //
+    //     if (glyphIndex === 0) {
+    //       if (glyph.inserted) {
+    //         console.log('stringIndexForGlyphIndex', s, gid, stringIndex, glyph.inserted, new Error().stack)
+    //       }
+    //       return stringIndex;
+    //     }
+    //   }
+    // }
+    //
+    // console.log('stringIndexForGlyphIndex', s)
+    // return stringIndex;
   }
 
   glyphIndexForStringIndex(stringIndex) {
-    if (stringIndex === 0) {
-      return 0;
-    }
+    let run = this.runAtStringIndex(stringIndex);
+    return run.glyphIndices[stringIndex - run.stringStart] - this.start;
+    // if (stringIndex === 0) {
+    //   return 0;
+    // }
+    //
+    // let glyphIndex = 0;
+    // for (let run of this.glyphRuns) {
+    //   for (let glyph of run.glyphs) {
+    //     if (glyph.inserted) {
+    //       glyphIndex++;
+    //       continue;
+    //     }
+    //
+    //     if (stringIndex <= 0 && glyph.codePoints.length > 0) {
+    //       return glyphIndex;
+    //     }
+    //
+    //     stringIndex -= String.fromCodePoint(...glyph.codePoints).length;
+    //     glyphIndex++;
+    //   }
+    // }
+    //
+    // return glyphIndex;
+  }
 
-    let glyphIndex = 0;
-    for (let run of this.glyphRuns) {
-      for (let glyph of run.run.glyphs) {
-        if (glyph.inserted) {
-          glyphIndex++;
-          continue;
-        }
+  codePointAtGlyphIndex(glyphIndex) {
+    return this.string.codePointAt(this.stringIndexForGlyphIndex(glyphIndex));
+  }
 
-        if (stringIndex <= 0 && glyph.codePoints.length > 0) {
-          return glyphIndex;
-        }
-
-        stringIndex -= String.fromCodePoint(...glyph.codePoints).length;
-        glyphIndex++;
-      }
-    }
-
-    return glyphIndex;
+  charAtGlyphIndex(glyphIndex) {
+    return this.string.charAt(this.stringIndexForGlyphIndex(glyphIndex));
   }
 
   offsetAtGlyphIndex(glyphIndex) {
     let offset = 0;
     for (let run of this.glyphRuns) {
-      for (let i = 0; i < run.run.glyphs.length; i++) {
+      for (let i = 0; i < run.glyphs.length; i++) {
         if (glyphIndex === 0) {
           return offset;
         }
 
-        offset += run.run.positions[i].xAdvance * run.scale;
+        offset += run.positions[i].xAdvance;
         glyphIndex--;
       }
     }
@@ -264,13 +296,13 @@ export default class GlyphString {
   }
 
   getUnicodeCategory(index) {
-    let glyph = this.glyphAtIndex(index);
-    return glyph ? unicode.getCategory(glyph.codePoints[0]) : null;
+    let codePoint = this.codePointAtGlyphIndex(index);
+    return codePoint ? unicode.getCategory(codePoint) : null;
   }
 
   isWhiteSpace(index) {
-    let glyph = this.glyphAtIndex(index);
-    return glyph && unicode.isWhiteSpace(glyph.codePoints[0]);
+    let codePoint = this.codePointAtGlyphIndex(index);
+    return codePoint ? unicode.isWhiteSpace(codePoint) : false;
   }
 
   isHangingPunctuationStart(index) {
@@ -279,7 +311,7 @@ export default class GlyphString {
 
   isHangingPunctuationEnd(index) {
     return HANGING_PUNCTUATION_END_CATEGORIES.has(this.getUnicodeCategory(index))
-      || HANGING_PUNCTUATION_END_CODEPOINTS.has(this.glyphAtIndex(index).codePoints[0]);
+      || HANGING_PUNCTUATION_END_CODEPOINTS.has(this.codePointAtGlyphIndex(index));
   }
 
   insertGlyph(index, codePoint) {
@@ -288,8 +320,8 @@ export default class GlyphString {
 
     let glyph = run.attributes.font.glyphForCodePoint(codePoint);
     glyph.inserted = true; // TODO: don't do this
-    run.run.glyphs.splice(this.start + index - run.start, 0, glyph);
-    run.run.positions.splice(this.start + index - run.start, 0, {
+    run.glyphs.splice(this.start + index - run.start, 0, glyph);
+    run.positions.splice(this.start + index - run.start, 0, {
       xAdvance: glyph.advanceWidth,
       yAdvance: 0,
       xOffset: 0,
@@ -319,8 +351,8 @@ export default class GlyphString {
     let run = this._glyphRuns[runIndex];
     let glyphIndex = this.start + index - run.start;
 
-    run.run.glyphs.splice(glyphIndex, 1);
-    run.run.positions.splice(glyphIndex, 1);
+    run.glyphs.splice(glyphIndex, 1);
+    run.positions.splice(glyphIndex, 1);
 
     // TODO: fix string indexes
 

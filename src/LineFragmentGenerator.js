@@ -48,11 +48,14 @@ export default class LineFragmentGenerator {
       let contour = polygon.contours[i];
       let index = -1;
       let state = -1;
+
+      // Find the first point outside the line rect.
       do {
         let point = contour[++index];
         state = point.y <= minY ? BELOW : point.y >= maxY ? ABOVE : INSIDE;
       } while (state === INSIDE && index < contour.length - 1);
 
+      // Contour is entirely inside the line rect. Skip it.
       if (state === INSIDE) {
         continue;
       }
