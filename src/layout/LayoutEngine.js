@@ -31,23 +31,39 @@ import Typesetter from './Typesetter';
  */
 export default class LayoutEngine {
   constructor() {
-    this.glyphGenerator = new GlyphGenerator;
-    this.typesetter = new Typesetter;
+    this.glyphGenerator = new GlyphGenerator();
+    this.typesetter = new Typesetter();
   }
 
   layout(attributedString, containers) {
     let start = 0;
 
-    for (let i = 0; i < containers.length && start < attributedString.length; i++) {
+    for (
+      let i = 0;
+      i < containers.length && start < attributedString.length;
+      i++
+    ) {
       let container = containers[i];
       let isLastContainer = i === containers.length - 1;
 
       let bbox = container.bbox;
-      let columnWidth = (bbox.width - (container.columnGap * (container.columns - 1))) / container.columns;
+      let columnWidth =
+        (bbox.width - container.columnGap * (container.columns - 1)) /
+        container.columns;
       let rect = new Rect(bbox.minX, bbox.minY, columnWidth, bbox.height);
 
-      for (let j = 0; j < container.columns && start < attributedString.length; j++) {
-        start = this.layoutColumn(attributedString, start, container, rect.copy(), isLastContainer);
+      for (
+        let j = 0;
+        j < container.columns && start < attributedString.length;
+        j++
+      ) {
+        start = this.layoutColumn(
+          attributedString,
+          start,
+          container,
+          rect.copy(),
+          isLastContainer
+        );
         rect.x += columnWidth + container.columnGap;
       }
     }
@@ -61,7 +77,12 @@ export default class LayoutEngine {
       }
 
       let paragraph = attributedString.slice(start, next);
-      let block = this.layoutParagraph(paragraph, container, rect, isLastContainer);
+      let block = this.layoutParagraph(
+        paragraph,
+        container,
+        rect,
+        isLastContainer
+      );
       container.blocks.push(block);
 
       let height = block.bbox.height + block.style.paragraphSpacing;
@@ -85,12 +106,17 @@ export default class LayoutEngine {
 
   layoutParagraph(attributedString, container, rect, isLastContainer) {
     let glyphString = this.glyphGenerator.generateGlyphs(attributedString);
-    let paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
+    let paragraphStyle = new ParagraphStyle(
+      attributedString.runs[0].attributes
+    );
 
     let lineRect = new Rect(
       rect.x + paragraphStyle.marginLeft + paragraphStyle.indent,
       rect.y,
-      rect.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      rect.width -
+        paragraphStyle.marginLeft -
+        paragraphStyle.indent -
+        paragraphStyle.marginRight,
       glyphString.height
     );
 
@@ -99,7 +125,11 @@ export default class LayoutEngine {
     let firstLine = true;
     let lines = 0;
 
-    while (lineRect.y < rect.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
+    while (
+      lineRect.y < rect.maxY &&
+      pos < glyphString.length &&
+      lines < paragraphStyle.maxLines
+    ) {
       let lineFragments = this.typesetter.layoutLineFragments(
         lineRect,
         glyphString.slice(pos, glyphString.length),
@@ -125,9 +155,15 @@ export default class LayoutEngine {
     let isTruncated = isLastContainer && pos < glyphString.length;
     for (let i = 0; i < fragments.length; i++) {
       let fragment = fragments[i];
-      let isLastFragment = i === fragments.length - 1 && pos === glyphString.length;
+      let isLastFragment =
+        i === fragments.length - 1 && pos === glyphString.length;
 
-      this.typesetter.finalizeLineFragment(fragment, paragraphStyle, isLastFragment, isTruncated);
+      this.typesetter.finalizeLineFragment(
+        fragment,
+        paragraphStyle,
+        isLastFragment,
+        isTruncated
+      );
     }
 
     return new Block(fragments, paragraphStyle);

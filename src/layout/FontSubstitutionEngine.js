@@ -9,7 +9,7 @@ import Run from '../models/Run';
  */
 export default class FontSubstitutionEngine {
   constructor() {
-    this.fontCache = new Map;
+    this.fontCache = new Map();
   }
 
   getFont(fontDescriptor) {
@@ -34,7 +34,9 @@ export default class FontSubstitutionEngine {
     let index = 0;
 
     for (let run of runs) {
-      let defaultDescriptor = FontManager.findFontSync(run.attributes.fontDescriptor);
+      let defaultDescriptor = FontManager.findFontSync(
+        run.attributes.fontDescriptor
+      );
       let defaultFont = this.getFont(defaultDescriptor);
 
       for (let char of string.slice(run.start, run.end)) {
@@ -43,16 +45,24 @@ export default class FontSubstitutionEngine {
         let font = null;
 
         if (defaultFont.hasGlyphForCodePoint(codePoint)) {
-          descriptor = defaultDescriptor
+          descriptor = defaultDescriptor;
           font = defaultFont;
         } else {
-          descriptor = FontManager.substituteFontSync(defaultDescriptor.postscriptName, char);
+          descriptor = FontManager.substituteFontSync(
+            defaultDescriptor.postscriptName,
+            char
+          );
           font = this.getFont(descriptor);
         }
 
         if (font !== lastFont) {
           if (lastFont) {
-            res.push(new Run(lastIndex, index, {font: lastFont, fontDescriptor: lastDescriptor}));
+            res.push(
+              new Run(lastIndex, index, {
+                font: lastFont,
+                fontDescriptor: lastDescriptor
+              })
+            );
           }
 
           lastFont = font;
@@ -65,7 +75,12 @@ export default class FontSubstitutionEngine {
     }
 
     if (lastIndex < string.length) {
-      res.push(new Run(lastIndex, string.length, {font: lastFont, fontDescriptor: lastDescriptor}));
+      res.push(
+        new Run(lastIndex, string.length, {
+          font: lastFont,
+          fontDescriptor: lastDescriptor
+        })
+      );
     }
 
     return res;

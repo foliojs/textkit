@@ -16,10 +16,14 @@ export default class ScriptItemizer {
     for (let char of string) {
       let codePoint = char.codePointAt();
       let script = unicode.getScript(codePoint);
-      if (script === 'Common' || script === 'Inherited' || script === 'Unknown') {
+      if (
+        script === 'Common' ||
+        script === 'Inherited' ||
+        script === 'Unknown'
+      ) {
         // TODO: deal with paired brackets?
       } else if (script !== lastScript && lastIndex !== 0) {
-        runs.push(new Run(lastIndex, index - 1, {script: lastScript}));
+        runs.push(new Run(lastIndex, index - 1, { script: lastScript }));
 
         lastIndex = index;
         lastScript = script;
@@ -29,7 +33,7 @@ export default class ScriptItemizer {
     }
 
     if (lastIndex < string.length) {
-      runs.push(new Run(lastIndex, string.length, {script: lastScript}));
+      runs.push(new Run(lastIndex, string.length, { script: lastScript }));
     }
 
     return runs;

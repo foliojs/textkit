@@ -2,7 +2,15 @@ import Run from './Run';
 import Attachment from './Attachment';
 
 export default class GlyphRun extends Run {
-  constructor(start, end, attributes, glyphs, positions, stringIndices, preScaled) {
+  constructor(
+    start,
+    end,
+    attributes,
+    glyphs,
+    positions,
+    stringIndices,
+    preScaled
+  ) {
     super(start, end, attributes);
     // this.run = run;
     this.glyphs = glyphs;
@@ -78,8 +86,19 @@ export default class GlyphRun extends Run {
 
     let glyphs = this.glyphs.slice(start - this.start, end - this.start);
     let positions = this.positions.slice(start - this.start, end - this.start);
-    let stringIndices = this.stringIndices.slice(start - this.start, end - this.start);
+    let stringIndices = this.stringIndices.slice(
+      start - this.start,
+      end - this.start
+    );
     // let run = new this.run.constructor(glyphs, positions);
-    return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
+    return new GlyphRun(
+      start,
+      end,
+      this.attributes,
+      glyphs,
+      positions,
+      stringIndices,
+      true
+    );
   }
 }

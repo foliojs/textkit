@@ -5,12 +5,12 @@ const BELOW = 1;
 const INSIDE = 2;
 const ABOVE = 3;
 
-const BELOW_TO_INSIDE = BELOW  << 4 | INSIDE;
-const BELOW_TO_ABOVE =  BELOW  << 4 | ABOVE;
-const INSIDE_TO_BELOW = INSIDE << 4 | BELOW;
-const INSIDE_TO_ABOVE = INSIDE << 4 | ABOVE;
-const ABOVE_TO_INSIDE = ABOVE  << 4 | INSIDE;
-const ABOVE_TO_BELOW =  ABOVE  << 4 | BELOW;
+const BELOW_TO_INSIDE = (BELOW << 4) | INSIDE;
+const BELOW_TO_ABOVE = (BELOW << 4) | ABOVE;
+const INSIDE_TO_BELOW = (INSIDE << 4) | BELOW;
+const INSIDE_TO_ABOVE = (INSIDE << 4) | ABOVE;
+const ABOVE_TO_INSIDE = (ABOVE << 4) | INSIDE;
+const ABOVE_TO_BELOW = (ABOVE << 4) | BELOW;
 
 const LEFT = 0;
 const RIGHT = 1;
@@ -162,7 +162,7 @@ export default class LineFragmentGenerator {
             }
 
             default:
-              throw new Error('Unknown state change')
+              throw new Error('Unknown state change');
           }
           state = s;
         } else if (s === INSIDE) {
@@ -178,7 +178,10 @@ export default class LineFragmentGenerator {
     // console.log(markers);
 
     let G = 0;
-    if (type === 'INTERIOR' || markers.length > 0 && markers[0].type === LEFT) {
+    if (
+      type === 'INTERIOR' ||
+      (markers.length > 0 && markers[0].type === LEFT)
+    ) {
       G++;
     }
 
@@ -220,5 +223,5 @@ export default class LineFragmentGenerator {
 function xIntersection(e, t, n) {
   var r = e - n.y,
     i = t.y - n.y;
-  return r / i * (t.x - n.x) + n.x
+  return r / i * (t.x - n.x) + n.x;
 }

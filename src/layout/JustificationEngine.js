@@ -63,7 +63,9 @@ export default class JustificationEngine {
     let start = 0;
     for (let run of line.glyphRuns) {
       // let engine = run.font._justEngine;
-      factors.push(...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
+      factors.push(
+        ...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK')
+      );
       start += run.glyphs.length;
     }
 
@@ -104,12 +106,10 @@ export default class JustificationEngine {
             factors[index - 1].after = 0;
           }
         }
-
       } else if (glyph.isMark && index > 0) {
         var factor = _.clone(factors[index - 1]);
         factor.before = 0;
         factors[index - 1].after = 0;
-
       } else {
         var factor = _.clone(charFactor);
       }
@@ -124,7 +124,11 @@ export default class JustificationEngine {
     let total = 0;
     let priorities = [];
     let unconstrained = [];
-    for (let priority = KASHIDA_PRIORITY; priority <= NULL_PRIORITY; priority++) {
+    for (
+      let priority = KASHIDA_PRIORITY;
+      priority <= NULL_PRIORITY;
+      priority++
+    ) {
       priorities[priority] = unconstrained[priority] = 0;
     }
 
@@ -183,7 +187,8 @@ export default class JustificationEngine {
     // if there is still space left over, assign it to the highest priority that we saw.
     // this violates their factors, but it only happens in extreme cases
     if (remainingGap > 0 && highestPriority > -1) {
-      priorities[highestPriority] = (highestPrioritySum + (gap - total)) / highestPrioritySum;
+      priorities[highestPriority] =
+        (highestPrioritySum + (gap - total)) / highestPrioritySum;
     }
 
     // create and return an array of distances to add to each glyph's advance

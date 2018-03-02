@@ -3,7 +3,7 @@ import Hyphenator from 'hypher';
 import en_US from 'hyphenation.en-us';
 
 const hyphenator = new Hyphenator(en_US);
-const HYPHEN = 0x002D;
+const HYPHEN = 0x002d;
 
 const SHRINK_FACTOR = 0.04;
 
@@ -17,7 +17,7 @@ export default class LineBreaker {
     if (glyphIndex === -1) return;
 
     if (glyphIndex === glyphString.length) {
-      return {position: glyphString.length, required: true};
+      return { position: glyphString.length, required: true };
     }
 
     let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
@@ -26,15 +26,24 @@ export default class LineBreaker {
     if (bk) {
       let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
 
-      if (bk.next != null && this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)) {
+      if (
+        bk.next != null &&
+        this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
+      ) {
         let lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
-        let shrunk = lineWidth + (lineWidth * SHRINK_FACTOR);
+        let shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
         // console.log(lineWidth, shrunk)
 
         let shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
-        stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
+        stringIndex = Math.min(
+          bk.next,
+          glyphString.stringIndexForGlyphIndex(shrunkIndex)
+        );
 
-        let point = this.findHyphenationPoint(glyphString.string.slice(bk.position, bk.next), stringIndex - bk.position);
+        let point = this.findHyphenationPoint(
+          glyphString.string.slice(bk.position, bk.next),
+          stringIndex - bk.position
+        );
 
         if (point > 0) {
           bk.position += point;
@@ -57,7 +66,7 @@ export default class LineBreaker {
     let last = null;
     let bk = null;
 
-    while (bk = breaker.nextBreak()) {
+    while ((bk = breaker.nextBreak())) {
       if (bk.position > index) {
         if (last) {
           last.next = bk.position;
@@ -78,7 +87,7 @@ export default class LineBreaker {
 
   shouldHyphenate(glyphString, glyphIndex, width, hyphenationFactor) {
     let lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
-    return (lineWidth / width) < hyphenationFactor;
+    return lineWidth / width < hyphenationFactor;
   }
 
   findHyphenationPoint(string, index) {

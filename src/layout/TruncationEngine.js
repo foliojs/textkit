@@ -27,21 +27,33 @@ export default class TruncationEngine {
     let ellipsisGlyph = font.glyphForCodePoint(ELLIPSIS);
     let ellipsisWidth = ellipsisGlyph.advanceWidth;
 
-    while (lineFragment.advanceWidth + ellipsisWidth > lineFragment.rect.width) {
+    while (
+      lineFragment.advanceWidth + ellipsisWidth >
+      lineFragment.rect.width
+    ) {
       let nextGlyph;
 
       // Find the next grapheme cluster break
       if (mode === 'right') {
-        stringIndex = GraphemeBreaker.previousBreak(lineFragment.string, stringIndex);
+        stringIndex = GraphemeBreaker.previousBreak(
+          lineFragment.string,
+          stringIndex
+        );
         nextGlyph = lineFragment.glyphIndexForStringIndex(stringIndex);
       } else {
-        let nextStringIndex = GraphemeBreaker.nextBreak(lineFragment.string, stringIndex);
+        let nextStringIndex = GraphemeBreaker.nextBreak(
+          lineFragment.string,
+          stringIndex
+        );
         nextGlyph = lineFragment.glyphIndexForStringIndex(nextStringIndex) - 1;
       }
 
       // Delete the cluster
       let min = Math.min(glyphIndex, nextGlyph, lineFragment.length - 1);
-      let max = Math.min(Math.max(glyphIndex, nextGlyph), lineFragment.length - 1);
+      let max = Math.min(
+        Math.max(glyphIndex, nextGlyph),
+        lineFragment.length - 1
+      );
 
       for (let i = max; i >= min; i--) {
         lineFragment.deleteGlyph(i);

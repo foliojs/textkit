@@ -63,7 +63,7 @@ export default class Path {
   }
 
   append(path) {
-    for (let {command, args} of path.commands) {
+    for (let { command, args } of path.commands) {
       this[command](...args);
     }
 
@@ -76,7 +76,9 @@ export default class Path {
    * @return {string}
    */
   toFunction() {
-    let cmds = this.commands.map(c => `  ctx.${c.command}(${c.args.join(', ')});`);
+    let cmds = this.commands.map(
+      c => `  ctx.${c.command}(${c.args.join(', ')});`
+    );
     return new Function('ctx', cmds.join('\n'));
   }
 
@@ -102,7 +104,7 @@ export default class Path {
    */
   get cbox() {
     if (!this._cbox) {
-      let cbox = new BBox;
+      let cbox = new BBox();
       for (let command of this.commands) {
         for (let i = 0; i < command.args.length; i += 2) {
           cbox.addPoint(command.args[i], command.args[i + 1]);
@@ -125,17 +127,17 @@ export default class Path {
       return this._bbox;
     }
 
-    let bbox = new BBox;
-    let cx = 0, cy = 0;
+    let bbox = new BBox();
+    let cx = 0,
+      cy = 0;
 
-    let f = t => (
-      Math.pow(1 - t, 3) * p0[i]
-        + 3 * Math.pow(1 - t, 2) * t * p1[i]
-        + 3 * (1 - t) * Math.pow(t, 2) * p2[i]
-        + Math.pow(t, 3) * p3[i]
-    );
+    let f = t =>
+      Math.pow(1 - t, 3) * p0[i] +
+      3 * Math.pow(1 - t, 2) * t * p1[i] +
+      3 * (1 - t) * Math.pow(t, 2) * p2[i] +
+      Math.pow(t, 3) * p3[i];
 
-    for (let {command, args} of this.commands) {
+    for (let { command, args } of this.commands) {
       switch (command) {
         case 'moveTo':
         case 'lineTo':
@@ -147,7 +149,7 @@ export default class Path {
 
         case 'quadraticCurveTo':
           args = quadraticToBezier(cx, cy, ...args);
-          // fall through
+        // fall through
 
         case 'bezierCurveTo':
           let [cp1x, cp1y, cp2x, cp2y, p3x, p3y] = args;
@@ -212,11 +214,11 @@ export default class Path {
       }
     }
 
-    return this._bbox = Object.freeze(bbox);
+    return (this._bbox = Object.freeze(bbox));
   }
 
   mapPoints(fn) {
-    let path = new Path;
+    let path = new Path();
 
     for (let c of this.commands) {
       let args = [];
@@ -258,14 +260,22 @@ export default class Path {
       return this;
     }
 
-    let path = new Path;
-    let x = 0, y = 0;
+    let path = new Path();
+    let x = 0,
+      y = 0;
     for (let c of this.commands) {
       if (c.command === 'quadraticCurveTo') {
         let quads = quadraticToBezier(x, y, ...c.args);
 
         for (let i = 2; i < quads.length; i += 6) {
-          path.bezierCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3], quads[i + 4], quads[i + 5]);
+          path.bezierCurveTo(
+            quads[i],
+            quads[i + 1],
+            quads[i + 2],
+            quads[i + 3],
+            quads[i + 4],
+            quads[i + 5]
+          );
         }
       } else {
         path[c.command](...c.args);
@@ -282,14 +292,20 @@ export default class Path {
       return this;
     }
 
-    let path = new Path;
-    let x = 0, y = 0;
+    let path = new Path();
+    let x = 0,
+      y = 0;
     for (let c of this.commands) {
       if (c.command === 'bezierCurveTo') {
         let quads = cubic2quad(x, y, ...c.args, 0.1);
 
         for (let i = 2; i < quads.length; i += 4) {
-          path.quadraticCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3]);
+          path.quadraticCurveTo(
+            quads[i],
+            quads[i + 1],
+            quads[i + 2],
+            quads[i + 3]
+          );
         }
       } else {
         path[c.command](...c.args);
@@ -310,10 +326,13 @@ export default class Path {
       return this;
     }
 
-    let res = new Path;
-    let cx = 0, cy = 0, sx = 0, sy = 0;
+    let res = new Path();
+    let cx = 0,
+      cy = 0,
+      sx = 0,
+      sy = 0;
 
-    for (let {command, args} of this.commands) {
+    for (let { command, args } of this.commands) {
       switch (command) {
         case 'moveTo':
           res.moveTo(...args);
@@ -329,7 +348,7 @@ export default class Path {
 
         case 'quadraticCurveTo':
           args = quadraticToBezier(cx, cy, ...args);
-          // fall through!
+        // fall through!
 
         case 'bezierCurveTo':
           subdivideBezierWithFlatness(res, 0.6, cx, cy, ...args);
@@ -362,7 +381,7 @@ export default class Path {
     let sum = 0;
 
     let path = this.flatten();
-    for (let {command, args} of path.commands) {
+    for (let { command, args } of path.commands) {
       let [x, y] = args;
       switch (command) {
         case 'moveTo':
@@ -397,10 +416,10 @@ export default class Path {
   reverse() {
     let commands = this.commands;
     let start = commands[0];
-    let res = new Path;
+    let res = new Path();
 
     for (let i = 1; i < commands.length; i++) {
-      let {command, args} = commands[i];
+      let { command, args } = commands[i];
       if (command !== 'moveTo' && i + 1 < commands.length) {
         continue;
       }
@@ -431,7 +450,14 @@ export default class Path {
             break;
 
           case 'bezierCurveTo':
-            res.bezierCurveTo(cur.args[2], cur.args[3], cur.args[0], cur.args[1], px, py);
+            res.bezierCurveTo(
+              cur.args[2],
+              cur.args[3],
+              cur.args[0],
+              cur.args[1],
+              px,
+              py
+            );
             if (closed && prev.command === 'moveTo') {
               prev.closePath();
             }
@@ -468,9 +494,9 @@ export default class Path {
     }
 
     let contour = [];
-    let polygon = new Polygon;
+    let polygon = new Polygon();
 
-    for (let {command, args} of path.commands) {
+    for (let { command, args } of path.commands) {
       switch (command) {
         case 'moveTo':
           if (contour.length) {
@@ -501,7 +527,13 @@ export default class Path {
   }
 }
 
-for (let command of ['moveTo', 'lineTo', 'quadraticCurveTo', 'bezierCurveTo', 'closePath']) {
+for (let command of [
+  'moveTo',
+  'lineTo',
+  'quadraticCurveTo',
+  'bezierCurveTo',
+  'closePath'
+]) {
   Path.prototype[command] = function(...args) {
     this._bbox = this._cbox = null;
     this.commands.push({
@@ -523,12 +555,23 @@ function quadraticToBezier(cx, cy, qp1x, qp1y, x, y) {
   // http://fontforge.org/bezier.html
   var cp1x = cx + 2 / 3 * (qp1x - cx); // CP1 = QP0 + 2/3 * (QP1-QP0)
   var cp1y = cy + 2 / 3 * (qp1y - cy);
-  var cp2x = x + 2 / 3 * (qp1x - x);   // CP2 = QP2 + 2/3 * (QP1-QP2)
+  var cp2x = x + 2 / 3 * (qp1x - x); // CP2 = QP2 + 2/3 * (QP1-QP2)
   var cp2y = y + 2 / 3 * (qp1y - y);
   return [cp1x, cp1y, cp2x, cp2y, x, y];
 }
 
-function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, cp2y, x, y) {
+function subdivideBezierWithFlatness(
+  path,
+  flatness,
+  cx,
+  cy,
+  cp1x,
+  cp1y,
+  cp2x,
+  cp2y,
+  x,
+  y
+) {
   let dx1 = cp1x - cx;
   let dx2 = cp2x - cp1x;
   let dx3 = x - cp2x;
