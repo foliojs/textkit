@@ -18,8 +18,8 @@ export default class GlyphGenerator {
   constructor() {
     this.resolvers = [
       // new BidiEngine,
-      new FontSubstitutionEngine,
-      new ScriptItemizer
+      new FontSubstitutionEngine(),
+      new ScriptItemizer()
     ];
   }
 
@@ -31,10 +31,21 @@ export default class GlyphGenerator {
     let glyphIndex = 0;
     let glyphRuns = runs.map(run => {
       let str = attributedString.string.slice(run.start, run.end);
-      let glyphRun = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
+      let glyphRun = run.attributes.font.layout(
+        str,
+        run.attributes.features,
+        run.attributes.script
+      );
       let end = glyphIndex + glyphRun.glyphs.length;
 
-      let res = new GlyphRun(glyphIndex, end, run.attributes, glyphRun.glyphs, glyphRun.positions, glyphRun.stringIndices);
+      let res = new GlyphRun(
+        glyphIndex,
+        end,
+        run.attributes,
+        glyphRun.glyphs,
+        glyphRun.positions,
+        glyphRun.stringIndices
+      );
       this.resolveAttachments(res);
 
       glyphIndex = end;
@@ -47,7 +58,7 @@ export default class GlyphGenerator {
   resolveRuns(attributedString) {
     // Map attributes to RunStyle objects
     let r = attributedString.runs.map(run => {
-      return new Run(run.start, run.end, new RunStyle(run.attributes))
+      return new Run(run.start, run.end, new RunStyle(run.attributes));
     });
 
     // Resolve run ranges and additional attributes

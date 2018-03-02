@@ -21,7 +21,9 @@ export default class FontDescriptor {
       postscriptName: attributes.fontPostscriptName || font.postscriptName,
       family: attributes.fontFamily || font.family,
       style: attributes.fontStyle,
-      weight: getFontWeight(attributes.fontWeight) || (attributes.bold ? FONT_WEIGHTS.bold : null),
+      weight:
+        getFontWeight(attributes.fontWeight) ||
+        (attributes.bold ? FONT_WEIGHTS.bold : null),
       width: getFontWidth(attributes.fontWidth),
       italic: attributes.italic,
       monospace: attributes.monospace
@@ -42,7 +44,7 @@ function parseFont(font) {
     };
   }
 
-  return {family: font};
+  return { family: font };
 }
 
 const FONT_WEIGHTS = {

@@ -4,20 +4,20 @@ import unicode from 'unicode-properties';
 const HANGING_PUNCTUATION_START_CATEGORIES = new Set(['Ps', 'Pi', 'Pf']);
 const HANGING_PUNCTUATION_END_CATEGORIES = new Set(['Pe', 'Pi', 'Pf']);
 const HANGING_PUNCTUATION_END_CODEPOINTS = new Set([
-  0x002C, // COMMA
-  0x002E, // FULL STOP
-  0x060C, // ARABIC COMMA
-  0x06D4, // ARABIC FULL STOP
+  0x002c, // COMMA
+  0x002e, // FULL STOP
+  0x060c, // ARABIC COMMA
+  0x06d4, // ARABIC FULL STOP
   0x3001, // IDEOGRAPHIC COMMA
   0x3002, // IDEOGRAPHIC FULL STOP
-  0xFF0C, // FULLWIDTH COMMA
-  0xFF0E, // FULLWIDTH FULL STOP
-  0xFE50, // SMALL COMMA
-  0xFE51, // SMALL IDEOGRAPHIC COMMA
-  0xFE52, // SMALL FULL STOP
-  0xFF61, // HALFWIDTH IDEOGRAPHIC FULL STOP
-  0xFF64, // HALFWIDTH IDEOGRAPHIC COMMA
-  0x002D, // HYPHEN
+  0xff0c, // FULLWIDTH COMMA
+  0xff0e, // FULLWIDTH FULL STOP
+  0xfe50, // SMALL COMMA
+  0xfe51, // SMALL IDEOGRAPHIC COMMA
+  0xfe52, // SMALL FULL STOP
+  0xff61, // HALFWIDTH IDEOGRAPHIC FULL STOP
+  0xff64, // HALFWIDTH IDEOGRAPHIC COMMA
+  0x002d // HYPHEN
 ]);
 
 export default class GlyphString {
@@ -43,7 +43,9 @@ export default class GlyphString {
 
     let runs = [];
 
-    runs.push(startRun.slice(this.start - startRun.start, this.end - startRun.start));
+    runs.push(
+      startRun.slice(this.start - startRun.start, this.end - startRun.start)
+    );
 
     if (endRunIndex !== startRunIndex) {
       runs.push(...this._glyphRuns.slice(startRunIndex + 1, endRunIndex));
@@ -143,7 +145,10 @@ export default class GlyphString {
   runIndexAtStringIndex(index) {
     index += this._glyphRuns[0].stringStart;
     for (let i = 0; i < this._glyphRuns.length; i++) {
-      if (this._glyphRuns[i].stringStart <= index && index < this._glyphRuns[i].stringEnd) {
+      if (
+        this._glyphRuns[i].stringStart <= index &&
+        index < this._glyphRuns[i].stringEnd
+      ) {
         return i;
       }
     }
@@ -157,7 +162,10 @@ export default class GlyphString {
 
   slice(start, end) {
     return new GlyphString(
-      this.string.slice(this.stringIndexForGlyphIndex(start), this.stringIndexForGlyphIndex(end)),
+      this.string.slice(
+        this.stringIndexForGlyphIndex(start),
+        this.stringIndexForGlyphIndex(end)
+      ),
       this._glyphRuns,
       start + this.start,
       end + this.start
@@ -202,8 +210,17 @@ export default class GlyphString {
     if (glyphIndex >= run.end) {
       return -1;
     }
-    console.log(glyphIndex, run.start, this.start + glyphIndex - run.start, run.stringIndices.length, run.stringIndices[glyphIndex - run.start], this.glyphRuns[0].stringStart)
-    return run.stringIndices[glyphIndex - run.start] - this.glyphRuns[0].stringStart;
+    console.log(
+      glyphIndex,
+      run.start,
+      this.start + glyphIndex - run.start,
+      run.stringIndices.length,
+      run.stringIndices[glyphIndex - run.start],
+      this.glyphRuns[0].stringStart
+    );
+    return (
+      run.stringIndices[glyphIndex - run.start] - this.glyphRuns[0].stringStart
+    );
 
     // let gid = glyphIndex;
     // if (glyphIndex === 0) {
@@ -306,12 +323,16 @@ export default class GlyphString {
   }
 
   isHangingPunctuationStart(index) {
-    return HANGING_PUNCTUATION_START_CATEGORIES.has(this.getUnicodeCategory(index));
+    return HANGING_PUNCTUATION_START_CATEGORIES.has(
+      this.getUnicodeCategory(index)
+    );
   }
 
   isHangingPunctuationEnd(index) {
-    return HANGING_PUNCTUATION_END_CATEGORIES.has(this.getUnicodeCategory(index))
-      || HANGING_PUNCTUATION_END_CODEPOINTS.has(this.codePointAtGlyphIndex(index));
+    return (
+      HANGING_PUNCTUATION_END_CATEGORIES.has(this.getUnicodeCategory(index)) ||
+      HANGING_PUNCTUATION_END_CODEPOINTS.has(this.codePointAtGlyphIndex(index))
+    );
   }
 
   insertGlyph(index, codePoint) {

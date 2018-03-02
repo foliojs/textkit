@@ -24,7 +24,7 @@ export default class Container {
       return null;
     }
 
-    let excluded = new Path;
+    let excluded = new Path();
     for (let p of this.exclusionPaths) {
       excluded.append(p);
     }

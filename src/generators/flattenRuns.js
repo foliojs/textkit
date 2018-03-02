@@ -10,7 +10,7 @@ export default function flattenRuns(runs) {
     points.push(['end', run.end, run.attributes, i]);
   }
 
-  points.sort((a, b) => (a[1] - b[1]) || (a[3] - b[3]));
+  points.sort((a, b) => a[1] - b[1] || a[3] - b[3]);
 
   let start = -1;
   let stack = [];
@@ -30,7 +30,7 @@ export default function flattenRuns(runs) {
         if (stack[i] === attributes) {
           stack.splice(i--, 1);
         } else {
-          Object.assign(attrs, stack[i])
+          Object.assign(attrs, stack[i]);
         }
       }
     }

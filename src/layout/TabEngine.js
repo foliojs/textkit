@@ -21,11 +21,11 @@ const ALIGN_TERMINATORS = {
  */
 export default class TabEngine {
   processLineFragment(glyphString, container) {
-    for (let {glyph, position, run, x, index} of glyphString) {
+    for (let { glyph, position, run, x, index } of glyphString) {
       if (glyphString.codePointAtGlyphIndex(index) === TAB) {
         // Find the next tab stop and adjust x-advance
         let tabStop = this.getTabStopAfter(container, x);
-        position.xAdvance = (tabStop.x - x);
+        position.xAdvance = tabStop.x - x;
 
         // Adjust based on tab stop alignment
         let terminator = ALIGN_TERMINATORS[tabStop.align];
@@ -38,7 +38,8 @@ export default class TabEngine {
             nextX += glyphString.getGlyphWidth(next) / 2;
           }
 
-          position.xAdvance -= (nextX - tabStop.x) * ALIGN_FACTORS[tabStop.align];
+          position.xAdvance -=
+            (nextX - tabStop.x) * ALIGN_FACTORS[tabStop.align];
         }
       }
     }
@@ -52,8 +53,13 @@ export default class TabEngine {
     // If the x position is greater than the last defined tab stop,
     // find the next tab stop using the tabStopInterval.
     if (Math.round(x) >= maxX) {
-      let xOffset = (Math.ceil((x - maxX) / container.tabStopInterval) + 1) * container.tabStopInterval;
-      return new TabStop(Math.min(maxX + xOffset, container.bbox.width), 'left');
+      let xOffset =
+        (Math.ceil((x - maxX) / container.tabStopInterval) + 1) *
+        container.tabStopInterval;
+      return new TabStop(
+        Math.min(maxX + xOffset, container.bbox.width),
+        'left'
+      );
     }
 
     // Binary search for the closest tab stop

@@ -19,18 +19,29 @@ export default class TextDecorationEngine {
 
     for (let run of lineFragment.glyphRuns) {
       let width = Math.min(maxX - x, run.advanceWidth);
-      let thickness = Math.max(0.5, Math.floor(run.attributes.fontSize / BASE_FONT_SIZE));
+      let thickness = Math.max(
+        0.5,
+        Math.floor(run.attributes.fontSize / BASE_FONT_SIZE)
+      );
 
       if (run.attributes.underline) {
         let rect = new Rect(x, lineFragment.ascent, width, thickness);
-        let line = new DecorationLine(rect, run.attributes.underlineColor, run.attributes.underlineStyle);
+        let line = new DecorationLine(
+          rect,
+          run.attributes.underlineColor,
+          run.attributes.underlineStyle
+        );
         this.addDecorationLine(line, underlines);
       }
 
       if (run.attributes.strike) {
         let y = lineFragment.ascent - run.ascent / 3;
         let rect = new Rect(x, y, width, thickness);
-        let line = new DecorationLine(rect, run.attributes.strikeColor, run.attributes.strikeStyle);
+        let line = new DecorationLine(
+          rect,
+          run.attributes.strikeColor,
+          run.attributes.strikeStyle
+        );
         this.addDecorationLine(line, lineFragment.decorationLines);
       }
 
@@ -40,7 +51,9 @@ export default class TextDecorationEngine {
     // Adjust underline y positions, and intersect with glyph descenders.
     for (let line of underlines) {
       line.rect.y += line.rect.height * 2;
-      lineFragment.decorationLines.push(...this.intersectWithGlyphs(line, lineFragment));
+      lineFragment.decorationLines.push(
+        ...this.intersectWithGlyphs(line, lineFragment)
+      );
     }
   }
 
@@ -116,7 +129,7 @@ export default class TextDecorationEngine {
     // but only if the space warrents an underline.
     let lines = [];
     x = line.rect.x;
-    for (let {start, end} of merged) {
+    for (let { start, end } of merged) {
       if (start - x > line.rect.height) {
         lines.push(line.slice(x, start));
       }
@@ -137,14 +150,18 @@ export default class TextDecorationEngine {
    * containing the leftmost and rightmost intersection points, if any.
    */
   findPathIntersections(path, rect) {
-    let sx = 0, sy = 0;
-    let cx = 0, cy = 0;
-    let px = 0, py = 0;
+    let sx = 0,
+      sy = 0;
+    let cx = 0,
+      cy = 0;
+    let px = 0,
+      py = 0;
     let range = new Range(Infinity, -Infinity);
-    let y1 = rect.y, y2 = rect.maxY;
+    let y1 = rect.y,
+      y2 = rect.maxY;
     let dialation = Math.ceil(rect.height);
 
-    for (let {command, args} of path.commands) {
+    for (let { command, args } of path.commands) {
       switch (command) {
         case 'moveTo':
           sx = cx = args[0];

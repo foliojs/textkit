@@ -7,7 +7,7 @@ export default class Block {
   }
 
   get bbox() {
-    let bbox = new BBox;
+    let bbox = new BBox();
     for (let line of this.lines) {
       bbox.addRect(line.rect);
     }

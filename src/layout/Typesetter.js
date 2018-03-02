@@ -22,20 +22,26 @@ const ALIGNMENT_FACTORS = {
  */
 export default class Typesetter {
   constructor() {
-    this.lineBreaker = new LineBreaker;
-    this.lineFragmentGenerator = new LineFragmentGenerator;
-    this.justificationEngine = new JustificationEngine;
-    this.truncationEngine = new TruncationEngine;
-    this.decorationEngine = new TextDecorationEngine;
-    this.tabEngine = new TabEngine;
+    this.lineBreaker = new LineBreaker();
+    this.lineFragmentGenerator = new LineFragmentGenerator();
+    this.justificationEngine = new JustificationEngine();
+    this.truncationEngine = new TruncationEngine();
+    this.decorationEngine = new TextDecorationEngine();
+    this.tabEngine = new TabEngine();
   }
 
   layoutLineFragments(lineRect, glyphString, container, paragraphStyle) {
     // Guess the line height using the full line before intersecting with the container.
-    lineRect.height = glyphString.slice(0, glyphString.glyphIndexAtOffset(lineRect.width)).height;
+    lineRect.height = glyphString.slice(
+      0,
+      glyphString.glyphIndexAtOffset(lineRect.width)
+    ).height;
 
     // Generate line fragment rectangles by intersecting with the container.
-    let fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, container);
+    let fragmentRects = this.lineFragmentGenerator.generateFragments(
+      lineRect,
+      container
+    );
     if (fragmentRects.length === 0) {
       return [];
     }
@@ -56,7 +62,10 @@ export default class Typesetter {
       if (bk) {
         bk.position += pos;
 
-        let lineFragment = new LineFragment(fragmentRect, glyphString.slice(pos, bk.position));
+        let lineFragment = new LineFragment(
+          fragmentRect,
+          glyphString.slice(pos, bk.position)
+        );
         lineFragments.push(lineFragment);
         lineHeight = Math.max(lineHeight, lineFragment.height);
 
@@ -79,17 +88,33 @@ export default class Typesetter {
     return lineFragments;
   }
 
-  finalizeLineFragment(lineFragment, paragraphStyle, isLastFragment, isTruncated) {
-    let align = isLastFragment && !isTruncated ? paragraphStyle.alignLastLine : paragraphStyle.align;
+  finalizeLineFragment(
+    lineFragment,
+    paragraphStyle,
+    isLastFragment,
+    isTruncated
+  ) {
+    let align =
+      isLastFragment && !isTruncated
+        ? paragraphStyle.alignLastLine
+        : paragraphStyle.align;
 
     if (isLastFragment && isTruncated && paragraphStyle.truncationMode) {
-      this.truncationEngine.truncate(lineFragment, paragraphStyle.truncationMode);
+      this.truncationEngine.truncate(
+        lineFragment,
+        paragraphStyle.truncationMode
+      );
     }
 
     this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
 
-    if (align === 'justify' || lineFragment.advanceWidth > lineFragment.rect.width) {
-      this.justificationEngine.justify(lineFragment, {factor: paragraphStyle.justificationFactor});
+    if (
+      align === 'justify' ||
+      lineFragment.advanceWidth > lineFragment.rect.width
+    ) {
+      this.justificationEngine.justify(lineFragment, {
+        factor: paragraphStyle.justificationFactor
+      });
     }
 
     this.decorationEngine.createDecorationLines(lineFragment);
@@ -105,7 +130,7 @@ export default class Typesetter {
     }
 
     while (lineFragment.isWhiteSpace(end - 1)) {
-      lineFragment.overflowRight +=  lineFragment.getGlyphWidth(--end);
+      lineFragment.overflowRight += lineFragment.getGlyphWidth(--end);
     }
 
     // Adjust line rect for hanging punctuation
@@ -124,7 +149,8 @@ export default class Typesetter {
     }
 
     lineFragment.rect.x -= lineFragment.overflowLeft;
-    lineFragment.rect.width += lineFragment.overflowLeft + lineFragment.overflowRight;
+    lineFragment.rect.width +=
+      lineFragment.overflowLeft + lineFragment.overflowRight;
 
     // Adjust line offset for alignment
     let remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
