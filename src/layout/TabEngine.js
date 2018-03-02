@@ -1,4 +1,4 @@
-import TabStop from './models/TabStop';
+import TabStop from '../models/TabStop';
 
 const TAB = 9; // Unicode/ASCII tab character code point
 const ALIGN_FACTORS = {

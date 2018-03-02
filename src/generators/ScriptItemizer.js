@@ -1,5 +1,5 @@
 import unicode from 'unicode-properties';
-import Run from './models/Run';
+import Run from '../models/Run';
 
 /**
  * A ScriptItemizer is used by a GlyphGenerator to resolve

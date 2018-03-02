@@ -1,4 +1,4 @@
-import Run from './models/Run';
+import Run from '../models/Run';
 
 export default function flattenRuns(runs) {
   let res = [];

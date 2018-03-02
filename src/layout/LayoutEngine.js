@@ -1,13 +1,11 @@
-import AttributedString from './models/AttributedString';
-import LineBreaker from './LineBreaker';
-import LineFragment from './models/LineFragment';
-import LineFragmentGenerator from './LineFragmentGenerator';
-import Rect from './geom/Rect';
-import Block from './models/Block';
+import AttributedString from '../models/AttributedString';
+import LineFragment from '../models/LineFragment';
+import ParagraphStyle from '../models/ParagraphStyle';
+import Rect from '../geom/Rect';
+import Block from '../models/Block';
+import GlyphGenerator from '../generators/GlyphGenerator';
 import JustificationEngine from './JustificationEngine';
-import ParagraphStyle from './models/ParagraphStyle';
 import Typesetter from './Typesetter';
-import GlyphGenerator from './GlyphGenerator';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
