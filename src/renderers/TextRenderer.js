@@ -1,5 +1,5 @@
-import Attachment from './models/Attachment';
-import Rect from './geom/Rect';
+import Attachment from '../models/Attachment';
+import Rect from '../geom/Rect';
 
 /**
  * A TextRenderer renders text layout objects to a graphics context.
