@@ -1,4 +1,5 @@
 import Attachment from './models/Attachment';
+import Rect from './geom/Rect';
 
 /**
  * A TextRenderer renders text layout objects to a graphics context.
@@ -35,9 +36,14 @@ export default class TextRenderer {
 
     this.ctx.save();
     this.ctx.translate(line.rect.x, line.rect.y + line.ascent);
-    this.ctx.scale(1, -1, {});
+    // this.ctx.scale(1, -1, {});
 
     for (let run of line.glyphRuns) {
+      if (run.attributes.backgroundColor) {
+        let backgroundRect = new Rect(0, -line.ascent, run.advanceWidth, line.rect.height);
+        this.renderBackground(backgroundRect, run.attributes.backgroundColor);
+      }
+
       this.renderRun(run);
     }
 
@@ -58,25 +64,52 @@ export default class TextRenderer {
       this.ctx.rect(0, 0, run.advanceWidth, run.height).stroke();
     }
 
+    this.ctx.fillColor(run.attributes.color);
+
     let x = 0, y = 0;
 
-    for (let i = 0; i < run.run.glyphs.length; i++) {
-      let position = run.run.positions[i];
-      let glyph = run.run.glyphs[i];
-
+    // for (let i = 0; i < run.glyphs.length; i++) {
+    //   let position = run.positions[i];
+    //   let glyph = run.glyphs[i];
+    //
+    //   this.ctx.save();
+    //   this.ctx.translate(position.xOffset, position.yOffset);
+    //
+    //   if (glyph.codePoints[0] === Attachment.CODEPOINT && run.attributes.attachment) {
+    //     this.renderAttachment(run.attributes.attachment);
+    //   } else {
+    //     glyph.render(this.ctx, run.attributes.fontSize);
+    //   }
+    //
+    //   this.ctx.restore();
+    let font = run.attributes.font;
+    if (font.sbix || (font.COLR && font.CPAL)) {
       this.ctx.save();
-      this.ctx.translate(position.xOffset * run.scale, position.yOffset * run.scale);
+      this.ctx.translate(0, -run.ascent);
+      for (let i = 0; i < run.glyphs.length; i++) {
+        let position = run.positions[i];
+        let glyph = run.glyphs[i];
 
-      if (glyph.codePoints[0] === Attachment.CODEPOINT && run.attributes.attachment) {
-        this.renderAttachment(run.attributes.attachment);
-      } else {
+        this.ctx.save();
+        this.ctx.translate(position.xOffset, position.yOffset);
+
         glyph.render(this.ctx, run.attributes.fontSize);
+
+        this.ctx.restore();
+        this.ctx.translate(position.xAdvance, position.yAdvance);
       }
-
       this.ctx.restore();
-
-      this.ctx.translate(position.xAdvance * run.scale, position.yAdvance * run.scale);
+    } else {
+      this.ctx.font(run.attributes.font, run.attributes.fontSize);
+      this.ctx._addGlyphs(run.glyphs, run.positions, 0, 0);
     }
+
+    this.ctx.translate(run.advanceWidth, 0);
+  }
+
+  renderBackground(rect, backgroundColor) {
+    this.ctx.rect(rect.x, rect.y, rect.width, rect.height);
+    this.ctx.fill(backgroundColor);
   }
 
   renderAttachment(attachment) {

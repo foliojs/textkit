@@ -68,14 +68,14 @@ export default class TextDecorationEngine {
         continue;
       }
 
-      for (let i = 0; i < run.run.glyphs.length; i++) {
-        let position = run.run.positions[i];
+      for (let i = 0; i < run.glyphs.length; i++) {
+        let position = run.positions[i];
 
         if (x >= line.rect.x && x <= line.rect.maxX) {
-          let gx = x + position.xOffset * run.scale;
-          let gy = y + position.yOffset * run.scale;
+          let gx = x + position.xOffset;
+          let gy = y + position.yOffset;
 
-          let path = run.run.glyphs[i].path
+          let path = run.glyphs[i].path
             .scale(run.scale, -run.scale)
             .translate(gx, gy);
 
@@ -85,8 +85,8 @@ export default class TextDecorationEngine {
           }
         }
 
-        x += position.xAdvance * run.scale;
-        y += position.yAdvance * run.scale;
+        x += position.xAdvance;
+        y += position.yAdvance;
       }
     }
 

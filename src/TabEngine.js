@@ -22,10 +22,10 @@ const ALIGN_TERMINATORS = {
 export default class TabEngine {
   processLineFragment(glyphString, container) {
     for (let {glyph, position, run, x, index} of glyphString) {
-      if (glyph.codePoints[0] === TAB) {
+      if (glyphString.codePointAtGlyphIndex(index) === TAB) {
         // Find the next tab stop and adjust x-advance
         let tabStop = this.getTabStopAfter(container, x);
-        position.xAdvance = (tabStop.x - x) / run.scale;
+        position.xAdvance = (tabStop.x - x);
 
         // Adjust based on tab stop alignment
         let terminator = ALIGN_TERMINATORS[tabStop.align];
@@ -38,7 +38,7 @@ export default class TabEngine {
             nextX += glyphString.getGlyphWidth(next) / 2;
           }
 
-          position.xAdvance -= (nextX - tabStop.x) / run.scale * ALIGN_FACTORS[tabStop.align];
+          position.xAdvance -= (nextX - tabStop.x) * ALIGN_FACTORS[tabStop.align];
         }
       }
     }

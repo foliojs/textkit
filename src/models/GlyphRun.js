@@ -2,19 +2,45 @@ import Run from './Run';
 import Attachment from './Attachment';
 
 export default class GlyphRun extends Run {
-  constructor(start, end, attributes, run) {
+  constructor(start, end, attributes, glyphs, positions, stringIndices, preScaled) {
     super(start, end, attributes);
-    this.run = run;
+    // this.run = run;
+    this.glyphs = glyphs;
+    this.positions = positions;
+    this.stringIndices = stringIndices;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
+
+    this.stringStart = Math.min(...stringIndices);
+    this.stringEnd = Math.max(...stringIndices);
+
+    this.glyphIndices = [];
+
+    for (let i = 0; i < stringIndices.length; i++) {
+      this.glyphIndices[stringIndices[i]] = i;
+    }
+
+    if (!preScaled) {
+      for (let pos of this.positions) {
+        pos.xAdvance *= this.scale;
+        pos.yAdvance *= this.scale;
+        pos.xOffset *= this.scale;
+        pos.yOffset *= this.scale;
+      }
+    }
   }
 
   get length() {
-    return this.run.glyphs.length;
+    return this.glyphs.length;
   }
 
   // @cache
   get advanceWidth() {
-    return this.run.advanceWidth * this.scale;
+    let width = 0;
+    for (let position of this.positions) {
+      width += position.xAdvance;
+    }
+
+    return width;
   }
 
   // @cache
@@ -42,17 +68,18 @@ export default class GlyphRun extends Run {
   }
 
   get hasAttachmentGlyphs() {
-    return this.run.glyphs.some(g => g.codePoints[0] === Attachment.CODEPOINT);
+    return this.glyphs.some(g => g.codePoints[0] === Attachment.CODEPOINT);
   }
 
   slice(start, end) {
     start += this.start;
     end += this.start;
-    end = Math.min(end, this.start + this.run.glyphs.length);
+    end = Math.min(end, this.start + this.glyphs.length);
 
-    let glyphs = this.run.glyphs.slice(start - this.start, end - this.start);
-    let positions = this.run.positions.slice(start - this.start, end - this.start);
-    let run = new this.run.constructor(glyphs, positions);
-    return new GlyphRun(start, end, this.attributes, run);
+    let glyphs = this.glyphs.slice(start - this.start, end - this.start);
+    let positions = this.positions.slice(start - this.start, end - this.start);
+    let stringIndices = this.stringIndices.slice(start - this.start, end - this.start);
+    // let run = new this.run.constructor(glyphs, positions);
+    return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
   }
 }

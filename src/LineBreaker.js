@@ -5,6 +5,8 @@ import en_US from 'hyphenation.en-us';
 const hyphenator = new Hyphenator(en_US);
 const HYPHEN = 0x002D;
 
+const SHRINK_FACTOR = 0.04;
+
 /**
  * A LineBreaker is used by the Typesetter to perform
  * Unicode line breaking and hyphenation.
@@ -25,17 +27,26 @@ export default class LineBreaker {
       let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
 
       if (bk.next != null && this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)) {
+        let lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
+        let shrunk = lineWidth + (lineWidth * SHRINK_FACTOR);
+        // console.log(lineWidth, shrunk)
+
+        let shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
+        stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
+
         let point = this.findHyphenationPoint(glyphString.string.slice(bk.position, bk.next), stringIndex - bk.position);
-        bk.position += point;
-        bk.hyphenated = point > 0;
+
+        if (point > 0) {
+          bk.position += point;
+          breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
+
+          if (bk.position < bk.next) {
+            glyphString.insertGlyph(breakIndex++, HYPHEN);
+          }
+        }
       }
 
-      if (bk.hyphenated) {
-        bk.position = glyphString.glyphIndexForStringIndex(bk.position);
-        glyphString.insertGlyph(bk.position++, HYPHEN);
-      } else {
-        bk.position = breakIndex;
-      }
+      bk.position = breakIndex;
     }
 
     return bk;
