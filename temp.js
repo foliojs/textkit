@@ -1,19 +1,22 @@
+import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import Path from './src/geom/Path';
-import fs from 'fs';
-import LineFragmentGenerator from './src/LineFragmentGenerator';
 import Rect from './src/geom/Rect';
-import LayoutEngine from './src/LayoutEngine';
+import LayoutEngine from './src/engines/LayoutEngine';
 import AttributedString from './src/models/AttributedString';
-import TextRenderer from './src/TextRenderer';
 import Container from './src/models/Container';
 import TabStop from './src/models/TabStop';
 import Attachment from './src/models/Attachment';
+import LineFragmentGenerator from './src/generators/LineFragmentGenerator';
+import TextRenderer from './src/renderers/TextRenderer';
 
 let path = new Path;
+let path2 = new Path;
+let path3 = new Path;
 // path.circle(150, 150, 120);
 // path = path.scale(2);
-path.rect(50, 50, 300, 500);
+path.rect(50, 50, 300, 400);
+path2.circle(500, 300, 100);
 
 // path.moveTo(0, 20)
 //    .lineTo(100, 160)
@@ -25,6 +28,7 @@ path.rect(50, 50, 300, 500);
 // path = path.scale(1.5)
 
 let exclusion = new Path;
+let exclusion2 = new Path;
 // exclusion.moveTo(0, 20);
 // exclusion.lineTo(100, 160);
 // exclusion.quadraticCurveTo(130, 200, 150, 120);
@@ -35,6 +39,7 @@ let exclusion = new Path;
 // exclusion = exclusion.scale(0.5).translate(100, 100);
 
 exclusion.circle(200, 200, 50);
+exclusion2.circle(200, 400, 50);
 
 // path.moveTo(250, 75);
 // path.lineTo(323, 301);
@@ -50,9 +55,12 @@ doc.pipe(fs.createWriteStream('out.pdf'));
 
 // path = path.scale(1.5)
 path.toFunction()(doc);
+path2.toFunction()(doc);
+path3.toFunction()(doc);
 doc.stroke('green');
 
 exclusion.toFunction()(doc);
+exclusion2.toFunction()(doc);
 doc.stroke();
 //
 // exclusion.scale(0.5).translate(100, 220).toFunction()(doc);
@@ -75,8 +83,8 @@ doc.stroke();
 
 let string = AttributedString.fromFragments([
   {
-    string: '“Lorem ipsum dolor sit \ufffc amet, ',
-    attributes: {font: 'Hoefler Text', fontSize: 14, bold: true, align: 'justify', hyphenationFactor: 0.9, hangingPunctuation: true, lineSpacing: 5, underline: true, underlineStyle: 'wavy', underlineColor: 'red', truncate: true, attachment: new Attachment(50, 50, {image: '/Users/devongovett/Downloads/Slack for iOS Upload (1).jpg'})}
+    string: '“Lorem ipsum dolor sit amet, ',
+    attributes: {font: 'Hoefler Text', fontSize: 14, bold: true, align: 'justify', hyphenationFactor: 0.9, hangingPunctuation: true, lineSpacing: 5, underline: true, underlineStyle: 'wavy', underlineColor: 'red', truncate: true}
   },
   {
     string: 'consectetur adipiscing elit, ',
@@ -96,37 +104,25 @@ let string = AttributedString.fromFragments([
 //   }
 // ]);
 
-let ex2 = exclusion.translate(0, 200);
 
-console.log(string)
-
-let path2 = new Path;
-path2.rect(50, 600, 300, 150);
 // path2.toFunction()(doc);
 // doc.stroke('green');
 
 let l = new LayoutEngine;
 // let block = l.layoutParagraph(string, path, [exclusion, exclusion.scale(0.5).translate(100, 220)]);
 let container = new Container(path, {
-  exclusionPaths: [exclusion],
+  exclusionPaths: [exclusion, exclusion2],
   tabStops: [new TabStop(100, 'decimal'), new TabStop(150, 'left'), new TabStop(250, 'right')],
   columns: 2
 });
 let container2 = new Container(path2);
-l.layout(string, [container]);
+let container3 = new Container(path3);
+
+l.layout(string, [container, container2, container3]);
 
 let renderer = new TextRenderer(doc, {outlineLines: false});
 renderer.render(container);
 renderer.render(container2);
-
-console.log(container, container2)
-
-
-for (let stop of container.tabStops) {
-  doc.moveTo(container.bbox.minX + stop.x, path.bbox.minY - 10)
-     .lineTo(container.bbox.minX + stop.x, path.bbox.minY + 10)
-     .stroke('blue');
-}
 
 doc.strokeColor('green');
 

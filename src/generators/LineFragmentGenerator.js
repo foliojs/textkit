@@ -1,5 +1,5 @@
-import Rect from './geom/Rect';
-import Path from './geom/Path';
+import Rect from '../geom/Rect';
+import Path from '../geom/Path';
 
 const BELOW = 1;
 const INSIDE = 2;
