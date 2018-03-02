@@ -2,7 +2,7 @@ import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import Path from './src/geom/Path';
 import Rect from './src/geom/Rect';
-import LayoutEngine from './src/engines/LayoutEngine';
+import LayoutEngine from './src/layout/LayoutEngine';
 import AttributedString from './src/models/AttributedString';
 import Container from './src/models/Container';
 import TabStop from './src/models/TabStop';

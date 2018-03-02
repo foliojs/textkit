@@ -5,7 +5,7 @@ import Rect from '../geom/Rect';
 import Block from '../models/Block';
 import GlyphGenerator from '../generators/GlyphGenerator';
 import JustificationEngine from './JustificationEngine';
-import Typesetter from '../Typesetter';
+import Typesetter from './Typesetter';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction

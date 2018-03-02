@@ -1,10 +1,10 @@
-import LineBreaker from './engines/LineBreaker';
-import LineFragment from './models/LineFragment';
-import LineFragmentGenerator from './generators/LineFragmentGenerator';
-import JustificationEngine from './engines/JustificationEngine';
-import TruncationEngine from './engines/TruncationEngine';
-import TextDecorationEngine from './engines/TextDecorationEngine';
-import TabEngine from './engines/TabEngine';
+import LineFragment from '../models/LineFragment';
+import LineFragmentGenerator from '../generators/LineFragmentGenerator';
+import JustificationEngine from './JustificationEngine';
+import TruncationEngine from './TruncationEngine';
+import TextDecorationEngine from './TextDecorationEngine';
+import TabEngine from './TabEngine';
+import LineBreaker from './LineBreaker';
 
 const ALIGNMENT_FACTORS = {
   left: 0,
