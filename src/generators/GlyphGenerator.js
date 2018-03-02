@@ -1,12 +1,12 @@
 // import BidiEngine from './BidiEngine';
-import flattenRuns from './flattenRuns';
-import FontSubstitutionEngine from './FontSubstitutionEngine';
-import GlyphRun from './models/GlyphRun';
-import GlyphString from './models/GlyphString';
-import Run from './models/Run';
-import RunStyle from './models/RunStyle';
-import ScriptItemizer from './ScriptItemizer';
-import Attachment from './models/Attachment';
+import flattenRuns from '../flattenRuns';
+import GlyphRun from '../models/GlyphRun';
+import GlyphString from '../models/GlyphString';
+import Attachment from '../models/Attachment';
+import Run from '../models/Run';
+import RunStyle from '../models/RunStyle';
+import FontSubstitutionEngine from '../engines/FontSubstitutionEngine';
+import ScriptItemizer from '../ScriptItemizer';
 
 /**
  * A GlyphGenerator is responsible for mapping characters in

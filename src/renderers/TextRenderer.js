@@ -1,4 +1,4 @@
-import Attachment from './models/Attachment';
+import Attachment from '../models/Attachment';
 
 /**
  * A TextRenderer renders text layout objects to a graphics context.

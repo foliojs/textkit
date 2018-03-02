@@ -1,6 +1,6 @@
-import DecorationLine from './models/DecorationLine';
-import Range from './models/Range';
-import Rect from './geom/Rect';
+import DecorationLine from '../models/DecorationLine';
+import Range from '../models/Range';
+import Rect from '../geom/Rect';
 
 // The base font size used for calculating underline thickness.
 const BASE_FONT_SIZE = 16;

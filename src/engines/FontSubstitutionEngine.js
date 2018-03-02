@@ -1,6 +1,6 @@
 import FontManager from 'font-manager';
 import fontkit from 'fontkit';
-import Run from './models/Run';
+import Run from '../models/Run';
 
 /**
  * A FontSubstitutionEngine is used by a GlyphGenerator to resolve
