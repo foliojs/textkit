@@ -1,7 +1,7 @@
+import cubic2quad from 'cubic2quad';
 import BBox from './BBox';
 import Polygon from './Polygon';
 import Point from './Point';
-import cubic2quad from 'cubic2quad';
 
 const SVG_COMMANDS = {
   moveTo: 'M',
@@ -42,12 +42,12 @@ export default class Path {
     // based on http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas/2173084#2173084
     x -= r1;
     y -= r2;
-    let ox = r1 * KAPPA;
-    let oy = r2 * KAPPA;
-    let xe = x + r1 * 2;
-    let ye = y + r2 * 2;
-    let xm = x + r1;
-    let ym = y + r2;
+    const ox = r1 * KAPPA;
+    const oy = r2 * KAPPA;
+    const xe = x + r1 * 2;
+    const ye = y + r2 * 2;
+    const xm = x + r1;
+    const ym = y + r2;
 
     this.moveTo(x, ym);
     this.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
@@ -63,7 +63,7 @@ export default class Path {
   }
 
   append(path) {
-    for (let { command, args } of path.commands) {
+    for (const { command, args } of path.commands) {
       this[command](...args);
     }
 
@@ -76,9 +76,7 @@ export default class Path {
    * @return {string}
    */
   toFunction() {
-    let cmds = this.commands.map(
-      c => `  ctx.${c.command}(${c.args.join(', ')});`
-    );
+    const cmds = this.commands.map(c => `  ctx.${c.command}(${c.args.join(', ')});`);
     return new Function('ctx', cmds.join('\n'));
   }
 
@@ -87,8 +85,8 @@ export default class Path {
    * @return {string}
    */
   toSVG() {
-    let cmds = this.commands.map(c => {
-      let args = c.args.map(arg => Math.round(arg * 100) / 100);
+    const cmds = this.commands.map(c => {
+      const args = c.args.map(arg => Math.round(arg * 100) / 100);
       return `${SVG_COMMANDS[c.command]}${args.join(' ')}`;
     });
 
@@ -104,8 +102,8 @@ export default class Path {
    */
   get cbox() {
     if (!this._cbox) {
-      let cbox = new BBox();
-      for (let command of this.commands) {
+      const cbox = new BBox();
+      for (const command of this.commands) {
         for (let i = 0; i < command.args.length; i += 2) {
           cbox.addPoint(command.args[i], command.args[i + 1]);
         }
@@ -127,11 +125,11 @@ export default class Path {
       return this._bbox;
     }
 
-    let bbox = new BBox();
-    let cx = 0,
-      cy = 0;
+    const bbox = new BBox();
+    let cx = 0;
+    let cy = 0;
 
-    let f = t =>
+    const f = t =>
       Math.pow(1 - t, 3) * p0[i] +
       3 * Math.pow(1 - t, 2) * t * p1[i] +
       3 * (1 - t) * Math.pow(t, 2) * p2[i] +
@@ -141,7 +139,7 @@ export default class Path {
       switch (command) {
         case 'moveTo':
         case 'lineTo':
-          let [x, y] = args;
+          const [x, y] = args;
           bbox.addPoint(x, y);
           cx = x;
           cy = y;
@@ -152,20 +150,20 @@ export default class Path {
         // fall through
 
         case 'bezierCurveTo':
-          let [cp1x, cp1y, cp2x, cp2y, p3x, p3y] = args;
+          const [cp1x, cp1y, cp2x, cp2y, p3x, p3y] = args;
 
           // http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
           bbox.addPoint(p3x, p3y);
 
-          var p0 = [cx, cy];
-          var p1 = [cp1x, cp1y];
-          var p2 = [cp2x, cp2y];
-          var p3 = [p3x, p3y];
+          const p0 = [cx, cy];
+          const p1 = [cp1x, cp1y];
+          const p2 = [cp2x, cp2y];
+          const p3 = [p3x, p3y];
 
-          for (var i = 0; i <= 1; i++) {
-            let b = 6 * p0[i] - 12 * p1[i] + 6 * p2[i];
-            let a = -3 * p0[i] + 9 * p1[i] - 9 * p2[i] + 3 * p3[i];
-            let c = 3 * p1[i] - 3 * p0[i];
+          for (let i = 0; i <= 1; i++) {
+            const b = 6 * p0[i] - 12 * p1[i] + 6 * p2[i];
+            const a = -3 * p0[i] + 9 * p1[i] - 9 * p2[i] + 3 * p3[i];
+            const c = 3 * p1[i] - 3 * p0[i];
 
             if (a === 0) {
               if (b === 0) {
@@ -211,6 +209,8 @@ export default class Path {
           cx = p3x;
           cy = p3y;
           break;
+        default:
+          break;
       }
     }
 
@@ -218,12 +218,12 @@ export default class Path {
   }
 
   mapPoints(fn) {
-    let path = new Path();
+    const path = new Path();
 
-    for (let c of this.commands) {
-      let args = [];
+    for (const c of this.commands) {
+      const args = [];
       for (let i = 0; i < c.args.length; i += 2) {
-        let [x, y] = fn(c.args[i], c.args[i + 1]);
+        const [x, y] = fn(c.args[i], c.args[i + 1]);
         args.push(x, y);
       }
 
@@ -246,8 +246,8 @@ export default class Path {
   }
 
   rotate(angle) {
-    let cos = Math.cos(angle);
-    let sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
     return this.transform(cos, sin, -sin, cos, 0, 0);
   }
 
@@ -260,22 +260,16 @@ export default class Path {
       return this;
     }
 
-    let path = new Path();
-    let x = 0,
-      y = 0;
-    for (let c of this.commands) {
+    const path = new Path();
+    let x = 0;
+    let y = 0;
+
+    for (const c of this.commands) {
       if (c.command === 'quadraticCurveTo') {
-        let quads = quadraticToBezier(x, y, ...c.args);
+        const quads = quadraticToBezier(x, y, ...c.args);
 
         for (let i = 2; i < quads.length; i += 6) {
-          path.bezierCurveTo(
-            quads[i],
-            quads[i + 1],
-            quads[i + 2],
-            quads[i + 3],
-            quads[i + 4],
-            quads[i + 5]
-          );
+          path.bezierCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3], quads[i + 4], quads[i + 5]);
         }
       } else {
         path[c.command](...c.args);
@@ -292,20 +286,16 @@ export default class Path {
       return this;
     }
 
-    let path = new Path();
-    let x = 0,
-      y = 0;
-    for (let c of this.commands) {
+    const path = new Path();
+    let x = 0;
+    let y = 0;
+
+    for (const c of this.commands) {
       if (c.command === 'bezierCurveTo') {
-        let quads = cubic2quad(x, y, ...c.args, 0.1);
+        const quads = cubic2quad(x, y, ...c.args, 0.1);
 
         for (let i = 2; i < quads.length; i += 4) {
-          path.quadraticCurveTo(
-            quads[i],
-            quads[i + 1],
-            quads[i + 2],
-            quads[i + 3]
-          );
+          path.quadraticCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3]);
         }
       } else {
         path[c.command](...c.args);
@@ -326,11 +316,11 @@ export default class Path {
       return this;
     }
 
-    let res = new Path();
-    let cx = 0,
-      cy = 0,
-      sx = 0,
-      sy = 0;
+    const res = new Path();
+    let cx = 0;
+    let cy = 0;
+    let sx = 0;
+    let sy = 0;
 
     for (let { command, args } of this.commands) {
       switch (command) {
@@ -414,9 +404,9 @@ export default class Path {
   }
 
   reverse() {
-    let commands = this.commands;
+    const res = new Path();
+    const commands = this.commands;
     let start = commands[0];
-    let res = new Path();
 
     for (let i = 1; i < commands.length; i++) {
       let { command, args } = commands[i];
@@ -431,14 +421,14 @@ export default class Path {
         j--;
       }
 
-      let move = commands[j].command === 'closePath' ? start : commands[j];
+      const move = commands[j].command === 'closePath' ? start : commands[j];
       res.moveTo(move.args[0], move.args[1]);
 
       for (; commands[j].command !== 'moveTo'; j--) {
-        let prev = commands[j - 1];
-        let cur = commands[j];
-        let px = prev.args[prev.args.length - 2];
-        let py = prev.args[prev.args.length - 1];
+        const prev = commands[j - 1];
+        const cur = commands[j];
+        const px = prev.args[prev.args.length - 2];
+        const py = prev.args[prev.args.length - 1];
 
         switch (cur.command) {
           case 'lineTo':
@@ -450,14 +440,7 @@ export default class Path {
             break;
 
           case 'bezierCurveTo':
-            res.bezierCurveTo(
-              cur.args[2],
-              cur.args[3],
-              cur.args[0],
-              cur.args[1],
-              px,
-              py
-            );
+            res.bezierCurveTo(cur.args[2], cur.args[3], cur.args[0], cur.args[1], px, py);
             if (closed && prev.command === 'moveTo') {
               prev.closePath();
             }
@@ -494,7 +477,7 @@ export default class Path {
     }
 
     let contour = [];
-    let polygon = new Polygon();
+    const polygon = new Polygon();
 
     for (let { command, args } of path.commands) {
       switch (command) {
@@ -527,14 +510,8 @@ export default class Path {
   }
 }
 
-for (let command of [
-  'moveTo',
-  'lineTo',
-  'quadraticCurveTo',
-  'bezierCurveTo',
-  'closePath'
-]) {
-  Path.prototype[command] = function(...args) {
+for (const command of Object.keys(SVG_COMMANDS)) {
+  Path.prototype[command] = (...args) => {
     this._bbox = this._cbox = null;
     this.commands.push({
       command,
@@ -553,43 +530,32 @@ for (let command of [
 
 function quadraticToBezier(cx, cy, qp1x, qp1y, x, y) {
   // http://fontforge.org/bezier.html
-  var cp1x = cx + 2 / 3 * (qp1x - cx); // CP1 = QP0 + 2/3 * (QP1-QP0)
-  var cp1y = cy + 2 / 3 * (qp1y - cy);
-  var cp2x = x + 2 / 3 * (qp1x - x); // CP2 = QP2 + 2/3 * (QP1-QP2)
-  var cp2y = y + 2 / 3 * (qp1y - y);
+  const cp1x = cx + 2 / 3 * (qp1x - cx); // CP1 = QP0 + 2/3 * (QP1-QP0)
+  const cp1y = cy + 2 / 3 * (qp1y - cy);
+  const cp2x = x + 2 / 3 * (qp1x - x); // CP2 = QP2 + 2/3 * (QP1-QP2)
+  const cp2y = y + 2 / 3 * (qp1y - y);
   return [cp1x, cp1y, cp2x, cp2y, x, y];
 }
 
-function subdivideBezierWithFlatness(
-  path,
-  flatness,
-  cx,
-  cy,
-  cp1x,
-  cp1y,
-  cp2x,
-  cp2y,
-  x,
-  y
-) {
-  let dx1 = cp1x - cx;
-  let dx2 = cp2x - cp1x;
-  let dx3 = x - cp2x;
-  let dx4 = dx2 - dx1;
-  let dx5 = dx3 - dx2;
-  let dx6 = dx5 - dx4;
+function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, cp2y, x, y) {
+  const dx1 = cp1x - cx;
+  const dx2 = cp2x - cp1x;
+  const dx3 = x - cp2x;
+  const dx4 = dx2 - dx1;
+  const dx5 = dx3 - dx2;
+  const dx6 = dx5 - dx4;
 
-  let dy1 = cp1y - cy;
-  let dy2 = cp2y - cp1y;
-  let dy3 = y - cp2y;
-  let dy4 = dy2 - dy1;
-  let dy5 = dy3 - dy2;
-  let dy6 = dy5 - dy4;
+  const dy1 = cp1y - cy;
+  const dy2 = cp2y - cp1y;
+  const dy3 = y - cp2y;
+  const dy4 = dy2 - dy1;
+  const dy5 = dy3 - dy2;
+  const dy6 = dy5 - dy4;
 
-  let d1 = dx4 * dx4 + dy4 * dy4;
-  let d2 = dx5 * dx5 + dy5 * dy5;
+  const d1 = dx4 * dx4 + dy4 * dy4;
+  const d2 = dx5 * dx5 + dy5 * dy5;
+  const flatnessSqr = flatness * flatness;
   let wat = 9 * Math.max(d1, d2) / 16;
-  let flatnessSqr = flatness * flatness;
 
   let wat2 = 6 * dx6;
   let wat3 = 6 * (dx4 + dx6);

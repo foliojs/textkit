@@ -9,18 +9,13 @@ export default class ScriptItemizer {
   getRuns(string) {
     let lastIndex = 0;
     let lastScript = 'Unknown';
-    let runs = [];
-
     let index = 0;
+    const runs = [];
 
-    for (let char of string) {
-      let codePoint = char.codePointAt();
-      let script = unicode.getScript(codePoint);
-      if (
-        script === 'Common' ||
-        script === 'Inherited' ||
-        script === 'Unknown'
-      ) {
+    for (const char of string) {
+      const codePoint = char.codePointAt();
+      const script = unicode.getScript(codePoint);
+      if (script === 'Common' || script === 'Inherited' || script === 'Unknown') {
         // TODO: deal with paired brackets?
       } else if (script !== lastScript && lastIndex !== 0) {
         runs.push(new Run(lastIndex, index - 1, { script: lastScript }));

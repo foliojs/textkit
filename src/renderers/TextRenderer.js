@@ -1,4 +1,3 @@
-import Attachment from '../models/Attachment';
 import Rect from '../geom/Rect';
 
 /**
@@ -14,47 +13,33 @@ export default class TextRenderer {
   }
 
   render(container) {
-    for (let block of container.blocks) {
+    for (const block of container.blocks) {
       this.renderBlock(block);
     }
   }
 
   renderBlock(block) {
     if (this.outlineBlocks) {
-      this.ctx
-        .rect(
-          block.bbox.minX,
-          block.bbox.minY,
-          block.bbox.width,
-          block.bbox.height
-        )
-        .stroke();
+      this.ctx.rect(block.bbox.minX, block.bbox.minY, block.bbox.width, block.bbox.height).stroke();
     }
 
-    for (let line of block.lines) {
+    for (const line of block.lines) {
       this.renderLine(line);
     }
   }
 
   renderLine(line) {
     if (this.outlineLines) {
-      this.ctx
-        .rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height)
-        .stroke();
+      this.ctx.rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height).stroke();
     }
 
     this.ctx.save();
     this.ctx.translate(line.rect.x, line.rect.y + line.ascent);
     // this.ctx.scale(1, -1, {});
 
-    for (let run of line.glyphRuns) {
+    for (const run of line.glyphRuns) {
       if (run.attributes.backgroundColor) {
-        let backgroundRect = new Rect(
-          0,
-          -line.ascent,
-          run.advanceWidth,
-          line.rect.height
-        );
+        const backgroundRect = new Rect(0, -line.ascent, run.advanceWidth, line.rect.height);
         this.renderBackground(backgroundRect, run.attributes.backgroundColor);
       }
 
@@ -66,7 +51,7 @@ export default class TextRenderer {
     this.ctx.save();
     this.ctx.translate(line.rect.x, line.rect.y);
 
-    for (let decorationLine of line.decorationLines) {
+    for (const decorationLine of line.decorationLines) {
       this.renderDecorationLine(decorationLine);
     }
 
@@ -79,9 +64,6 @@ export default class TextRenderer {
     }
 
     this.ctx.fillColor(run.attributes.color);
-
-    let x = 0,
-      y = 0;
 
     // for (let i = 0; i < run.glyphs.length; i++) {
     //   let position = run.positions[i];
@@ -97,13 +79,13 @@ export default class TextRenderer {
     //   }
     //
     //   this.ctx.restore();
-    let font = run.attributes.font;
+    const { font } = run.attributes;
     if (font.sbix || (font.COLR && font.CPAL)) {
       this.ctx.save();
       this.ctx.translate(0, -run.ascent);
       for (let i = 0; i < run.glyphs.length; i++) {
-        let position = run.positions[i];
-        let glyph = run.glyphs[i];
+        const position = run.positions[i];
+        const glyph = run.glyphs[i];
 
         this.ctx.save();
         this.ctx.translate(position.xOffset, position.yOffset);
@@ -158,30 +140,23 @@ export default class TextRenderer {
     }
 
     if (/wavy/.test(line.style)) {
-      let dist = Math.max(2, line.rect.height);
+      const dist = Math.max(2, line.rect.height);
+      const stepCount = Math.floor(line.rect.width / (2 * step));
       let step = 1.1 * dist;
-      let stepCount = Math.floor(line.rect.width / (2 * step));
 
       // Adjust step to fill entire width
-      let remainingWidth = line.rect.width - stepCount * 2 * step;
-      let adjustment = remainingWidth / stepCount / 2;
+      const remainingWidth = line.rect.width - stepCount * 2 * step;
+      const adjustment = remainingWidth / stepCount / 2;
       step += adjustment;
 
-      let cp1y = line.rect.y + dist;
-      let cp2y = line.rect.y - dist;
-      let x = line.rect.x;
+      const cp1y = line.rect.y + dist;
+      const cp2y = line.rect.y - dist;
+      let { x } = line.rect;
 
       this.ctx.moveTo(line.rect.x, line.rect.y);
 
       for (let i = 0; i < stepCount; i++) {
-        this.ctx.bezierCurveTo(
-          x + step,
-          cp1y,
-          x + step,
-          cp2y,
-          x + 2 * step,
-          line.rect.y
-        );
+        this.ctx.bezierCurveTo(x + step, cp1y, x + step, cp2y, x + 2 * step, line.rect.y);
         x += 2 * step;
       }
     } else {

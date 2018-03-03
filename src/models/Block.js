@@ -7,8 +7,8 @@ export default class Block {
   }
 
   get bbox() {
-    let bbox = new BBox();
-    for (let line of this.lines) {
+    const bbox = new BBox();
+    for (const line of this.lines) {
       bbox.addRect(line.rect);
     }
 
@@ -17,7 +17,7 @@ export default class Block {
 
   get stringLength() {
     let length = 0;
-    for (let line of this.lines) {
+    for (const line of this.lines) {
       length += line.string.length;
     }
 

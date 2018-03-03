@@ -1,5 +1,7 @@
 import Point from './Point';
 
+const CORNERS = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+
 /**
  * Represents a rectangle
  */
@@ -107,12 +109,7 @@ export default class Rect {
    * @return {boolean}
    */
   containsRect(rect) {
-    return (
-      this.x <= rect.x &&
-      this.y <= rect.y &&
-      this.maxX >= rect.maxX &&
-      this.maxY >= rect.maxY
-    );
+    return this.x <= rect.x && this.y <= rect.y && this.maxX >= rect.maxX && this.maxY >= rect.maxY;
   }
 
   /**
@@ -121,12 +118,7 @@ export default class Rect {
    * @return {boolean}
    */
   containsPoint(point) {
-    return (
-      this.x <= point.x &&
-      this.y <= point.y &&
-      this.maxX >= point.x &&
-      this.maxY >= point.y
-    );
+    return this.x <= point.x && this.y <= point.y && this.maxX >= point.x && this.maxY >= point.y;
   }
 
   /**
@@ -136,7 +128,7 @@ export default class Rect {
    * @return {string}
    */
   getCornerInRect(rect) {
-    for (let key of ['topLeft', 'topRight', 'bottomLeft', 'bottomRight']) {
+    for (const key of CORNERS) {
       if (rect.containsPoint(this[key])) {
         return key;
       }
@@ -146,20 +138,15 @@ export default class Rect {
   }
 
   equals(rect) {
-    return (
-      rect.x === this.x &&
-      rect.y === this.y &&
-      rect.width === this.width &&
-      rect.height === this.height
-    );
+    return rect.x === this.x && rect.y === this.y && rect.width === this.width && rect.height === this.height;
   }
 
   pointEquals(point) {
-    return rect.x === point.x && rect.y === point.y;
+    return this.x === point.x && this.y === point.y;
   }
 
   sizeEquals(size) {
-    return rect.width === size.width && rect.height === size.height;
+    return this.width === size.width && this.height === size.height;
   }
 
   /**

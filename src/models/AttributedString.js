@@ -11,14 +11,12 @@ export default class AttributedString {
 
   static fromFragments(fragments = []) {
     let string = '';
-    let runs = [];
     let offset = 0;
+    const runs = [];
 
-    for (let fragment of fragments) {
+    for (const fragment of fragments) {
       string += fragment.string;
-      runs.push(
-        new Run(offset, offset + fragment.string.length, fragment.attributes)
-      );
+      runs.push(new Run(offset, offset + fragment.string.length, fragment.attributes));
       offset += fragment.string.length;
     }
 
@@ -37,42 +35,28 @@ export default class AttributedString {
   }
 
   slice(start, end) {
-    let startRunIndex = this.runIndexAtIndex(start);
-    let endRunIndex = this.runIndexAtIndex(end);
+    const startRunIndex = this.runIndexAtIndex(start);
+    const endRunIndex = this.runIndexAtIndex(end);
+    const startRun = this.runs[startRunIndex];
+    const endRun = this.runs[endRunIndex];
+    const runs = [];
 
-    let startRun = this.runs[startRunIndex];
-    let endRun = this.runs[endRunIndex];
-
-    let runs = [];
-
-    runs.push(
-      startRun.slice(
-        start + this.start - startRun.start,
-        end + this.start - startRun.start
-      )
-    );
+    runs.push(startRun.slice(start + this.start - startRun.start, end + this.start - startRun.start));
 
     if (endRunIndex !== startRunIndex) {
-      runs.push(
-        ...this.runs.slice(startRunIndex + 1, endRunIndex).map(r => r.copy())
-      );
+      runs.push(...this.runs.slice(startRunIndex + 1, endRunIndex).map(r => r.copy()));
 
       if (this.end - endRun.start !== 0) {
         runs.push(endRun.slice(0, this.end - endRun.start));
       }
     }
 
-    let offset = start + this.start;
-    for (let run of runs) {
+    const offset = start + this.start;
+    for (const run of runs) {
       run.start -= offset;
       run.end -= offset;
     }
 
-    return new AttributedString(
-      this.string.slice(start, end),
-      runs,
-      start + this.start,
-      end + this.start
-    );
+    return new AttributedString(this.string.slice(start, end), runs, start + this.start, end + this.start);
   }
 }

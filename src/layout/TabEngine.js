@@ -21,16 +21,16 @@ const ALIGN_TERMINATORS = {
  */
 export default class TabEngine {
   processLineFragment(glyphString, container) {
-    for (let { glyph, position, run, x, index } of glyphString) {
+    for (const { position, x, index } of glyphString) {
       if (glyphString.codePointAtGlyphIndex(index) === TAB) {
         // Find the next tab stop and adjust x-advance
-        let tabStop = this.getTabStopAfter(container, x);
+        const tabStop = this.getTabStopAfter(container, x);
         position.xAdvance = tabStop.x - x;
 
         // Adjust based on tab stop alignment
-        let terminator = ALIGN_TERMINATORS[tabStop.align];
+        const terminator = ALIGN_TERMINATORS[tabStop.align];
         if (terminator) {
-          let next = glyphString.indexOf(terminator, index + 1);
+          const next = glyphString.indexOf(terminator, index + 1);
           let nextX = glyphString.offsetAtGlyphIndex(next);
 
           // Center the decimal point at the tab stop
@@ -38,8 +38,7 @@ export default class TabEngine {
             nextX += glyphString.getGlyphWidth(next) / 2;
           }
 
-          position.xAdvance -=
-            (nextX - tabStop.x) * ALIGN_FACTORS[tabStop.align];
+          position.xAdvance -= (nextX - tabStop.x) * ALIGN_FACTORS[tabStop.align];
         }
       }
     }
@@ -48,24 +47,19 @@ export default class TabEngine {
   getTabStopAfter(container, x) {
     let low = 0;
     let high = container.tabStops.length - 1;
-    let maxX = container.tabStops.length === 0 ? 0 : container.tabStops[high].x;
+    const maxX = container.tabStops.length === 0 ? 0 : container.tabStops[high].x;
 
     // If the x position is greater than the last defined tab stop,
     // find the next tab stop using the tabStopInterval.
     if (Math.round(x) >= maxX) {
-      let xOffset =
-        (Math.ceil((x - maxX) / container.tabStopInterval) + 1) *
-        container.tabStopInterval;
-      return new TabStop(
-        Math.min(maxX + xOffset, container.bbox.width),
-        'left'
-      );
+      const xOffset = (Math.ceil((x - maxX) / container.tabStopInterval) + 1) * container.tabStopInterval;
+      return new TabStop(Math.min(maxX + xOffset, container.bbox.width), 'left');
     }
 
     // Binary search for the closest tab stop
     while (low <= high) {
-      let mid = (low + high) >> 1;
-      let tabStop = container.tabStops[mid];
+      const mid = (low + high) >> 1;
+      const tabStop = container.tabStops[mid];
 
       if (x < tabStop.x) {
         high = mid - 1;

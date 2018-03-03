@@ -25,20 +25,16 @@ export default class GlyphGenerator {
 
   generateGlyphs(attributedString) {
     // Resolve runs
-    let runs = this.resolveRuns(attributedString);
+    const runs = this.resolveRuns(attributedString);
 
     // Generate glyphs
     let glyphIndex = 0;
-    let glyphRuns = runs.map(run => {
-      let str = attributedString.string.slice(run.start, run.end);
-      let glyphRun = run.attributes.font.layout(
-        str,
-        run.attributes.features,
-        run.attributes.script
-      );
-      let end = glyphIndex + glyphRun.glyphs.length;
+    const glyphRuns = runs.map(run => {
+      const str = attributedString.string.slice(run.start, run.end);
+      const glyphRun = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
+      const end = glyphIndex + glyphRun.glyphs.length;
 
-      let res = new GlyphRun(
+      const res = new GlyphRun(
         glyphIndex,
         end,
         run.attributes,
@@ -57,28 +53,26 @@ export default class GlyphGenerator {
 
   resolveRuns(attributedString) {
     // Map attributes to RunStyle objects
-    let r = attributedString.runs.map(run => {
-      return new Run(run.start, run.end, new RunStyle(run.attributes));
-    });
+    const r = attributedString.runs.map(run => new Run(run.start, run.end, new RunStyle(run.attributes)));
 
     // Resolve run ranges and additional attributes
-    let runs = [];
-    for (let resolver of this.resolvers) {
-      let resolved = resolver.getRuns(attributedString.string, r);
+    const runs = [];
+    for (const resolver of this.resolvers) {
+      const resolved = resolver.getRuns(attributedString.string, r);
       runs.push(...resolved);
     }
 
     // Ignore resolved properties
-    let styles = attributedString.runs.map(run => {
-      let attrs = Object.assign({}, run.attributes);
+    const styles = attributedString.runs.map(run => {
+      const attrs = Object.assign({}, run.attributes);
       delete attrs.font;
       delete attrs.fontDescriptor;
       return new Run(run.start, run.end, attrs);
     });
 
     // Flatten runs
-    let resolvedRuns = flattenRuns([...styles, ...runs]);
-    for (let run of resolvedRuns) {
+    const resolvedRuns = flattenRuns([...styles, ...runs]);
+    for (const run of resolvedRuns) {
       run.attributes = new RunStyle(run.attributes);
     }
 
@@ -86,14 +80,16 @@ export default class GlyphGenerator {
   }
 
   resolveAttachments(glyphRun) {
-    let attachment = glyphRun.attributes.attachment;
+    const { attachment } = glyphRun.attributes;
+
     if (!attachment) {
       return;
     }
 
     for (let i = 0; i < glyphRun.length; i++) {
-      let glyph = glyphRun.glyphs[i];
-      let position = glyphRun.positions[i];
+      const glyph = glyphRun.glyphs[i];
+      const position = glyphRun.positions[i];
+
       if (glyph.codePoints[0] === Attachment.CODEPOINT) {
         position.xAdvance = attachment.width;
       }
