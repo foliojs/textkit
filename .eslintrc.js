@@ -1,6 +1,6 @@
 module.exports = {
   parser: 'babel-eslint',
-  extends: 'airbnb-base',
+  extends: ['airbnb-base', 'prettier'],
   rules: {
     'no-bitwise': 0,
     'no-continue': 0,
