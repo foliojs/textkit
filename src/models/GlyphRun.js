@@ -2,15 +2,7 @@ import Run from './Run';
 import Attachment from './Attachment';
 
 export default class GlyphRun extends Run {
-  constructor(
-    start,
-    end,
-    attributes,
-    glyphs,
-    positions,
-    stringIndices,
-    preScaled
-  ) {
+  constructor(start, end, attributes, glyphs, positions, stringIndices, preScaled) {
     super(start, end, attributes);
     // this.run = run;
     this.glyphs = glyphs;
@@ -28,7 +20,7 @@ export default class GlyphRun extends Run {
     }
 
     if (!preScaled) {
-      for (let pos of this.positions) {
+      for (const pos of this.positions) {
         pos.xAdvance *= this.scale;
         pos.yAdvance *= this.scale;
         pos.xOffset *= this.scale;
@@ -44,7 +36,7 @@ export default class GlyphRun extends Run {
   // @cache
   get advanceWidth() {
     let width = 0;
-    for (let position of this.positions) {
+    for (const position of this.positions) {
       width += position.xAdvance;
     }
 
@@ -53,7 +45,7 @@ export default class GlyphRun extends Run {
 
   // @cache
   get ascent() {
-    let ascent = this.attributes.font.ascent * this.scale;
+    const ascent = this.attributes.font.ascent * this.scale;
     if (this.attributes.attachment && this.hasAttachmentGlyphs) {
       return Math.max(ascent, this.attributes.attachment.height);
     }
@@ -84,21 +76,11 @@ export default class GlyphRun extends Run {
     end += this.start;
     end = Math.min(end, this.start + this.glyphs.length);
 
-    let glyphs = this.glyphs.slice(start - this.start, end - this.start);
-    let positions = this.positions.slice(start - this.start, end - this.start);
-    let stringIndices = this.stringIndices.slice(
-      start - this.start,
-      end - this.start
-    );
+    const glyphs = this.glyphs.slice(start - this.start, end - this.start);
+    const positions = this.positions.slice(start - this.start, end - this.start);
+    const stringIndices = this.stringIndices.slice(start - this.start, end - this.start);
     // let run = new this.run.constructor(glyphs, positions);
-    return new GlyphRun(
-      start,
-      end,
-      this.attributes,
-      glyphs,
-      positions,
-      stringIndices,
-      true
-    );
+
+    return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
   }
 }

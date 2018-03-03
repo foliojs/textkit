@@ -1,11 +1,11 @@
 import Run from '../models/Run';
 
 export default function flattenRuns(runs) {
-  let res = [];
+  const res = [];
 
-  let points = [];
+  const points = [];
   for (let i = 0; i < runs.length; i++) {
-    let run = runs[i];
+    const run = runs[i];
     points.push(['start', run.start, run.attributes, i]);
     points.push(['end', run.end, run.attributes, i]);
   }
@@ -13,10 +13,10 @@ export default function flattenRuns(runs) {
   points.sort((a, b) => a[1] - b[1] || a[3] - b[3]);
 
   let start = -1;
-  let stack = [];
   let attrs = {};
+  const stack = [];
 
-  for (let [type, offset, attributes] of points) {
+  for (const [type, offset, attributes] of points) {
     if (start !== -1 && start < offset) {
       res.push(new Run(start, offset, attrs));
     }

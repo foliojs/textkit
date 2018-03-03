@@ -1,18 +1,15 @@
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import Path from './src/geom/Path';
-import Rect from './src/geom/Rect';
 import LayoutEngine from './src/layout/LayoutEngine';
 import AttributedString from './src/models/AttributedString';
 import Container from './src/models/Container';
 import TabStop from './src/models/TabStop';
-import Attachment from './src/models/Attachment';
-import LineFragmentGenerator from './src/generators/LineFragmentGenerator';
 import TextRenderer from './src/renderers/TextRenderer';
 
-let path = new Path();
-let path2 = new Path();
-let path3 = new Path();
+const path = new Path();
+const path2 = new Path();
+const path3 = new Path();
 // path.circle(150, 150, 120);
 // path = path.scale(2);
 path.rect(50, 50, 300, 400);
@@ -27,8 +24,8 @@ path2.circle(500, 300, 100);
 //
 // path = path.scale(1.5)
 
-let exclusion = new Path();
-let exclusion2 = new Path();
+const exclusion = new Path();
+const exclusion2 = new Path();
 // exclusion.moveTo(0, 20);
 // exclusion.lineTo(100, 160);
 // exclusion.quadraticCurveTo(130, 200, 150, 120);
@@ -50,7 +47,7 @@ exclusion2.circle(200, 400, 50);
 
 // path = path.scale(2, 2);
 
-let doc = new PDFDocument();
+const doc = new PDFDocument();
 doc.pipe(fs.createWriteStream('out.pdf'));
 
 // path = path.scale(1.5)
@@ -81,7 +78,7 @@ doc.stroke();
 //   }
 // ]);
 
-let string = AttributedString.fromFragments([
+const string = AttributedString.fromFragments([
   {
     string: '“Lorem ipsum dolor sit \ufffc amet, ',
     attributes: {
@@ -127,23 +124,19 @@ let string = AttributedString.fromFragments([
 // path2.toFunction()(doc);
 // doc.stroke('green');
 
-let l = new LayoutEngine();
-// let block = l.layoutParagraph(string, path, [exclusion, exclusion.scale(0.5).translate(100, 220)]);
-let container = new Container(path, {
+const l = new LayoutEngine();
+// const block = l.layoutParagraph(string, path, [exclusion, exclusion.scale(0.5).translate(100, 220)]);
+const container = new Container(path, {
   exclusionPaths: [exclusion, exclusion2],
-  tabStops: [
-    new TabStop(100, 'decimal'),
-    new TabStop(150, 'left'),
-    new TabStop(250, 'right')
-  ]
+  tabStops: [new TabStop(100, 'decimal'), new TabStop(150, 'left'), new TabStop(250, 'right')]
   // columns: 2
 });
-let container2 = new Container(path2);
-let container3 = new Container(path3);
+const container2 = new Container(path2);
+const container3 = new Container(path3);
 
 l.layout(string, [container, container2, container3]);
 
-let renderer = new TextRenderer(doc, { outlineLines: false });
+const renderer = new TextRenderer(doc, { outlineLines: false });
 renderer.render(container);
 renderer.render(container2);
 

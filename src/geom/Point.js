@@ -26,8 +26,8 @@ export default class Point {
   }
 
   transform(m0, m1, m2, m3, m4, m5) {
-    let x = m0 * this.x + m2 * this.y + m4;
-    let y = m1 * this.x + m3 * this.y + m5;
+    const x = m0 * this.x + m2 * this.y + m4;
+    const y = m1 * this.x + m3 * this.y + m5;
     return new Point(x, y);
   }
 }

@@ -27,20 +27,18 @@ export default class FontSubstitutionEngine {
   }
 
   getRuns(string, runs) {
-    let res = [];
+    const res = [];
     let lastDescriptor = null;
     let lastFont = null;
     let lastIndex = 0;
     let index = 0;
 
-    for (let run of runs) {
-      let defaultDescriptor = FontManager.findFontSync(
-        run.attributes.fontDescriptor
-      );
-      let defaultFont = this.getFont(defaultDescriptor);
+    for (const run of runs) {
+      const defaultDescriptor = FontManager.findFontSync(run.attributes.fontDescriptor);
+      const defaultFont = this.getFont(defaultDescriptor);
 
-      for (let char of string.slice(run.start, run.end)) {
-        let codePoint = char.codePointAt();
+      for (const char of string.slice(run.start, run.end)) {
+        const codePoint = char.codePointAt();
         let descriptor = null;
         let font = null;
 
@@ -48,10 +46,7 @@ export default class FontSubstitutionEngine {
           descriptor = defaultDescriptor;
           font = defaultFont;
         } else {
-          descriptor = FontManager.substituteFontSync(
-            defaultDescriptor.postscriptName,
-            char
-          );
+          descriptor = FontManager.substituteFontSync(defaultDescriptor.postscriptName, char);
           font = this.getFont(descriptor);
         }
 

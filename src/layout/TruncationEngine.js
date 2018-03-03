@@ -17,43 +17,31 @@ export default class TruncationEngine {
 
     // If mode is center, get the visual center instead of the index center.
     if (mode === 'center') {
-      let offset = lineFragment.rect.width * OFFSET_FACTORS[mode];
+      const offset = lineFragment.rect.width * OFFSET_FACTORS[mode];
       glyphIndex = lineFragment.glyphIndexAtOffset(offset);
     }
 
     let stringIndex = lineFragment.stringIndexForGlyphIndex(glyphIndex);
-    let run = lineFragment.runAtGlyphIndex(glyphIndex);
-    let font = run.attributes.font;
-    let ellipsisGlyph = font.glyphForCodePoint(ELLIPSIS);
-    let ellipsisWidth = ellipsisGlyph.advanceWidth;
+    const run = lineFragment.runAtGlyphIndex(glyphIndex);
+    const font = run.attributes.font;
+    const ellipsisGlyph = font.glyphForCodePoint(ELLIPSIS);
+    const ellipsisWidth = ellipsisGlyph.advanceWidth;
 
-    while (
-      lineFragment.advanceWidth + ellipsisWidth >
-      lineFragment.rect.width
-    ) {
+    while (lineFragment.advanceWidth + ellipsisWidth > lineFragment.rect.width) {
       let nextGlyph;
 
       // Find the next grapheme cluster break
       if (mode === 'right') {
-        stringIndex = GraphemeBreaker.previousBreak(
-          lineFragment.string,
-          stringIndex
-        );
+        stringIndex = GraphemeBreaker.previousBreak(lineFragment.string, stringIndex);
         nextGlyph = lineFragment.glyphIndexForStringIndex(stringIndex);
       } else {
-        let nextStringIndex = GraphemeBreaker.nextBreak(
-          lineFragment.string,
-          stringIndex
-        );
+        const nextStringIndex = GraphemeBreaker.nextBreak(lineFragment.string, stringIndex);
         nextGlyph = lineFragment.glyphIndexForStringIndex(nextStringIndex) - 1;
       }
 
       // Delete the cluster
-      let min = Math.min(glyphIndex, nextGlyph, lineFragment.length - 1);
-      let max = Math.min(
-        Math.max(glyphIndex, nextGlyph),
-        lineFragment.length - 1
-      );
+      const min = Math.min(glyphIndex, nextGlyph, lineFragment.length - 1);
+      const max = Math.min(Math.max(glyphIndex, nextGlyph), lineFragment.length - 1);
 
       for (let i = max; i >= min; i--) {
         lineFragment.deleteGlyph(i);

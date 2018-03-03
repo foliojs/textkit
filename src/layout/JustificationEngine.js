@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import unicode from 'unicode-properties';
 
 const KASHIDA_PRIORITY = 0;
 const WHITESPACE_PRIORITY = 1;
@@ -45,7 +44,7 @@ export default class JustificationEngine {
     //   return;
     // }
 
-    let factor = options.factor || 1;
+    const factor = options.factor || 1;
     if (factor < 0 || factor > 1) {
       throw new Error(`Invalid justification factor: ${factor}`);
     }
@@ -54,50 +53,52 @@ export default class JustificationEngine {
     //   throw new Error(`Invalid justification width: ${width}`);
     // }
 
-    let gap = line.rect.width - line.advanceWidth;
+    const gap = line.rect.width - line.advanceWidth;
     if (gap === 0) {
       return;
     }
 
-    let factors = [];
+    const factors = [];
     let start = 0;
-    for (let run of line.glyphRuns) {
+    for (const run of line.glyphRuns) {
       // let engine = run.font._justEngine;
-      factors.push(
-        ...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK')
-      );
+      factors.push(...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
       start += run.glyphs.length;
     }
 
     factors[0].before = 0;
     factors[factors.length - 1].after = 0;
 
-    let distances = this.assign(gap, factors);
+    const distances = this.assign(gap, factors);
 
     // let changed = this.postprocess(glyphs, advances, distances);
 
     let index = 0;
-    for (let run of line.glyphRuns) {
-      for (let position of run.positions) {
+    for (const run of line.glyphRuns) {
+      for (const position of run.positions) {
         position.xAdvance += distances[index++];
       }
     }
   }
 
   factor(line, start, glyphs, direction) {
+    let charFactor;
+    let whitespaceFactor;
+
     if (direction === 'GROW') {
-      var charFactor = _.clone(EXPAND_CHAR_FACTOR);
-      var whitespaceFactor = _.clone(EXPAND_WHITESPACE_FACTOR);
+      charFactor = _.clone(EXPAND_CHAR_FACTOR);
+      whitespaceFactor = _.clone(EXPAND_WHITESPACE_FACTOR);
     } else {
-      var charFactor = _.clone(SHRINK_CHAR_FACTOR);
-      var whitespaceFactor = _.clone(SHRINK_WHITESPACE_FACTOR);
+      charFactor = _.clone(SHRINK_CHAR_FACTOR);
+      whitespaceFactor = _.clone(SHRINK_WHITESPACE_FACTOR);
     }
 
-    let factors = [];
+    const factors = [];
     for (let index = 0; index < glyphs.length; index++) {
-      let glyph = glyphs[index];
+      let factor;
+      const glyph = glyphs[index];
       if (line.isWhiteSpace(start + index)) {
-        var factor = _.clone(whitespaceFactor);
+        factor = _.clone(whitespaceFactor);
 
         if (index === glyphs.length - 1) {
           factor.before = 0;
@@ -107,11 +108,11 @@ export default class JustificationEngine {
           }
         }
       } else if (glyph.isMark && index > 0) {
-        var factor = _.clone(factors[index - 1]);
+        factor = _.clone(factors[index - 1]);
         factor.before = 0;
         factors[index - 1].after = 0;
       } else {
-        var factor = _.clone(charFactor);
+        factor = _.clone(charFactor);
       }
 
       factors.push(factor);
@@ -122,20 +123,17 @@ export default class JustificationEngine {
 
   assign(gap, factors) {
     let total = 0;
-    let priorities = [];
-    let unconstrained = [];
-    for (
-      let priority = KASHIDA_PRIORITY;
-      priority <= NULL_PRIORITY;
-      priority++
-    ) {
+    const priorities = [];
+    const unconstrained = [];
+
+    for (let priority = KASHIDA_PRIORITY; priority <= NULL_PRIORITY; priority++) {
       priorities[priority] = unconstrained[priority] = 0;
     }
 
     // sum the factors at each priority
     for (let j = 0; j < factors.length; j++) {
-      var factor = factors[j];
-      let sum = factor.before + factor.after;
+      const factor = factors[j];
+      const sum = factor.before + factor.after;
       total += sum;
       priorities[factor.priority] += sum;
       if (factor.unconstrained) {
@@ -149,7 +147,7 @@ export default class JustificationEngine {
     let remainingGap = gap;
     let priority;
     for (priority = KASHIDA_PRIORITY; priority <= NULL_PRIORITY; priority++) {
-      let prioritySum = priorities[priority];
+      const prioritySum = priorities[priority];
       if (prioritySum !== 0) {
         if (highestPriority === -1) {
           highestPriority = priority;
@@ -187,18 +185,18 @@ export default class JustificationEngine {
     // if there is still space left over, assign it to the highest priority that we saw.
     // this violates their factors, but it only happens in extreme cases
     if (remainingGap > 0 && highestPriority > -1) {
-      priorities[highestPriority] =
-        (highestPrioritySum + (gap - total)) / highestPrioritySum;
+      priorities[highestPriority] = (highestPrioritySum + (gap - total)) / highestPrioritySum;
     }
 
     // create and return an array of distances to add to each glyph's advance
-    let distances = [];
+    const distances = [];
     for (let index = 0; index < factors.length; index++) {
       // the distance to add to this glyph is the sum of the space to add
       // after this glyph, and the space to add before the next glyph
-      var factor = factors[index];
+      const factor = factors[index];
+      const next = factors[index + 1];
       let dist = factor.after * priorities[factor.priority];
-      let next = factors[index + 1];
+
       if (next) {
         dist += next.before * priorities[next.priority];
       }

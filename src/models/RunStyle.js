@@ -20,7 +20,6 @@ export default class RunStyle {
     this.wordSpacing = attributes.wordSpacing || 0;
     this.characterSpacing = attributes.characterSpacing || 0;
     this.attachment = attributes.attachment || null;
-
     this.script = attributes.script || null;
     this.bidiLevel = attributes.bidiLevel || null;
   }
