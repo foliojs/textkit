@@ -30,7 +30,7 @@ describe('Run', () => {
     expect(slice).toHaveProperty('end', 10);
   });
 
-  test('should slice surplus range', () => {
+  test('should slice exceeding range', () => {
     const run = new Run(5, 15);
     const slice = run.slice(8, 13);
 
