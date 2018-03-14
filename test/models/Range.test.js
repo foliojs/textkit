@@ -1,4 +1,4 @@
-import Range from '../src/models/Range';
+import Range from '../../src/models/Range';
 
 describe('Range', () => {
   test('should handle passed start and end', () => {

@@ -1,5 +1,5 @@
-import Run from '../src/models/Run';
-import AttributedString from '../src/models/AttributedString';
+import Run from '../../src/models/Run';
+import AttributedString from '../../src/models/AttributedString';
 
 const testString = 'Lorem ipsum';
 const testRuns = [

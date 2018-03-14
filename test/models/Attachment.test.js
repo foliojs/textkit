@@ -1,4 +1,4 @@
-import Attachment from '../src/models/Attachment';
+import Attachment from '../../src/models/Attachment';
 
 describe('Attachment', () => {
   test('should handle passed width', () => {

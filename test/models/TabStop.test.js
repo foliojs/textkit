@@ -1,4 +1,4 @@
-import TabStop from '../src/models/TabStop';
+import TabStop from '../../src/models/TabStop';
 
 describe('TabStop', () => {
   test('should handle have left alignment by default', () => {

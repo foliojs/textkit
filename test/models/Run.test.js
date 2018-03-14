@@ -1,4 +1,4 @@
-import Run from '../src/models/Run';
+import Run from '../../src/models/Run';
 
 describe('Run', () => {
   test('should handle passed start and end', () => {

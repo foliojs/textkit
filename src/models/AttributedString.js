@@ -27,6 +27,7 @@ export default class AttributedString {
 
   runIndexAtIndex(index) {
     index += this.start;
+
     for (let i = 0; i < this.runs.length; i++) {
       if (this.runs[i].start <= index && index < this.runs[i].end) {
         return i;

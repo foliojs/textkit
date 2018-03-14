@@ -1,7 +1,7 @@
 import fontkit from 'fontkit';
-import RunStyle from '../src/models/RunStyle';
-import GlyphRun from '../src/models/GlyphRun';
-import Attachment from '../src/models/Attachment';
+import RunStyle from '../../src/models/RunStyle';
+import GlyphRun from '../../src/models/GlyphRun';
+import Attachment from '../../src/models/Attachment';
 
 const font = fontkit.openSync(`${__dirname}/data/OpenSans-Regular.ttf`);
 
