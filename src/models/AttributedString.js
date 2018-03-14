@@ -14,11 +14,13 @@ export default class AttributedString {
     let offset = 0;
     const runs = [];
 
-    for (const fragment of fragments) {
+    fragments.forEach(fragment => {
       string += fragment.string;
-      runs.push(new Run(offset, offset + fragment.string.length, fragment.attributes));
+      runs.push(
+        new Run(offset, offset + fragment.string.length, fragment.attributes)
+      );
       offset += fragment.string.length;
-    }
+    });
 
     return new AttributedString(string, runs);
   }
@@ -41,10 +43,17 @@ export default class AttributedString {
     const endRun = this.runs[endRunIndex];
     const runs = [];
 
-    runs.push(startRun.slice(start + this.start - startRun.start, end + this.start - startRun.start));
+    runs.push(
+      startRun.slice(
+        start + this.start - startRun.start,
+        end + this.start - startRun.start
+      )
+    );
 
-    if (endRunIndex !== startRunIndex) {
-      runs.push(...this.runs.slice(startRunIndex + 1, endRunIndex).map(r => r.copy()));
+    if (startRunIndex !== endRunIndex) {
+      runs.push(
+        ...this.runs.slice(startRunIndex + 1, endRunIndex).map(r => r.copy())
+      );
 
       if (this.end - endRun.start !== 0) {
         runs.push(endRun.slice(0, this.end - endRun.start));
@@ -52,11 +61,17 @@ export default class AttributedString {
     }
 
     const offset = start + this.start;
+
     for (const run of runs) {
       run.start -= offset;
       run.end -= offset;
     }
 
-    return new AttributedString(this.string.slice(start, end), runs, start + this.start, end + this.start);
+    return new AttributedString(
+      this.string.slice(start, end),
+      runs,
+      start + this.start,
+      end + this.start
+    );
   }
 }

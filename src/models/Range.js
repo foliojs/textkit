@@ -2,7 +2,7 @@
  * This class represents a numeric range between
  * a starting and ending value, inclusive.
  */
-export default class Range {
+class Range {
   /**
    * Creates a new Range
    * @param {number} start the starting index of the range
@@ -65,3 +65,5 @@ export default class Range {
     this.end = Math.max(this.end, index);
   }
 }
+
+export default Range;
