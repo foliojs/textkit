@@ -1,9 +1,12 @@
+import path from 'path';
 import fontkit from 'fontkit';
 import RunStyle from '../../src/models/RunStyle';
 import GlyphRun from '../../src/models/GlyphRun';
 import Attachment from '../../src/models/Attachment';
 
-const font = fontkit.openSync(`${__dirname}/data/OpenSans-Regular.ttf`);
+const font = fontkit.openSync(
+  path.resolve(__dirname, '../data/OpenSans-Regular.ttf')
+);
 
 describe('GlyphRun', () => {
   let attrs;
