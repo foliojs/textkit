@@ -20,7 +20,7 @@ const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0);
  * to SVG path data strings, or to functions that can be applied to
  * render the path to a graphics context.
  */
-export default class Path {
+class Path {
   constructor() {
     this.commands = [];
     this._bbox = null;
@@ -626,3 +626,5 @@ function subdivideBezierWithFlatness(
 
   path.lineTo(x, y);
 }
+
+export default Path;

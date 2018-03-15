@@ -5,7 +5,7 @@ const CORNERS = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
 /**
  * Represents a rectangle
  */
-export default class Rect {
+class Rect {
   /** @public */
   constructor(x = 0, y = 0, width = 0, height = 0) {
     /**
@@ -172,3 +172,5 @@ export default class Rect {
     return new Rect(this.x, this.y, this.width, this.height);
   }
 }
+
+export default Rect;

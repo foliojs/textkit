@@ -1,7 +1,7 @@
 /**
  * Represents a glyph bounding box
  */
-export default class BBox {
+class BBox {
   constructor(
     minX = Infinity,
     minY = Infinity,
@@ -76,3 +76,5 @@ export default class BBox {
     return new BBox(this.minX, this.minY, this.maxX, this.maxY);
   }
 }
+
+export default BBox;
