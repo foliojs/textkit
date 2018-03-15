@@ -20,7 +20,7 @@ const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0);
  * to SVG path data strings, or to functions that can be applied to
  * render the path to a graphics context.
  */
-export default class Path {
+class Path {
   constructor() {
     this.commands = [];
     this._bbox = null;
@@ -76,7 +76,9 @@ export default class Path {
    * @return {string}
    */
   toFunction() {
-    const cmds = this.commands.map(c => `  ctx.${c.command}(${c.args.join(', ')});`);
+    const cmds = this.commands.map(
+      c => `  ctx.${c.command}(${c.args.join(', ')});`
+    );
     return new Function('ctx', cmds.join('\n'));
   }
 
@@ -269,7 +271,14 @@ export default class Path {
         const quads = quadraticToBezier(x, y, ...c.args);
 
         for (let i = 2; i < quads.length; i += 6) {
-          path.bezierCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3], quads[i + 4], quads[i + 5]);
+          path.bezierCurveTo(
+            quads[i],
+            quads[i + 1],
+            quads[i + 2],
+            quads[i + 3],
+            quads[i + 4],
+            quads[i + 5]
+          );
         }
       } else {
         path[c.command](...c.args);
@@ -295,7 +304,12 @@ export default class Path {
         const quads = cubic2quad(x, y, ...c.args, 0.1);
 
         for (let i = 2; i < quads.length; i += 4) {
-          path.quadraticCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3]);
+          path.quadraticCurveTo(
+            quads[i],
+            quads[i + 1],
+            quads[i + 2],
+            quads[i + 3]
+          );
         }
       } else {
         path[c.command](...c.args);
@@ -440,7 +454,14 @@ export default class Path {
             break;
 
           case 'bezierCurveTo':
-            res.bezierCurveTo(cur.args[2], cur.args[3], cur.args[0], cur.args[1], px, py);
+            res.bezierCurveTo(
+              cur.args[2],
+              cur.args[3],
+              cur.args[0],
+              cur.args[1],
+              px,
+              py
+            );
             if (closed && prev.command === 'moveTo') {
               prev.closePath();
             }
@@ -511,7 +532,7 @@ export default class Path {
 }
 
 for (const command of Object.keys(SVG_COMMANDS)) {
-  Path.prototype[command] = (...args) => {
+  Path.prototype[command] = function(...args) {
     this._bbox = this._cbox = null;
     this.commands.push({
       command,
@@ -537,7 +558,18 @@ function quadraticToBezier(cx, cy, qp1x, qp1y, x, y) {
   return [cp1x, cp1y, cp2x, cp2y, x, y];
 }
 
-function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, cp2y, x, y) {
+function subdivideBezierWithFlatness(
+  path,
+  flatness,
+  cx,
+  cy,
+  cp1x,
+  cp1y,
+  cp2x,
+  cp2y,
+  x,
+  y
+) {
   const dx1 = cp1x - cx;
   const dx2 = cp2x - cp1x;
   const dx3 = x - cp2x;
@@ -594,3 +626,5 @@ function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, c
 
   path.lineTo(x, y);
 }
+
+export default Path;

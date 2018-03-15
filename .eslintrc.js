@@ -1,6 +1,10 @@
 module.exports = {
   parser: 'babel-eslint',
-  extends: 'airbnb-base',
+  extends: ['airbnb-base', 'prettier'],
+  plugins: ['jest'],
+  env: {
+    'jest/globals': true
+  },
   rules: {
     'no-bitwise': 0,
     'no-continue': 0,
@@ -19,6 +23,6 @@ module.exports = {
     'no-param-reassign': ['warn'],
     'no-mixed-operators': ['warn'],
     'prefer-destructuring': ['warn'],
-    'max-len': ['error', { code: 120, ignoreComments: true }]
+    'max-len': ['error', { code: 80, ignoreComments: true }]
   }
 };

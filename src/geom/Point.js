@@ -1,7 +1,7 @@
 /**
  * Represents a 2d point
  */
-export default class Point {
+class Point {
   /** @public */
   constructor(x = 0, y = 0) {
     /**
@@ -31,3 +31,5 @@ export default class Point {
     return new Point(x, y);
   }
 }
+
+export default Point;

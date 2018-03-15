@@ -1,4 +1,4 @@
-export default class Attachment {
+class Attachment {
   static CODEPOINT = 0xfffc;
   static CHARACTER = '\ufffc';
 
@@ -9,3 +9,5 @@ export default class Attachment {
     this.render = options.render || null;
   }
 }
+
+export default Attachment;

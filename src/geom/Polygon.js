@@ -1,4 +1,4 @@
-export default class Polygon {
+class Polygon {
   constructor() {
     this.contours = [];
   }
@@ -7,3 +7,5 @@ export default class Polygon {
     this.contours.push(contour);
   }
 }
+
+export default Polygon;
