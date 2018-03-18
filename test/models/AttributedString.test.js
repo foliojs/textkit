@@ -2,10 +2,7 @@ import Run from '../../src/models/Run';
 import AttributedString from '../../src/models/AttributedString';
 
 const testString = 'Lorem ipsum';
-const testRuns = [
-  new Run(0, 6, { something: 'blah' }),
-  new Run(6, 12, { somethingElse: 'blah' })
-];
+const testRuns = [new Run(0, 6, { attr: 1 }), new Run(6, 11, { attr: 2 })];
 
 describe('AttributedString', () => {
   test('should handle passed string', () => {
@@ -13,15 +10,6 @@ describe('AttributedString', () => {
 
     expect(attributedString.string).toBe(testString);
     expect(attributedString.length).toBe(testString.length);
-    expect(attributedString.start).toBe(0);
-    expect(attributedString.end).toBe(testString.length + 1);
-  });
-
-  test('should handle custom start and end', () => {
-    const attributedString = new AttributedString(testString, [], 10, 20);
-
-    expect(attributedString.start).toBe(10);
-    expect(attributedString.end).toBe(20);
   });
 
   test('should not have runs when created', () => {
@@ -50,14 +38,84 @@ describe('AttributedString', () => {
     expect(attributedString.runs[1].start).toBe(3);
   });
 
-  test.only('should slice with several runs', () => {
+  test('should slice with one run', () => {
+    const run = [new Run(0, 11, { attr: 1 })];
+    const attributedString = new AttributedString(testString, run);
+    const splittedString = attributedString.slice(2, 8);
+
+    expect(splittedString.length).toBe(6);
+    expect(splittedString.string).toBe('rem ip');
+    expect(splittedString.runs[0]).toHaveProperty('start', 0);
+    expect(splittedString.runs[0]).toHaveProperty('end', 6);
+    expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 1 });
+  });
+
+  test('should return correct run index', () => {
+    const attributedString = new AttributedString(testString, testRuns);
+
+    expect(attributedString.runIndexAtIndex(0)).toBe(0);
+    expect(attributedString.runIndexAtIndex(5)).toBe(0);
+    expect(attributedString.runIndexAtIndex(6)).toBe(1);
+    expect(attributedString.runIndexAtIndex(10)).toBe(1);
+  });
+
+  test('should slice with two runs', () => {
     const attributedString = new AttributedString(testString, testRuns);
     const splittedString = attributedString.slice(2, 8);
 
-    expect(splittedString.string).toBe(testString.slice(2, 8));
+    expect(splittedString.length).toBe(6);
+    expect(splittedString.string).toBe('rem ip');
     expect(splittedString.runs[0]).toHaveProperty('start', 0);
     expect(splittedString.runs[0]).toHaveProperty('end', 4);
+    expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 1 });
     expect(splittedString.runs[1]).toHaveProperty('start', 4);
-    // expect(splittedString.runs[1]).toHaveProperty('end', 8);
+    expect(splittedString.runs[1]).toHaveProperty('end', 6);
+    expect(splittedString.runs[1]).toHaveProperty('attributes', { attr: 2 });
+  });
+
+  test('should slice with several runs', () => {
+    const runs = [
+      new Run(0, 3, { attr: 1 }),
+      new Run(3, 6, { attr: 2 }),
+      new Run(6, 11, { attr: 3 })
+    ];
+    const attributedString = new AttributedString(testString, runs);
+    const splittedString = attributedString.slice(2, 8);
+
+    expect(splittedString.length).toBe(6);
+    expect(splittedString.string).toBe('rem ip');
+    expect(splittedString.runs[0]).toHaveProperty('start', 0);
+    expect(splittedString.runs[0]).toHaveProperty('end', 1);
+    expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 1 });
+    expect(splittedString.runs[1]).toHaveProperty('start', 1);
+    expect(splittedString.runs[1]).toHaveProperty('end', 4);
+    expect(splittedString.runs[1]).toHaveProperty('attributes', { attr: 2 });
+    expect(splittedString.runs[2]).toHaveProperty('start', 4);
+    expect(splittedString.runs[2]).toHaveProperty('end', 6);
+    expect(splittedString.runs[2]).toHaveProperty('attributes', { attr: 3 });
+  });
+
+  test('should ignore unnecesary leading runs when slice', () => {
+    const attributedString = new AttributedString(testString, testRuns);
+    const splittedString = attributedString.slice(6, 11);
+
+    expect(splittedString.length).toBe(5);
+    expect(splittedString.runs.length).toBe(1);
+    expect(splittedString.string).toBe('ipsum');
+    expect(splittedString.runs[0]).toHaveProperty('start', 0);
+    expect(splittedString.runs[0]).toHaveProperty('end', 5);
+    expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 2 });
+  });
+
+  test('should ignore unnecesary trailing runs when slice', () => {
+    const attributedString = new AttributedString(testString, testRuns);
+    const splittedString = attributedString.slice(1, 6);
+
+    expect(splittedString.length).toBe(5);
+    expect(splittedString.runs.length).toBe(1);
+    expect(splittedString.string).toBe('orem ');
+    expect(splittedString.runs[0]).toHaveProperty('start', 0);
+    expect(splittedString.runs[0]).toHaveProperty('end', 5);
+    expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 1 });
   });
 });
