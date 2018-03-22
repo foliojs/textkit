@@ -20,7 +20,14 @@ export default class TextRenderer {
 
   renderBlock(block) {
     if (this.outlineBlocks) {
-      this.ctx.rect(block.bbox.minX, block.bbox.minY, block.bbox.width, block.bbox.height).stroke();
+      this.ctx
+        .rect(
+          block.bbox.minX,
+          block.bbox.minY,
+          block.bbox.width,
+          block.bbox.height
+        )
+        .stroke();
     }
 
     for (const line of block.lines) {
@@ -30,7 +37,9 @@ export default class TextRenderer {
 
   renderLine(line) {
     if (this.outlineLines) {
-      this.ctx.rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height).stroke();
+      this.ctx
+        .rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height)
+        .stroke();
     }
 
     this.ctx.save();
@@ -39,7 +48,12 @@ export default class TextRenderer {
 
     for (const run of line.glyphRuns) {
       if (run.attributes.backgroundColor) {
-        const backgroundRect = new Rect(0, -line.ascent, run.advanceWidth, line.rect.height);
+        const backgroundRect = new Rect(
+          0,
+          -line.ascent,
+          run.advanceWidth,
+          line.rect.height
+        );
         this.renderBackground(backgroundRect, run.attributes.backgroundColor);
       }
 
@@ -141,8 +155,8 @@ export default class TextRenderer {
 
     if (/wavy/.test(line.style)) {
       const dist = Math.max(2, line.rect.height);
-      const stepCount = Math.floor(line.rect.width / (2 * step));
       let step = 1.1 * dist;
+      const stepCount = Math.floor(line.rect.width / (2 * step));
 
       // Adjust step to fill entire width
       const remainingWidth = line.rect.width - stepCount * 2 * step;
@@ -156,7 +170,14 @@ export default class TextRenderer {
       this.ctx.moveTo(line.rect.x, line.rect.y);
 
       for (let i = 0; i < stepCount; i++) {
-        this.ctx.bezierCurveTo(x + step, cp1y, x + step, cp2y, x + 2 * step, line.rect.y);
+        this.ctx.bezierCurveTo(
+          x + step,
+          cp1y,
+          x + step,
+          cp2y,
+          x + 2 * step,
+          line.rect.y
+        );
         x += 2 * step;
       }
     } else {
