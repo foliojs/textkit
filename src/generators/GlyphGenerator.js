@@ -31,7 +31,11 @@ export default class GlyphGenerator {
     let glyphIndex = 0;
     const glyphRuns = runs.map(run => {
       const str = attributedString.string.slice(run.start, run.end);
-      const glyphRun = run.attributes.font.layout(str, run.attributes.features, run.attributes.script);
+      const glyphRun = run.attributes.font.layout(
+        str,
+        run.attributes.features,
+        run.attributes.script
+      );
       const end = glyphIndex + glyphRun.glyphs.length;
 
       const res = new GlyphRun(
@@ -53,7 +57,9 @@ export default class GlyphGenerator {
 
   resolveRuns(attributedString) {
     // Map attributes to RunStyle objects
-    const r = attributedString.runs.map(run => new Run(run.start, run.end, new RunStyle(run.attributes)));
+    const r = attributedString.runs.map(
+      run => new Run(run.start, run.end, new RunStyle(run.attributes))
+    );
 
     // Resolve run ranges and additional attributes
     const runs = [];
