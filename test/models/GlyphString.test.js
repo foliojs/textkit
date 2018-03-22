@@ -68,9 +68,9 @@ describe('GlyphString', () => {
     const sliced = string.slice(2, 6);
 
     expect(sliced.string).toBe('rem ');
-    expect(sliced._glyphRuns[0].start).toBe(0);
-    expect(sliced._glyphRuns[0].end).toBe(4);
-    expect(sliced._glyphRuns[0].glyphs).toHaveLength(4);
+    expect(sliced.glyphRuns[0].start).toBe(0);
+    expect(sliced.glyphRuns[0].end).toBe(4);
+    expect(sliced.glyphRuns[0].glyphs).toHaveLength(4);
   });
 
   test('should slice exceeding range', () => {
@@ -78,9 +78,9 @@ describe('GlyphString', () => {
     const sliced = string.slice(2, 14);
 
     expect(sliced.string).toBe('rem ipsum');
-    expect(sliced._glyphRuns[0].start).toBe(0);
-    expect(sliced._glyphRuns[0].end).toBe(9);
-    expect(sliced._glyphRuns[0].glyphs).toHaveLength(9);
+    expect(sliced.glyphRuns[0].start).toBe(0);
+    expect(sliced.glyphRuns[0].end).toBe(9);
+    expect(sliced.glyphRuns[0].glyphs).toHaveLength(9);
   });
 
   test('should ignore unnecesary trailing runs when slice', () => {
@@ -91,9 +91,9 @@ describe('GlyphString', () => {
 
     const sliced = string.slice(2, 6);
 
-    expect(sliced._glyphRuns).toHaveLength(1);
-    expect(sliced._glyphRuns[0].start).toBe(0);
-    expect(sliced._glyphRuns[0].end).toBe(4);
+    expect(sliced.glyphRuns).toHaveLength(1);
+    expect(sliced.glyphRuns[0].start).toBe(0);
+    expect(sliced.glyphRuns[0].end).toBe(4);
   });
 
   test('should ignore unnecesary leading runs when slice', () => {
@@ -104,8 +104,8 @@ describe('GlyphString', () => {
 
     const sliced = string.slice(6, 9);
 
-    expect(sliced._glyphRuns).toHaveLength(1);
-    expect(sliced._glyphRuns[0].start).toBe(0);
-    expect(sliced._glyphRuns[0].end).toBe(3);
+    expect(sliced.glyphRuns).toHaveLength(1);
+    expect(sliced.glyphRuns[0].start).toBe(0);
+    expect(sliced.glyphRuns[0].end).toBe(3);
   });
 });

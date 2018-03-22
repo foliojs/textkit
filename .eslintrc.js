@@ -23,6 +23,6 @@ module.exports = {
     'no-param-reassign': ['warn'],
     'no-mixed-operators': ['warn'],
     'prefer-destructuring': ['warn'],
-    'max-len': ['error', { code: 80, ignoreComments: true }]
+    'max-len': ['error', { code: 100, ignoreComments: true }]
   }
 };

@@ -4,7 +4,6 @@ import enUS from 'hyphenation.en-us';
 
 const hyphenator = new Hyphenator(enUS);
 const HYPHEN = 0x002d;
-
 const SHRINK_FACTOR = 0.04;
 
 /**
@@ -14,6 +13,7 @@ const SHRINK_FACTOR = 0.04;
 export default class LineBreaker {
   suggestLineBreak(glyphString, width, hyphenationFactor = 0) {
     const glyphIndex = glyphString.glyphIndexAtOffset(width);
+
     if (glyphIndex === -1) return null;
 
     if (glyphIndex === glyphString.length) {
@@ -26,10 +26,12 @@ export default class LineBreaker {
     if (bk) {
       let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
 
-      if (bk.next != null && this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)) {
+      if (
+        bk.next != null &&
+        this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
+      ) {
         const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
         const shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
-        // console.log(lineWidth, shrunk)
 
         const shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
         stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));

@@ -36,6 +36,7 @@ export default class Typesetter {
 
     // Generate line fragment rectangles by intersecting with the container.
     const fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, container);
+
     if (fragmentRects.length === 0) {
       return [];
     }
@@ -46,14 +47,19 @@ export default class Typesetter {
 
     for (const fragmentRect of fragmentRects) {
       const line = glyphString.slice(pos, glyphString.length);
-      this.tabEngine.processLineFragment(line, container);
+      // this.tabEngine.processLineFragment(line, container);
 
-      const bk = this.lineBreaker.suggestLineBreak(line, fragmentRect.width, paragraphStyle.hyphenationFactor);
+      const bk = this.lineBreaker.suggestLineBreak(
+        line,
+        fragmentRect.width,
+        paragraphStyle.hyphenationFactor
+      );
 
       if (bk) {
         bk.position += pos;
 
         const lineFragment = new LineFragment(fragmentRect, glyphString.slice(pos, bk.position));
+
         lineFragments.push(lineFragment);
         lineHeight = Math.max(lineHeight, lineFragment.height);
 
@@ -77,7 +83,8 @@ export default class Typesetter {
   }
 
   finalizeLineFragment(lineFragment, paragraphStyle, isLastFragment, isTruncated) {
-    const align = isLastFragment && !isTruncated ? paragraphStyle.alignLastLine : paragraphStyle.align;
+    const align =
+      isLastFragment && !isTruncated ? paragraphStyle.alignLastLine : paragraphStyle.align;
 
     if (isLastFragment && isTruncated && paragraphStyle.truncationMode) {
       this.truncationEngine.truncate(lineFragment, paragraphStyle.truncationMode);

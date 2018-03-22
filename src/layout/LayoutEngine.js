@@ -39,7 +39,8 @@ export default class LayoutEngine {
       const container = containers[i];
       const isLastContainer = i === containers.length - 1;
       const { bbox } = container;
-      const columnWidth = (bbox.width - container.columnGap * (container.columns - 1)) / container.columns;
+      const columnWidth =
+        (bbox.width - container.columnGap * (container.columns - 1)) / container.columns;
       const rect = new Rect(bbox.minX, bbox.minY, columnWidth, bbox.height);
 
       for (let j = 0; j < container.columns && start < attributedString.length; j++) {
@@ -107,7 +108,7 @@ export default class LayoutEngine {
 
       if (lineFragments.length > 0) {
         fragments.push(...lineFragments);
-        pos = lineFragments[lineFragments.length - 1].end;
+        pos += lineFragments[lineFragments.length - 1].end;
         lines++;
 
         if (firstLine) {
@@ -119,12 +120,12 @@ export default class LayoutEngine {
     }
 
     const isTruncated = isLastContainer && pos < glyphString.length;
-    for (let i = 0; i < fragments.length; i++) {
-      const fragment = fragments[i];
+
+    fragments.forEach((fragment, i) => {
       const isLastFragment = i === fragments.length - 1 && pos === glyphString.length;
 
       this.typesetter.finalizeLineFragment(fragment, paragraphStyle, isLastFragment, isTruncated);
-    }
+    });
 
     return new Block(fragments, paragraphStyle);
   }

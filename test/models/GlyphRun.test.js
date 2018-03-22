@@ -3,9 +3,7 @@ import fontkit from 'fontkit';
 import Attachment from '../../src/models/Attachment';
 import { glyphRunFactory } from '../utils/glyphRuns';
 
-const font = fontkit.openSync(
-  path.resolve(__dirname, '../data/OpenSans-Regular.ttf')
-);
+const font = fontkit.openSync(path.resolve(__dirname, '../data/OpenSans-Regular.ttf'));
 
 const createRun = glyphRunFactory(font);
 
@@ -78,13 +76,12 @@ describe('GlyphRun', () => {
     const getId = g => g.id;
     const expectedGlyphs = glyphRun.glyphs.slice(2, 5);
     const expectedPositions = glyphRun.positions.slice(2, 5);
-    const expectedIndices = glyphRun.stringIndices.slice(2, 5);
 
-    expect(sliced.start).toBe(2);
     expect(sliced.end).toBe(5);
-    expect(sliced.glyphs.map(getId)).toEqual(expectedGlyphs.map(getId));
+    expect(sliced.start).toBe(2);
+    expect(sliced.stringIndices[0]).toEqual(0);
     expect(sliced.positions).toEqual(expectedPositions);
-    expect(sliced.stringIndices).toEqual(expectedIndices);
+    expect(sliced.glyphs.map(getId)).toEqual(expectedGlyphs.map(getId));
   });
 
   test('should slice exceeding range', () => {
@@ -94,13 +91,12 @@ describe('GlyphRun', () => {
     const getId = g => g.id;
     const expectedGlyphs = glyphRun.glyphs.slice(2);
     const expectedPositions = glyphRun.positions.slice(2);
-    const expectedIndices = glyphRun.stringIndices.slice(2);
 
     expect(sliced.start).toBe(2);
     expect(sliced.end).toBe(11);
     expect(sliced.end).toBe(glyphRun.end);
+    expect(sliced.stringIndices[0]).toEqual(0);
     expect(sliced.glyphs.map(getId)).toEqual(expectedGlyphs.map(getId));
     expect(sliced.positions).toEqual(expectedPositions);
-    expect(sliced.stringIndices).toEqual(expectedIndices);
   });
 });

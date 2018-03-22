@@ -46,6 +46,7 @@ export default class GlyphGenerator {
         glyphRun.positions,
         glyphRun.stringIndices
       );
+
       this.resolveAttachments(res);
 
       glyphIndex = end;
