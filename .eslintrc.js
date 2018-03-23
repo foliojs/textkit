@@ -12,6 +12,7 @@ module.exports = {
     'no-plusplus': 0,
     'comma-dangle': 0,
     'no-cond-assign': 0,
+    'no-mixed-operators': 0,
     'no-use-before-define': 0,
     'no-case-declarations': 0,
     'no-underscore-dangle': 0,
@@ -21,7 +22,6 @@ module.exports = {
     'no-multi-assign': ['warn'],
     'no-nested-ternary': ['warn'],
     'no-param-reassign': ['warn'],
-    'no-mixed-operators': ['warn'],
     'prefer-destructuring': ['warn'],
     'max-len': ['error', { code: 100, ignoreComments: true }]
   }

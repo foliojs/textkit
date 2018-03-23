@@ -37,10 +37,9 @@ export default class LayoutEngine {
 
     for (let i = 0; i < containers.length && start < attributedString.length; i++) {
       const container = containers[i];
+      const { bbox, columns, columnGap } = container;
       const isLastContainer = i === containers.length - 1;
-      const { bbox } = container;
-      const columnWidth =
-        (bbox.width - container.columnGap * (container.columns - 1)) / container.columns;
+      const columnWidth = (bbox.width - columnGap * (columns - 1)) / columns;
       const rect = new Rect(bbox.minX, bbox.minY, columnWidth, bbox.height);
 
       for (let j = 0; j < container.columns && start < attributedString.length; j++) {
@@ -59,12 +58,12 @@ export default class LayoutEngine {
 
       const paragraph = attributedString.slice(start, next);
       const block = this.layoutParagraph(paragraph, container, rect, isLastContainer);
+      const paragraphHeight = block.bbox.height + block.style.paragraphSpacing;
+
       container.blocks.push(block);
 
-      const height = block.bbox.height + block.style.paragraphSpacing;
-
-      rect.y += height;
-      rect.height -= height;
+      rect.y += paragraphHeight;
+      rect.height -= paragraphHeight;
       start += block.stringLength;
 
       if (attributedString.string[start] === '\n') {
@@ -83,11 +82,12 @@ export default class LayoutEngine {
   layoutParagraph(attributedString, container, rect, isLastContainer) {
     const glyphString = this.glyphGenerator.generateGlyphs(attributedString);
     const paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
+    const { marginLeft, marginRight, indent, maxLines, lineSpacing } = paragraphStyle;
 
     const lineRect = new Rect(
-      rect.x + paragraphStyle.marginLeft + paragraphStyle.indent,
+      rect.x + marginLeft + indent,
       rect.y,
-      rect.width - paragraphStyle.marginLeft - paragraphStyle.indent - paragraphStyle.marginRight,
+      rect.width - marginLeft - indent - marginRight,
       glyphString.height
     );
 
@@ -96,7 +96,7 @@ export default class LayoutEngine {
     let firstLine = true;
     let lines = 0;
 
-    while (lineRect.y < rect.maxY && pos < glyphString.length && lines < paragraphStyle.maxLines) {
+    while (lineRect.y < rect.maxY && pos < glyphString.length && lines < maxLines) {
       const lineFragments = this.typesetter.layoutLineFragments(
         lineRect,
         glyphString.slice(pos, glyphString.length),
@@ -104,7 +104,7 @@ export default class LayoutEngine {
         paragraphStyle
       );
 
-      lineRect.y += lineRect.height + paragraphStyle.lineSpacing;
+      lineRect.y += lineRect.height + lineSpacing;
 
       if (lineFragments.length > 0) {
         fragments.push(...lineFragments);
@@ -112,8 +112,8 @@ export default class LayoutEngine {
         lines++;
 
         if (firstLine) {
-          lineRect.x -= paragraphStyle.indent;
-          lineRect.width += paragraphStyle.indent;
+          lineRect.x -= indent;
+          lineRect.width += indent;
           firstLine = false;
         }
       }
