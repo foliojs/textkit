@@ -79,24 +79,12 @@ export default class TextRenderer {
 
     this.ctx.fillColor(run.attributes.color);
 
-    // for (let i = 0; i < run.glyphs.length; i++) {
-    //   let position = run.positions[i];
-    //   let glyph = run.glyphs[i];
-    //
-    //   this.ctx.save();
-    //   this.ctx.translate(position.xOffset, position.yOffset);
-    //
-    //   if (glyph.codePoints[0] === Attachment.CODEPOINT && run.attributes.attachment) {
-    //     this.renderAttachment(run.attributes.attachment);
-    //   } else {
-    //     glyph.render(this.ctx, run.attributes.fontSize);
-    //   }
-    //
-    //   this.ctx.restore();
     const { font } = run.attributes;
+
     if (font.sbix || (font.COLR && font.CPAL)) {
       this.ctx.save();
       this.ctx.translate(0, -run.ascent);
+
       for (let i = 0; i < run.glyphs.length; i++) {
         const position = run.positions[i];
         const glyph = run.glyphs[i];
@@ -109,6 +97,7 @@ export default class TextRenderer {
         this.ctx.restore();
         this.ctx.translate(position.xAdvance, position.yAdvance);
       }
+
       this.ctx.restore();
     } else {
       this.ctx.font(run.attributes.font, run.attributes.fontSize);

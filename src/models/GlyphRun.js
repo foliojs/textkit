@@ -1,23 +1,12 @@
 import Run from './Run';
 
 class GlyphRun extends Run {
-  constructor(
-    start,
-    end,
-    attributes,
-    glyphs,
-    positions,
-    stringIndices,
-    preScaled
-  ) {
+  constructor(start, end, attributes, glyphs, positions, stringIndices, preScaled) {
     super(start, end, attributes);
-    // this.run = run;
     this.glyphs = glyphs;
     this.positions = positions;
     this.stringIndices = stringIndices;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
-    this.stringStart = Math.min(...stringIndices);
-    this.stringEnd = Math.max(...stringIndices);
     this.glyphIndices = [];
 
     for (let i = 0; i < stringIndices.length; i++) {
@@ -75,22 +64,22 @@ class GlyphRun extends Run {
     end = Math.min(end, this.start + this.glyphs.length);
 
     const glyphs = this.glyphs.slice(start - this.start, end - this.start);
-    const positions = this.positions.slice(
-      start - this.start,
-      end - this.start
-    );
-    const stringIndices = this.stringIndices.slice(
-      start - this.start,
-      end - this.start
-    );
+    const positions = this.positions.slice(start - this.start, end - this.start);
+    const stringIndices = this.stringIndices
+      .slice(start - this.start, end - this.start)
+      .map(index => index - this.stringIndices[start - this.start]);
 
+    return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
+  }
+
+  copy() {
     return new GlyphRun(
-      start,
-      end,
+      this.start,
+      this.end,
       this.attributes,
-      glyphs,
-      positions,
-      stringIndices,
+      this.glyphs,
+      this.positions,
+      this.stringIndices,
       true
     );
   }
