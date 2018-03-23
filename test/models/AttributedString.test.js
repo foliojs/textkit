@@ -25,10 +25,7 @@ describe('AttributedString', () => {
   });
 
   test('should be constructed by fragments', () => {
-    const attributedString = AttributedString.fromFragments([
-      { string: 'Hey' },
-      { string: ' ho' }
-    ]);
+    const attributedString = AttributedString.fromFragments([{ string: 'Hey' }, { string: ' ho' }]);
 
     const expectedString = 'Hey ho';
 
@@ -53,10 +50,10 @@ describe('AttributedString', () => {
   test('should return correct run index', () => {
     const attributedString = new AttributedString(testString, testRuns);
 
-    expect(attributedString.runIndexAtIndex(0)).toBe(0);
-    expect(attributedString.runIndexAtIndex(5)).toBe(0);
-    expect(attributedString.runIndexAtIndex(6)).toBe(1);
-    expect(attributedString.runIndexAtIndex(10)).toBe(1);
+    expect(attributedString.runIndexAt(0)).toBe(0);
+    expect(attributedString.runIndexAt(5)).toBe(0);
+    expect(attributedString.runIndexAt(6)).toBe(1);
+    expect(attributedString.runIndexAt(10)).toBe(1);
   });
 
   test('should slice with two runs', () => {

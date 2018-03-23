@@ -1,9 +1,9 @@
 import Run from '../models/Run';
 
-export default function flattenRuns(runs) {
+const flattenRuns = (runs = []) => {
   const res = [];
-
   const points = [];
+
   for (let i = 0; i < runs.length; i++) {
     const run = runs[i];
     points.push(['start', run.start, run.attributes, i]);
@@ -26,6 +26,7 @@ export default function flattenRuns(runs) {
       attrs = Object.assign({}, attrs, attributes);
     } else {
       attrs = {};
+
       for (let i = 0; i < stack.length; i++) {
         if (stack[i] === attributes) {
           stack.splice(i--, 1);
@@ -39,25 +40,6 @@ export default function flattenRuns(runs) {
   }
 
   return res;
-}
+};
 
-// flattenRuns([
-//   new Run(0, 10, {strike: true}),
-//   new Run(0, 10, {color: 'red'})
-// ]);
-
-// flattenRuns([
-//   new Run(12, 13, {red: true}),
-//   new Run(0, 5, {blue: true}),
-//   new Run(2, 12, {green: true}),
-//   new Run(3, 6, {yellow: true}),
-//   new Run(6, 10, {orange: true})
-// ]);
-
-// flattenRuns([
-//   new Run(12, 13, {color: 'red'}),
-//   new Run(0, 5,   {color: 'blue'}),
-//   new Run(2, 12,  {color: 'green'}),
-//   new Run(3, 6,   {color: 'yellow'}),
-//   new Run(6, 10,  {color: 'orange'})
-// ]);
+export default flattenRuns;
