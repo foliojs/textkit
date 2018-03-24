@@ -14,7 +14,7 @@ export const glyphRunFactory = font => ({
   const { glyphs, positions, stringIndices } = run;
   const glyphRun = new GlyphRun(
     start,
-    glyphs.length,
+    end || glyphs.length,
     attrs,
     glyphs,
     positions,

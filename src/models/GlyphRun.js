@@ -7,6 +7,8 @@ class GlyphRun extends Run {
     this.positions = positions;
     this.stringIndices = stringIndices;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
+    this.stringStart = Math.min(...stringIndices);
+    this.stringEnd = Math.max(...stringIndices);
     this.glyphIndices = [];
 
     for (let i = 0; i < stringIndices.length; i++) {
