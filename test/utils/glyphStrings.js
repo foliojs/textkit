@@ -4,16 +4,16 @@ import { glyphRunFactory } from './glyphRuns';
 /* eslint-disable-next-line */
 export const glyphStringFactory = font => ({
   value = 'Lorem ipsum',
-  steps = [[0, value.length]]
+  runs = [[0, value.length]]
 } = {}) => {
   const createRun = glyphRunFactory(font);
 
-  const glyphRuns = steps.map(
-    step =>
+  const glyphRuns = runs.map(
+    run =>
       createRun({
         value,
-        start: step[0],
-        end: step[1]
+        start: run[0],
+        end: run[1]
       }).glyphRun
   );
 
