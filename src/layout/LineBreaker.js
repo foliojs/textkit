@@ -21,39 +21,38 @@ export default class LineBreaker {
     }
 
     let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
-
     const bk = this.findBreakPreceeding(glyphString.string, stringIndex);
 
-    // if (bk) {
-    //   let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
-    //
-    //   if (
-    //     bk.next != null &&
-    //     this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
-    //   ) {
-    //     const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
-    //     const shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
-    //
-    //     const shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
-    //     stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
-    //
-    //     const point = this.findHyphenationPoint(
-    //       glyphString.string.slice(bk.position, bk.next),
-    //       stringIndex - bk.position
-    //     );
-    //
-    //     if (point > 0) {
-    //       bk.position += point;
-    //       breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
-    //
-    //       if (bk.position < bk.next) {
-    //         glyphString.insertGlyph(breakIndex++, HYPHEN);
-    //       }
-    //     }
-    //   }
-    //
-    //   bk.position = breakIndex;
-    // }
+    if (bk) {
+      let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
+
+      if (
+        bk.next != null &&
+        this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
+      ) {
+        const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
+        const shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
+
+        const shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
+        stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
+
+        const point = this.findHyphenationPoint(
+          glyphString.string.slice(bk.position, bk.next),
+          stringIndex - bk.position
+        );
+
+        if (point > 0) {
+          bk.position += point;
+          breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
+
+          if (bk.position < bk.next) {
+            glyphString.insertGlyph(breakIndex++, HYPHEN);
+          }
+        }
+      }
+
+      bk.position = breakIndex;
+    }
 
     return bk;
   }

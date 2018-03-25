@@ -112,7 +112,7 @@ class GlyphString {
     const idx = index + this._glyphRuns[0].stringStart + this.start;
 
     for (let i = 0; i < this._glyphRuns.length; i++) {
-      if (this._glyphRuns[i].stringStart <= idx && idx < this._glyphRuns[i].stringEnd + 1) {
+      if (this._glyphRuns[i].start <= idx && idx < this._glyphRuns[i].end) {
         return i;
       }
     }
@@ -233,9 +233,14 @@ class GlyphString {
   insertGlyph(index, codePoint) {
     const runIndex = this.runIndexAtGlyphIndex(index);
     const run = this._glyphRuns[runIndex];
+    const char = String.fromCharCode(codePoint);
     const glyph = run.attributes.font.glyphForCodePoint(codePoint);
 
-    glyph.inserted = true; // TODO: don't do this
+    // Should we edit the string value?
+    // Otherwise, the glyph runs and string would be inconsistent
+    this._string =
+      this._string.slice(0, this.start + index) + char + this._string.slice(this.start + index);
+
     run.glyphs.splice(this.start + index - run.start, 0, glyph);
     run.positions.splice(this.start + index - run.start, 0, {
       xAdvance: glyph.advanceWidth,

@@ -17,5 +17,5 @@ export const glyphStringFactory = font => ({
       }).glyphRun
   );
 
-  return new GlyphString(value, glyphRuns);
+  return new GlyphString(value, glyphRuns, 0, value.length);
 };

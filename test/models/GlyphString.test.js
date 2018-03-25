@@ -483,4 +483,42 @@ describe('GlyphString', () => {
     expect(sliced.isWhiteSpace(0)).toBeFalsy();
     expect(sliced.isWhiteSpace(1)).toBeTruthy();
   });
+
+  test('should successfully insert glyph', () => {
+    const string = createString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    string.insertGlyph(2, 0x002d);
+
+    expect(string.start).toBe(0);
+    expect(string.end).toBe(12);
+    expect(string.string).toBe('Lo-rem ipsum');
+    expect(string._glyphRuns[0].start).toBe(0);
+    expect(string._glyphRuns[0].end).toBe(7);
+    expect(string._glyphRuns[1].start).toBe(7);
+    expect(string._glyphRuns[1].end).toBe(12);
+    expect(string._glyphRuns[0].glyphs[2].id).toBe(16);
+  });
+
+  test('should successfully insert glyph for sliced strings', () => {
+    const string = createString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    const sliced = string.slice(4, string.length);
+
+    sliced.insertGlyph(2, 0x002d);
+
+    expect(sliced.start).toBe(4);
+    expect(sliced.end).toBe(12);
+    expect(sliced.string).toBe('m -ipsum');
+    expect(sliced._glyphRuns[0].start).toBe(0);
+    expect(sliced._glyphRuns[0].end).toBe(6);
+    expect(sliced._glyphRuns[1].start).toBe(6);
+    expect(sliced._glyphRuns[1].end).toBe(12);
+    expect(sliced._glyphRuns[1].glyphs[0].id).toBe(16);
+  });
 });
