@@ -87,28 +87,11 @@ class GlyphRun extends Run {
   }
 
   slice(start, end) {
-    const glyphStart = this.glyphIndices[start];
-    let glyphEnd = this.glyphIndices[end];
+    const glyphs = this.glyphs.slice(start, end);
+    const positions = this.positions.slice(start, end);
+    let stringIndices = this.stringIndices.slice(start, end);
 
-    if (glyphEnd === undefined) {
-      glyphEnd = this.glyphIndices[this.glyphIndices.length - 1] + 1;
-    }
-
-    let glyphs;
-    let positions;
-    let stringIndices;
-
-    if (glyphEnd === 0) {
-      glyphs = [this.glyphs[glyphStart]];
-      positions = [this.positions[glyphStart]];
-      stringIndices = [this.stringIndices[glyphStart]];
-    } else {
-      glyphs = this.glyphs.slice(glyphStart, glyphEnd);
-      positions = this.positions.slice(glyphStart, glyphEnd);
-      stringIndices = this.stringIndices.slice(glyphStart, glyphEnd);
-    }
-
-    stringIndices = stringIndices.map(index => index - this.stringIndices[glyphStart]);
+    stringIndices = stringIndices.map(index => index - this.stringIndices[start]);
 
     start += this.start;
     end += this.start;

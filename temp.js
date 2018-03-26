@@ -2,6 +2,7 @@ import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import Path from './src/geom/Path';
 import LayoutEngine from './src/layout/LayoutEngine';
+import Run from './src/models/Run';
 import AttributedString from './src/models/AttributedString';
 import Container from './src/models/Container';
 import TextRenderer from './src/renderers/TextRenderer';
@@ -57,6 +58,11 @@ const string = AttributedString.fromFragments([
     }
   }
 ]);
+
+// const string = new AttributedString('ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',[
+//   new Run(0, 8, { font: 'Khmer', color: 'red' }),
+//   new Run(8, 21, { font: 'Khmer', color: 'red' }),
+// ])
 
 const l = new LayoutEngine();
 const container = new Container(path, {

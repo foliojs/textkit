@@ -1,21 +1,31 @@
+import RunStyle from '../../src/models/RunStyle';
+import GlyphRun from '../../src/models/GlyphRun';
 import GlyphString from '../../src/models/GlyphString';
-import { glyphRunFactory } from './glyphRuns';
 
 /* eslint-disable-next-line */
 export const glyphStringFactory = font => ({
   value = 'Lorem ipsum',
   runs = [[0, value.length]]
 } = {}) => {
-  const createRun = glyphRunFactory(font);
+  let glyphIndex = 0;
 
-  const glyphRuns = runs.map(
-    run =>
-      createRun({
-        value,
-        start: run[0],
-        end: run[1]
-      }).glyphRun
-  );
+  const glyphRuns = runs.map(run => {
+    const string = value.slice(run[0], run[1]);
+    const attrs = new RunStyle(Object.assign({}, { font }));
+    const { glyphs, positions, stringIndices } = font.layout(string);
+    const glyphRun = new GlyphRun(
+      glyphIndex,
+      glyphIndex + glyphs.length,
+      attrs,
+      glyphs,
+      positions,
+      stringIndices
+    );
+
+    glyphIndex += glyphs.length;
+
+    return glyphRun;
+  });
 
   return new GlyphString(value, glyphRuns, 0, value.length);
 };
