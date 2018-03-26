@@ -67,8 +67,8 @@ class GlyphString {
       return this._glyphRunsCache;
     }
 
-    const startRunIndex = this.runIndexAtGlyphIndex(0);
-    const endRunIndex = this.runIndexAtGlyphIndex(this.length);
+    const startRunIndex = this.runIndexAtStringIndex(0);
+    const endRunIndex = this.runIndexAtStringIndex(this.length);
     const startRun = this._glyphRuns[startRunIndex];
     const endRun = this._glyphRuns[endRunIndex];
     const runs = [];
@@ -94,11 +94,16 @@ class GlyphString {
 
   runIndexAtGlyphIndex(index) {
     const idx = index + this.start;
+    let count = 0;
 
     for (let i = 0; i < this._glyphRuns.length; i++) {
-      if (this._glyphRuns[i].start <= idx && idx < this._glyphRuns[i].end) {
+      const run = this._glyphRuns[i];
+
+      if (count <= idx && idx < count + run.glyphs.length) {
         return i;
       }
+
+      count += run.glyphs.length;
     }
 
     return this._glyphRuns.length - 1;
@@ -109,7 +114,7 @@ class GlyphString {
   }
 
   runIndexAtStringIndex(index) {
-    const idx = index + this._glyphRuns[0].stringStart + this.start;
+    const idx = index + this._glyphRuns[0].start + this.start;
 
     for (let i = 0; i < this._glyphRuns.length; i++) {
       if (this._glyphRuns[i].start <= idx && idx < this._glyphRuns[i].end) {
@@ -233,16 +238,13 @@ class GlyphString {
   insertGlyph(index, codePoint) {
     const runIndex = this.runIndexAtGlyphIndex(index);
     const run = this._glyphRuns[runIndex];
-    const char = String.fromCharCode(codePoint);
     const glyph = run.attributes.font.glyphForCodePoint(codePoint);
+    const idx = this.start + index - run.start;
 
-    // Should we edit the string value?
-    // Otherwise, the glyph runs and string would be inconsistent
-    this._string =
-      this._string.slice(0, this.start + index) + char + this._string.slice(this.start + index);
-
-    run.glyphs.splice(this.start + index - run.start, 0, glyph);
-    run.positions.splice(this.start + index - run.start, 0, {
+    run.glyphs.splice(idx, 0, glyph);
+    run.glyphIndices.splice(idx, 0, run.glyphIndices[idx]);
+    run.stringIndices.splice(idx, 0, run.stringIndices[idx]);
+    run.positions.splice(idx, 0, {
       xAdvance: glyph.advanceWidth,
       yAdvance: 0,
       xOffset: 0,

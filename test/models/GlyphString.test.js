@@ -2,67 +2,125 @@ import path from 'path';
 import fontkit from 'fontkit';
 import { glyphStringFactory } from '../utils/glyphStrings';
 
-const font = fontkit.openSync(path.resolve(__dirname, '../data/OpenSans-Regular.ttf'));
+const openSans = fontkit.openSync(path.resolve(__dirname, '../data/OpenSans-Regular.ttf'));
+const khmer = fontkit.openSync(path.resolve(__dirname, '../data/Khmer.ttf'));
 
-const createString = glyphStringFactory(font);
+const createLatinString = glyphStringFactory(openSans);
+const createKhmerString = glyphStringFactory(khmer);
 
 describe('GlyphString', () => {
   test('should get string value', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.string).toBe('Lorem ipsum');
   });
 
   test('should get string end', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.end).toBe(11);
   });
 
   test('should get string length', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.length).toBe(11);
   });
 
   test('should get string advance width', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.advanceWidth).toBeCloseTo(74, 0);
   });
 
   test('should get string height', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.height).toBeCloseTo(16, 0);
   });
 
   test('should get string ascent', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.ascent).toBeCloseTo(13, 0);
   });
 
   test('should get string descent', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.descent).toBeCloseTo(-3.5, 1);
   });
 
+  test('should get glyphs run', () => {
+    const string = createLatinString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    expect(string.glyphRuns).toHaveLength(2);
+    expect(string.glyphRuns[0].start).toBe(0);
+    expect(string.glyphRuns[0].end).toBe(6);
+    expect(string.glyphRuns[1].start).toBe(6);
+    expect(string.glyphRuns[1].end).toBe(11);
+  });
+
+  test('should get glyphs run for sliced string', () => {
+    const string = createLatinString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    const sliced = string.slice(2, 8);
+
+    expect(sliced.glyphRuns).toHaveLength(2);
+    expect(sliced.glyphRuns[0].start).toBe(2);
+    expect(sliced.glyphRuns[0].end).toBe(6);
+    expect(sliced.glyphRuns[1].start).toBe(6);
+    expect(sliced.glyphRuns[1].end).toBe(8);
+  });
+
+  test('should get glyphs run (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    expect(string.glyphRuns).toHaveLength(2);
+    expect(string.glyphRuns[0].start).toBe(0);
+    expect(string.glyphRuns[0].end).toBe(8);
+    expect(string.glyphRuns[1].start).toBe(8);
+    expect(string.glyphRuns[1].end).toBe(21);
+  });
+
+  test('should get glyphs run for sliced string (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const sliced = string.slice(2, 8);
+
+    expect(sliced.glyphRuns).toHaveLength(2);
+    expect(sliced.glyphRuns[0].start).toBe(2);
+    expect(sliced.glyphRuns[0].end).toBe(6);
+    expect(sliced.glyphRuns[1].start).toBe(6);
+    expect(sliced.glyphRuns[1].end).toBe(8);
+  });
+
   test('should isWhiteSpace return true if white space', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.isWhiteSpace(5)).toBeTruthy();
   });
 
   test('should isWhiteSpace return false if non white space', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
 
     expect(string.isWhiteSpace(3)).toBeFalsy();
   });
 
   test('should slice containing range', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
     const sliced = string.slice(2, 6);
 
     expect(sliced.string).toBe('rem ');
@@ -72,7 +130,7 @@ describe('GlyphString', () => {
   });
 
   test('should slice exceeding range', () => {
-    const string = createString({ value: 'Lorem ipsum' });
+    const string = createLatinString({ value: 'Lorem ipsum' });
     const sliced = string.slice(2, 14);
 
     expect(sliced.string).toBe('rem ipsum');
@@ -82,7 +140,7 @@ describe('GlyphString', () => {
   });
 
   test('should ignore unnecesary trailing runs when slice', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -95,7 +153,7 @@ describe('GlyphString', () => {
   });
 
   test('should ignore unnecesary leading runs when slice', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -108,7 +166,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run index at glyph index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -118,7 +176,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run index at glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -131,8 +189,40 @@ describe('GlyphString', () => {
     expect(sliced.runIndexAtGlyphIndex(9)).toBe(1);
   });
 
+  test('should return correct run index at glyph index (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    expect(string.runIndexAtGlyphIndex(0)).toBe(0);
+    expect(string.runIndexAtGlyphIndex(4)).toBe(0);
+    expect(string.runIndexAtGlyphIndex(6)).toBe(0);
+    expect(string.runIndexAtGlyphIndex(7)).toBe(1);
+    expect(string.runIndexAtGlyphIndex(11)).toBe(1);
+    expect(string.runIndexAtGlyphIndex(15)).toBe(1);
+  });
+
+  test.skip('should return correct run index at glyph index for sliced strings (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const sliced = string.slice(4, 11);
+
+    console.log(sliced);
+
+    expect(sliced.runIndexAtGlyphIndex(0)).toBe(0);
+    expect(sliced.runIndexAtGlyphIndex(4)).toBe(0);
+    expect(sliced.runIndexAtGlyphIndex(6)).toBe(0);
+    expect(sliced.runIndexAtGlyphIndex(7)).toBe(1);
+    expect(sliced.runIndexAtGlyphIndex(11)).toBe(1);
+    expect(sliced.runIndexAtGlyphIndex(15)).toBe(1);
+  });
+
   test('should return correct run at glyph index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -142,7 +232,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run at glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -156,7 +246,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run index at string index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -166,7 +256,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run index at string index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -179,8 +269,38 @@ describe('GlyphString', () => {
     expect(sliced.runIndexAtStringIndex(5)).toBe(1);
   });
 
+  test('should return correct run index at string index (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    expect(string.runIndexAtStringIndex(0)).toBe(0);
+    expect(string.runIndexAtStringIndex(4)).toBe(0);
+    expect(string.runIndexAtStringIndex(7)).toBe(0);
+    expect(string.runIndexAtStringIndex(8)).toBe(1);
+    expect(string.runIndexAtStringIndex(14)).toBe(1);
+    expect(string.runIndexAtStringIndex(20)).toBe(1);
+  });
+
+  test('should return correct run index at string index for sliced strings (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const sliced = string.slice(4, 11);
+
+    expect(sliced.runIndexAtStringIndex(0)).toBe(0);
+    expect(sliced.runIndexAtStringIndex(2)).toBe(0);
+    expect(sliced.runIndexAtStringIndex(3)).toBe(0);
+    expect(sliced.runIndexAtStringIndex(4)).toBe(1);
+    expect(sliced.runIndexAtStringIndex(5)).toBe(1);
+    expect(sliced.runIndexAtStringIndex(6)).toBe(1);
+  });
+
   test('should return correct run at string index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -190,7 +310,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct run at string index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -203,8 +323,32 @@ describe('GlyphString', () => {
     expect(sliced.runAtStringIndex(5).start).toBe(6);
   });
 
+  test('should return correct run at string index (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    expect(string.runAtStringIndex(2).start).toBe(0);
+    expect(string.runAtStringIndex(9).start).toBe(8);
+  });
+
+  test('should return correct run at string index for sliced strings (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const sliced = string.slice(4, 11);
+
+    expect(sliced.runAtStringIndex(0).start).toBe(0);
+    expect(sliced.runAtStringIndex(1).start).toBe(0);
+    expect(sliced.runAtStringIndex(4).start).toBe(8);
+    expect(sliced.runAtStringIndex(6).start).toBe(8);
+  });
+
   test('should return correct glyph at index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -217,7 +361,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph at index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -232,8 +376,39 @@ describe('GlyphString', () => {
     expect(sliced.glyphAtIndex(5).id).toBe(secondRunGlyphs[3].id);
   });
 
+  test.skip('should return correct glyph at index (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const firstRunGlyphs = string._glyphRuns[0].glyphs;
+    const secondRunGlyphs = string._glyphRuns[1].glyphs;
+
+    expect(string.glyphAtIndex(2).id).toBe(firstRunGlyphs[2].id);
+    expect(string.glyphAtIndex(6).id).toBe(firstRunGlyphs[6].id);
+    expect(string.glyphAtIndex(7).id).toBe(secondRunGlyphs[0].id);
+    expect(string.glyphAtIndex(15).id).toBe(secondRunGlyphs[8].id);
+  });
+
+  test.skip('should return correct glyph at index for sliced strings (non latin)', () => {
+    const string = createKhmerString({
+      value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
+      runs: [[0, 8], [8, 21]]
+    });
+
+    const sliced = string.slice(4, 11);
+    const firstRunGlyphs = sliced._glyphRuns[0].glyphs;
+    const secondRunGlyphs = sliced._glyphRuns[1].glyphs;
+
+    const runs = sliced.glyphRuns;
+    // expect(sliced.glyphAtIndex(0).id).toBe(firstRunGlyphs[3].id);
+    // expect(sliced.glyphAtIndex(3).id).toBe(firstRunGlyphs[6].id);
+    // expect(sliced.glyphAtIndex(4).id).toBe(secondRunGlyphs[0].id);
+  });
+
   test('should return correct glyph width at index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -246,7 +421,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph width at index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -264,7 +439,7 @@ describe('GlyphString', () => {
   test('should return correct glyph index at offset', () => {
     //   l     o     r    e      m            i     p     s     u     m
     // 6.22  7.24  4.65  6.73  11.16  3.11  3.03  7.35  5.72  7.36  11.16
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -276,7 +451,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph index at offset for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -294,7 +469,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct string index for glyph index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -306,7 +481,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct string index for glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -319,7 +494,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph index for string index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -331,7 +506,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph index for string index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -344,7 +519,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph code at glyph index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -354,7 +529,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct glyph code at glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -368,7 +543,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct char at glyph index', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -378,7 +553,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct char at glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -394,7 +569,7 @@ describe('GlyphString', () => {
   test('should return correct offset at glyph index', () => {
     //   l     o     r    e      m            i     p     s     u     m
     // 6.22  7.24  4.65  6.73  11.16  3.11  3.03  7.35  5.72  7.36  11.16
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -406,7 +581,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct offset at glyph index for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -423,7 +598,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct index of', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -437,7 +612,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct index of for sliced strings', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
     });
@@ -452,7 +627,7 @@ describe('GlyphString', () => {
   });
 
   test('should return correct unicode category', () => {
-    const string = createString({
+    const string = createLatinString({
       value: 'Lo1.+ '
     });
 
@@ -465,18 +640,14 @@ describe('GlyphString', () => {
   });
 
   test('should return if is white space for index', () => {
-    const string = createString({
-      value: 'L '
-    });
+    const string = createLatinString({ value: 'L ' });
 
     expect(string.isWhiteSpace(0)).toBeFalsy();
     expect(string.isWhiteSpace(1)).toBeTruthy();
   });
 
   test('should return if is white space for index for sliced string', () => {
-    const string = createString({
-      value: 'someL '
-    });
+    const string = createLatinString({ value: 'someL ' });
 
     const sliced = string.slice(4, string.length);
 
@@ -485,40 +656,43 @@ describe('GlyphString', () => {
   });
 
   test('should successfully insert glyph', () => {
-    const string = createString({
-      value: 'Lorem ipsum',
-      runs: [[0, 6], [6, 11]]
-    });
+    const char = 0x002d; // "-"
+    const string = createLatinString({ value: 'Lorem ipsum', runs: [[0, 6], [6, 11]] });
 
-    string.insertGlyph(2, 0x002d);
+    string.insertGlyph(2, char);
 
     expect(string.start).toBe(0);
     expect(string.end).toBe(12);
-    expect(string.string).toBe('Lo-rem ipsum');
     expect(string._glyphRuns[0].start).toBe(0);
     expect(string._glyphRuns[0].end).toBe(7);
     expect(string._glyphRuns[1].start).toBe(7);
     expect(string._glyphRuns[1].end).toBe(12);
     expect(string._glyphRuns[0].glyphs[2].id).toBe(16);
+
+    // Test string indices.
+    // The new glyph shouldn't interfer with current indices
+    expect(string._glyphRuns[0].stringIndices[2]).toBe(2);
+    expect(string._glyphRuns[0].stringIndices[3]).toBe(2);
   });
 
   test('should successfully insert glyph for sliced strings', () => {
-    const string = createString({
-      value: 'Lorem ipsum',
-      runs: [[0, 6], [6, 11]]
-    });
-
+    const char = 0x002d; // "-"
+    const string = createLatinString({ value: 'Lorem ipsum', runs: [[0, 6], [6, 11]] });
     const sliced = string.slice(4, string.length);
 
-    sliced.insertGlyph(2, 0x002d);
+    sliced.insertGlyph(2, char);
 
     expect(sliced.start).toBe(4);
     expect(sliced.end).toBe(12);
-    expect(sliced.string).toBe('m -ipsum');
     expect(sliced._glyphRuns[0].start).toBe(0);
     expect(sliced._glyphRuns[0].end).toBe(6);
     expect(sliced._glyphRuns[1].start).toBe(6);
     expect(sliced._glyphRuns[1].end).toBe(12);
     expect(sliced._glyphRuns[1].glyphs[0].id).toBe(16);
+
+    // Test string indices.
+    // The new glyph shouldn't interfer with current indices
+    expect(string._glyphRuns[1].stringIndices[0]).toBe(0);
+    expect(string._glyphRuns[1].stringIndices[1]).toBe(0);
   });
 });

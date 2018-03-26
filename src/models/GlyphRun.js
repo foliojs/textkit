@@ -7,8 +7,6 @@ class GlyphRun extends Run {
     this.positions = positions;
     this.stringIndices = stringIndices;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
-    this.stringStart = Math.min(...stringIndices);
-    this.stringEnd = Math.max(...stringIndices);
     this.glyphIndices = [];
 
     for (let i = 0; i < stringIndices.length; i++) {
@@ -61,15 +59,18 @@ class GlyphRun extends Run {
   }
 
   slice(start, end) {
+    const glyphStart = this.glyphIndices[start];
+    const glyphEnd = this.glyphIndices[end] || this.end;
+
     start += this.start;
     end += this.start;
-    end = Math.min(end, this.start + this.glyphs.length);
+    end = Math.min(end, this.end);
 
-    const glyphs = this.glyphs.slice(start - this.start, end - this.start);
-    const positions = this.positions.slice(start - this.start, end - this.start);
+    const glyphs = this.glyphs.slice(glyphStart - this.start, glyphEnd - this.start);
+    const positions = this.positions.slice(glyphStart - this.start, glyphEnd - this.start);
     const stringIndices = this.stringIndices
-      .slice(start - this.start, end - this.start)
-      .map(index => index - this.stringIndices[start - this.start]);
+      .slice(glyphStart - this.start, glyphEnd - this.start)
+      .map(index => index - this.stringIndices[glyphStart - this.start]);
 
     return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
   }
