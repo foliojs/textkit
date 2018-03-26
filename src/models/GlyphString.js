@@ -93,20 +93,19 @@ class GlyphString {
   }
 
   runIndexAtGlyphIndex(index) {
-    const idx = index + this.start;
     let count = 0;
 
-    for (let i = 0; i < this._glyphRuns.length; i++) {
-      const run = this._glyphRuns[i];
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      const run = this.glyphRuns[i];
 
-      if (count <= idx && idx < count + run.glyphs.length) {
+      if (count <= index && index < count + run.glyphs.length) {
         return i;
       }
 
       count += run.glyphs.length;
     }
 
-    return this._glyphRuns.length - 1;
+    return this.glyphRuns.length - 1;
   }
 
   runAtGlyphIndex(index) {
@@ -130,13 +129,41 @@ class GlyphString {
   }
 
   glyphAtIndex(index) {
-    const run = this.runAtGlyphIndex(index);
-    return run.glyphs[this.start + index - run.start];
+    let run;
+    let count = 0;
+
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      run = this.glyphRuns[i];
+
+      if (count <= index && index < count + run.glyphs.length) {
+        return run.glyphs[index - count];
+      }
+
+      count += run.glyphs.length;
+    }
+
+    return run.glyphs[run.glyphs.length - 1];
+  }
+
+  positionAtIndex(index) {
+    let run;
+    let count = 0;
+
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      run = this.glyphRuns[i];
+
+      if (count <= index && index < count + run.positions.length) {
+        return run.positions[index - count];
+      }
+
+      count += run.positions.length;
+    }
+
+    return run.positions[run.positions.length - 1];
   }
 
   getGlyphWidth(index) {
-    const run = this.runAtGlyphIndex(index);
-    return run.positions[this.start + index - run.start].xAdvance;
+    return this.positionAtIndex(index).xAdvance;
   }
 
   glyphIndexAtOffset(width) {
@@ -163,19 +190,42 @@ class GlyphString {
     return index;
   }
 
-  stringIndexForGlyphIndex(glyphIndex) {
-    const run = this.runAtGlyphIndex(glyphIndex);
+  stringIndexForGlyphIndex(index) {
+    let run;
+    let count = 0;
+    let offset = 0;
 
-    if (glyphIndex >= run.end) {
-      return -1;
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      run = this.glyphRuns[i];
+
+      if (count <= index && index < count + run.glyphs.length) {
+        return offset + run.stringIndices[index - count];
+      }
+
+      offset += run.stringEnd + 1;
+      count += run.glyphs.length;
     }
 
-    return run.start - this.start + run.stringIndices[this.start + glyphIndex - run.start];
+    return run.stringIndices[run.stringIndices.length - 1];
   }
 
-  glyphIndexForStringIndex(stringIndex) {
-    const run = this.runAtStringIndex(stringIndex);
-    return run.start - this.start + run.glyphIndices[this.start + stringIndex - run.start];
+  glyphIndexForStringIndex(index) {
+    let run;
+    let count = 0;
+    let offset = 0;
+
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      run = this.glyphRuns[i];
+
+      if (count <= index && index < count + run.length) {
+        return offset + run.glyphIndices[index - count];
+      }
+
+      count += run.length;
+      offset += run.glyphs.length;
+    }
+
+    return run.glyphIndices[run.glyphIndices.length - 1];
   }
 
   codePointAtGlyphIndex(glyphIndex) {
