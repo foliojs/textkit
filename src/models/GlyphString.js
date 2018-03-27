@@ -237,15 +237,16 @@ class GlyphString {
 
   offsetAtGlyphIndex(glyphIndex) {
     let offset = 0;
+    let count = glyphIndex;
 
     for (const run of this.glyphRuns) {
       for (let i = 0; i < run.glyphs.length; i++) {
-        if (glyphIndex === 0) {
+        if (count === 0) {
           return offset;
         }
 
         offset += run.positions[i].xAdvance;
-        glyphIndex--;
+        count -= 1;
       }
     }
 
@@ -303,11 +304,11 @@ class GlyphString {
       yOffset: 0
     });
 
-    run.end++;
+    run.end += 1;
 
     for (let i = runIndex + 1; i < this._glyphRuns.length; i++) {
-      this._glyphRuns[i].start++;
-      this._glyphRuns[i].end++;
+      this._glyphRuns[i].start += 1;
+      this._glyphRuns[i].end += 1;
     }
 
     this._glyphRunsCache = null;
