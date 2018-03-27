@@ -5,21 +5,12 @@ import GlyphRun from '../../src/models/GlyphRun';
 export const glyphRunFactory = font => ({
   attributes = {},
   value = 'Lorem Ipsum',
-  start = 0,
-  end = value.length
+  start = 0
 } = {}) => {
-  const string = value.slice(start, end);
-  const run = font.layout(string);
+  const run = font.layout(value);
   const attrs = new RunStyle(Object.assign({}, { font }, attributes));
   const { glyphs, positions, stringIndices } = run;
-  const glyphRun = new GlyphRun(
-    start,
-    end || glyphs.length,
-    attrs,
-    glyphs,
-    positions,
-    stringIndices
-  );
+  const glyphRun = new GlyphRun(start, glyphs.length, attrs, glyphs, positions, stringIndices);
 
   return { glyphRun, glyphs, positions, stringIndices, attrs };
 };

@@ -7,13 +7,7 @@ class GlyphRun extends Run {
     this.positions = positions;
     this.stringIndices = stringIndices;
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
-    this.stringStart = Math.min(...stringIndices);
-    this.stringEnd = Math.max(...stringIndices);
-    this.glyphIndices = [];
-
-    for (let i = 0; i < stringIndices.length; i++) {
-      this.glyphIndices[stringIndices[i]] = i;
-    }
+    this._glyphIndices = null;
 
     if (!preScaled) {
       for (const pos of this.positions) {
@@ -26,7 +20,39 @@ class GlyphRun extends Run {
   }
 
   get length() {
-    return this.glyphs.length;
+    return this.end - this.start;
+  }
+
+  get glyphIndices() {
+    if (this._glyphIndices) {
+      return this._glyphIndices;
+    }
+
+    const glyphIndices = [];
+
+    for (let i = 0; i < this.stringIndices.length; i++) {
+      glyphIndices[this.stringIndices[i]] = i;
+    }
+
+    let lastValue = 0;
+    for (let i = glyphIndices.length - 1; i >= 0; i--) {
+      if (glyphIndices[i] === undefined) {
+        glyphIndices[i] = lastValue;
+      } else {
+        lastValue = glyphIndices[i];
+      }
+    }
+
+    this._glyphIndices = glyphIndices;
+    return glyphIndices;
+  }
+
+  get stringStart() {
+    return Math.min(...this.stringIndices);
+  }
+
+  get stringEnd() {
+    return Math.max(...this.stringIndices);
   }
 
   get advanceWidth() {
@@ -61,15 +87,15 @@ class GlyphRun extends Run {
   }
 
   slice(start, end) {
+    const glyphs = this.glyphs.slice(start, end);
+    const positions = this.positions.slice(start, end);
+    let stringIndices = this.stringIndices.slice(start, end);
+
+    stringIndices = stringIndices.map(index => index - this.stringIndices[start]);
+
     start += this.start;
     end += this.start;
-    end = Math.min(end, this.start + this.glyphs.length);
-
-    const glyphs = this.glyphs.slice(start - this.start, end - this.start);
-    const positions = this.positions.slice(start - this.start, end - this.start);
-    const stringIndices = this.stringIndices
-      .slice(start - this.start, end - this.start)
-      .map(index => index - this.stringIndices[start - this.start]);
+    end = Math.min(end, this.end);
 
     return new GlyphRun(start, end, this.attributes, glyphs, positions, stringIndices, true);
   }

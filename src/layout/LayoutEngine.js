@@ -97,9 +97,10 @@ export default class LayoutEngine {
     const fragments = [];
 
     while (lineRect.y < rect.maxY && pos < glyphString.length && lines < maxLines) {
+      const lineString = glyphString.slice(pos, glyphString.length);
       const lineFragments = this.typesetter.layoutLineFragments(
         lineRect,
-        glyphString.slice(pos, glyphString.length),
+        lineString,
         container,
         paragraphStyle
       );
@@ -108,7 +109,7 @@ export default class LayoutEngine {
 
       if (lineFragments.length > 0) {
         fragments.push(...lineFragments);
-        pos += lineFragments[lineFragments.length - 1].end;
+        pos = lineFragments[lineFragments.length - 1].end;
         lines++;
 
         if (firstLine) {

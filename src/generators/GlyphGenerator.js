@@ -53,7 +53,7 @@ export default class GlyphGenerator {
       return res;
     });
 
-    return new GlyphString(attributedString.string, glyphRuns, 0, attributedString.string.length);
+    return new GlyphString(attributedString.string, glyphRuns);
   }
 
   resolveRuns(attributedString) {
