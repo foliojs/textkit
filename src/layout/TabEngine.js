@@ -21,7 +21,7 @@ const ALIGN_TERMINATORS = {
  */
 export default class TabEngine {
   processLineFragment(glyphString, container) {
-    for (const { position, x, index } of glyphString) {
+    for (const { position, x, index, glyph } of glyphString) {
       if (glyphString.codePointAtGlyphIndex(index) === TAB) {
         // Find the next tab stop and adjust x-advance
         const tabStop = this.getTabStopAfter(container, x);
@@ -52,7 +52,8 @@ export default class TabEngine {
     // If the x position is greater than the last defined tab stop,
     // find the next tab stop using the tabStopInterval.
     if (Math.round(x) >= maxX) {
-      const xOffset = (Math.ceil((x - maxX) / container.tabStopInterval) + 1) * container.tabStopInterval;
+      const xOffset =
+        (Math.ceil((x - maxX) / container.tabStopInterval) + 1) * container.tabStopInterval;
       return new TabStop(Math.min(maxX + xOffset, container.bbox.width), 'left');
     }
 

@@ -8,6 +8,8 @@ const khmer = fontkit.openSync(path.resolve(__dirname, '../data/Khmer.ttf'));
 const createLatinString = glyphStringFactory(openSans);
 const createKhmerString = glyphStringFactory(khmer);
 
+const round = num => Math.round(num * 100) / 100;
+
 describe('GlyphString', () => {
   test('should get string value', () => {
     const string = createLatinString({ value: 'Lorem ipsum' });
@@ -824,5 +826,55 @@ describe('GlyphString', () => {
     // The new glyph shouldn't interfer with current indices
     expect(string._glyphRuns[1].stringIndices[0]).toBe(0);
     expect(string._glyphRuns[1].stringIndices[1]).toBe(0);
+  });
+
+  test('should be able to iterate through glyph runs', () => {
+    const string = createLatinString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    const glyphs = [];
+    const indices = [];
+    const positions = [];
+    const xs = [];
+
+    for (const { position, x, index, glyph } of string) {
+      glyphs.push(glyph.id);
+      indices.push(index);
+      positions.push(round(position.xAdvance));
+      xs.push(round(x));
+    }
+
+    expect(glyphs).toEqual([47, 82, 85, 72, 80, 3, 76, 83, 86, 88, 80]);
+    expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(positions).toEqual([6.23, 7.25, 4.66, 6.73, 11.16, 3.12, 3.04, 7.35, 5.72, 7.37, 11.16]);
+    expect(xs).toEqual([0, 6.23, 13.48, 18.13, 24.87, 36.03, 39.15, 42.18, 49.54, 55.26, 62.63]);
+  });
+
+  test('should be able to iterate through glyph runs for sliced string', () => {
+    const string = createLatinString({
+      value: 'Lorem ipsum',
+      runs: [[0, 6], [6, 11]]
+    });
+
+    const sliced = string.slice(4, 8);
+
+    const glyphs = [];
+    const indices = [];
+    const positions = [];
+    const xs = [];
+
+    for (const { position, x, index, glyph } of sliced) {
+      glyphs.push(glyph.id);
+      indices.push(index);
+      positions.push(round(position.xAdvance));
+      xs.push(round(x));
+    }
+
+    expect(glyphs).toEqual([80, 3, 76, 83]);
+    expect(indices).toEqual([4, 5, 6, 7]);
+    expect(positions).toEqual([11.16, 3.12, 3.04, 7.35]);
+    expect(xs).toEqual([0, 11.16, 14.28, 17.31]);
   });
 });

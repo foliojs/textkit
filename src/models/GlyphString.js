@@ -337,6 +337,23 @@ class GlyphString {
 
     this._glyphRunsCache = null;
   }
+
+  *[Symbol.iterator]() {
+    let x = 0;
+    for (const run of this.glyphRuns) {
+      for (let i = 0; i < run.glyphs.length; i++) {
+        yield {
+          glyph: run.glyphs[i],
+          position: run.positions[i],
+          run,
+          x,
+          index: run.start + i
+        };
+
+        x += run.positions[i].xAdvance;
+      }
+    }
+  }
 }
 
 export default GlyphString;
