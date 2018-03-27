@@ -21,13 +21,13 @@ const ALIGNMENT_FACTORS = {
  * typesetter's behavior.
  */
 export default class Typesetter {
-  constructor() {
-    this.lineBreaker = new LineBreaker();
-    this.lineFragmentGenerator = new LineFragmentGenerator();
-    this.justificationEngine = new JustificationEngine();
-    this.truncationEngine = new TruncationEngine();
-    this.decorationEngine = new TextDecorationEngine();
-    this.tabEngine = new TabEngine();
+  constructor(engines = {}) {
+    this.lineBreaker = engines.lineBreaker || new LineBreaker();
+    this.lineFragmentGenerator = engines.lineFragmentGenerator || new LineFragmentGenerator();
+    this.justificationEngine = engines.justificationEngine || new JustificationEngine();
+    this.truncationEngine = engines.truncationEngine || new TruncationEngine();
+    this.decorationEngine = engines.decorationEngine || new TextDecorationEngine();
+    this.tabEngine = engines.tabEngine || new TabEngine();
   }
 
   layoutLineFragments(lineRect, glyphString, container, paragraphStyle) {
