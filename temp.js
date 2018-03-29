@@ -1,24 +1,19 @@
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
-import Path from './src/geom/Path';
-import LayoutEngine from './src/layout/LayoutEngine';
-import Run from './src/models/Run';
-import AttributedString from './src/models/AttributedString';
-import Container from './src/models/Container';
-import TextRenderer from './src/renderers/TextRenderer';
+import { Path, LayoutEngine, AttributedString, Container, TextRenderer } from './src';
 
 const path = new Path();
 
 path.rect(30, 30, 300, 400);
 
-// const exclusion = new Path();
-// exclusion.circle(140, 160, 50);
+const exclusion = new Path();
+exclusion.circle(140, 160, 50);
 
 const doc = new PDFDocument();
 doc.pipe(fs.createWriteStream('out.pdf'));
 
 path.toFunction()(doc);
-// exclusion.toFunction()(doc);
+exclusion.toFunction()(doc);
 
 doc.stroke('green');
 doc.stroke();
@@ -61,14 +56,9 @@ const string = AttributedString.fromFragments([
   }
 ]);
 
-// const string = new AttributedString('ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',[
-//   new Run(0, 8, { font: 'Khmer', color: 'red' }),
-//   new Run(8, 21, { font: 'Khmer', color: 'red' }),
-// ])
-
 const l = new LayoutEngine();
 const container = new Container(path, {
-  // exclusionPaths: [exclusion]
+  exclusionPaths: [exclusion]
 });
 
 l.layout(string, [container]);
