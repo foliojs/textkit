@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import clone from 'lodash.clone';
 
 const KASHIDA_PRIORITY = 0;
 const WHITESPACE_PRIORITY = 1;
@@ -86,11 +86,11 @@ export default class JustificationEngine {
     let whitespaceFactor;
 
     if (direction === 'GROW') {
-      charFactor = _.clone(EXPAND_CHAR_FACTOR);
-      whitespaceFactor = _.clone(EXPAND_WHITESPACE_FACTOR);
+      charFactor = clone(EXPAND_CHAR_FACTOR);
+      whitespaceFactor = clone(EXPAND_WHITESPACE_FACTOR);
     } else {
-      charFactor = _.clone(SHRINK_CHAR_FACTOR);
-      whitespaceFactor = _.clone(SHRINK_WHITESPACE_FACTOR);
+      charFactor = clone(SHRINK_CHAR_FACTOR);
+      whitespaceFactor = clone(SHRINK_WHITESPACE_FACTOR);
     }
 
     const factors = [];
@@ -98,7 +98,7 @@ export default class JustificationEngine {
       let factor;
       const glyph = glyphs[index];
       if (line.isWhiteSpace(start + index)) {
-        factor = _.clone(whitespaceFactor);
+        factor = clone(whitespaceFactor);
 
         if (index === glyphs.length - 1) {
           factor.before = 0;
@@ -108,11 +108,11 @@ export default class JustificationEngine {
           }
         }
       } else if (glyph.isMark && index > 0) {
-        factor = _.clone(factors[index - 1]);
+        factor = clone(factors[index - 1]);
         factor.before = 0;
         factors[index - 1].after = 0;
       } else {
-        factor = _.clone(charFactor);
+        factor = clone(charFactor);
       }
 
       factors.push(factor);

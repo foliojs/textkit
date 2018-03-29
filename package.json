@@ -24,7 +24,7 @@
     "hypher": "^0.2.4",
     "iconv-lite": "^0.4.13",
     "linebreak": "^0.1.2",
-    "lodash": "^4.16.6",
+    "lodash.clone": "^4.5.0",
     "pdfkit": "^0.8.0",
     "svgpath": "^2.2.0",
     "unicode-properties": "^1.1.0"
@@ -33,8 +33,8 @@
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-plugin-transform-class-properties": "^6.19.0",
-    "babel-preset-node6": "^11.0.0",
     "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-preset-node6": "^11.0.0",
     "eslint": "^4.18.2",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.9.0",
