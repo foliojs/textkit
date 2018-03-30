@@ -288,7 +288,9 @@ class GlyphString {
   insertGlyph(index, codePoint) {
     const runIndex = this.runIndexAtGlyphIndex(index);
     const run = this._glyphRuns[runIndex];
+    const { font, fontSize } = run.attributes;
     const glyph = run.attributes.font.glyphForCodePoint(codePoint);
+    const scale = fontSize / font.unitsPerEm;
     const idx = this.start + index - run.start;
 
     if (this._end) {
@@ -298,7 +300,7 @@ class GlyphString {
     run.glyphs.splice(idx, 0, glyph);
     run.stringIndices.splice(idx, 0, run.stringIndices[idx]);
     run.positions.splice(idx, 0, {
-      xAdvance: glyph.advanceWidth,
+      xAdvance: glyph.advanceWidth * scale,
       yAdvance: 0,
       xOffset: 0,
       yOffset: 0
