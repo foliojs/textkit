@@ -1,9 +1,7 @@
 import Path from '../../src/geom/Path';
 
 const assertPath = (path, expected) => {
-  const value = path.commands.map(
-    ({ command, args }) => `${command}:${args.join(',')}`
-  );
+  const value = path.commands.map(({ command, args }) => `${command}:${args.join(',')}`);
 
   expect(value.join(`|`)).toBe(expected.replace(/\n| /g, ''));
 };
@@ -49,10 +47,7 @@ describe('Path', () => {
     const path = new Path();
     path.rect(5, 5, 10, 20);
 
-    assertPath(
-      path,
-      'moveTo:5,5|lineTo:15,5|lineTo:15,25|lineTo:5,25|closePath:'
-    );
+    assertPath(path, 'moveTo:5,5|lineTo:15,5|lineTo:15,25|lineTo:5,25|closePath:');
   });
 
   test('should correctly add ellipse commands', () => {
@@ -81,5 +76,73 @@ describe('Path', () => {
       bezierCurveTo:-0.5228474983079359,15,-5,10.522847498307936,
       -5,5|closePath:`
     );
+  });
+
+  test('should isClockwise return true if valid', () => {
+    const path = new Path();
+    path.moveTo(5, 5);
+    path.lineTo(10, 5);
+    path.lineTo(10, 10);
+    path.lineTo(5, 10);
+    path.closePath();
+
+    expect(path.isClockwise).toBeTruthy();
+  });
+
+  test('should isClockwise return true if valid for non rect paths', () => {
+    const path = new Path();
+    path.moveTo(5, 0);
+    path.lineTo(6, 4);
+    path.lineTo(4, 5);
+    path.lineTo(1, 5);
+    path.lineTo(1, 0);
+    path.closePath();
+
+    expect(path.isClockwise).toBeTruthy();
+  });
+
+  test('should isClockwise return true if valid for large numbers', () => {
+    const path = new Path();
+    path.moveTo(1000, 20);
+    path.lineTo(1350, 20);
+    path.lineTo(1350, 420);
+    path.lineTo(1000, 420);
+    path.closePath();
+
+    expect(path.isClockwise).toBeTruthy();
+  });
+
+  test('should isClockwise return false if invalid', () => {
+    const path = new Path();
+    path.moveTo(5, 5);
+    path.lineTo(5, 10);
+    path.lineTo(10, 10);
+    path.lineTo(10, 5);
+    path.closePath();
+
+    expect(path.isClockwise).toBeFalsy();
+  });
+
+  test('should isClockwise return false if invalid for non rect paths', () => {
+    const path = new Path();
+    path.moveTo(5, 0);
+    path.lineTo(1, 0);
+    path.lineTo(1, 5);
+    path.lineTo(4, 5);
+    path.lineTo(6, 4);
+    path.closePath();
+
+    expect(path.isClockwise).toBeFalsy();
+  });
+
+  test('should isClockwise return false if invalid for large numbers', () => {
+    const path = new Path();
+    path.moveTo(1000, 20);
+    path.lineTo(20, 1350);
+    path.lineTo(1350, 420);
+    path.lineTo(420, 1000);
+    path.closePath();
+
+    expect(path.isClockwise).toBeFalsy();
   });
 });

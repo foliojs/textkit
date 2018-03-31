@@ -76,9 +76,7 @@ class Path {
    * @return {string}
    */
   toFunction() {
-    const cmds = this.commands.map(
-      c => `  ctx.${c.command}(${c.args.join(', ')});`
-    );
+    const cmds = this.commands.map(c => `  ctx.${c.command}(${c.args.join(', ')});`);
     return new Function('ctx', cmds.join('\n'));
   }
 
@@ -304,12 +302,7 @@ class Path {
         const quads = cubic2quad(x, y, ...c.args, 0.1);
 
         for (let i = 2; i < quads.length; i += 4) {
-          path.quadraticCurveTo(
-            quads[i],
-            quads[i + 1],
-            quads[i + 2],
-            quads[i + 3]
-          );
+          path.quadraticCurveTo(quads[i], quads[i + 1], quads[i + 2], quads[i + 3]);
         }
       } else {
         path[c.command](...c.args);
@@ -375,37 +368,36 @@ class Path {
   }
 
   get isClockwise() {
-    // For each point, compute the cross-product magnitude of the two adjoining edges.
-    // If the sum is positive, the points are in clockwise order.
-    // http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
-    let cx = 0;
-    let cy = 0;
+    // Source: http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+    // Original solution define that f the sum is positive, the points are in clockwise order.
+    // We check for the opposite condition because we are in an inverted cartesian coordinate system
     let sx = 0;
     let sy = 0;
+    let cx = 0;
+    let cy = 0;
     let sum = 0;
 
-    let path = this.flatten();
-    for (let { command, args } of path.commands) {
-      let [x, y] = args;
+    const path = this.flatten();
+
+    for (const { command, args } of path.commands) {
+      const [x, y] = args;
       switch (command) {
         case 'moveTo':
-          sx = cx = x;
-          sy = cy = y;
+          cx = x;
+          cy = y;
+          sx = x;
+          sy = y;
           break;
 
         case 'lineTo':
-          if (cx !== x || cy !== y) {
-            sum += cx * y - cy * x;
-          }
+          sum += (x - cx) * (cy + y);
 
           cx = x;
           cy = y;
           break;
 
         case 'closePath':
-          if (cx !== sx || cy !== sy) {
-            sum += cx * sy - cy * sx;
-          }
+          sum += (sx - cx) * (sy + cy);
           break;
 
         default:
@@ -413,8 +405,7 @@ class Path {
       }
     }
 
-    sum += cx * sy - cy * sx;
-    return sum >= 0;
+    return sum < 0;
   }
 
   reverse() {
@@ -454,14 +445,7 @@ class Path {
             break;
 
           case 'bezierCurveTo':
-            res.bezierCurveTo(
-              cur.args[2],
-              cur.args[3],
-              cur.args[0],
-              cur.args[1],
-              px,
-              py
-            );
+            res.bezierCurveTo(cur.args[2], cur.args[3], cur.args[0], cur.args[1], px, py);
             if (closed && prev.command === 'moveTo') {
               prev.closePath();
             }
@@ -558,18 +542,7 @@ function quadraticToBezier(cx, cy, qp1x, qp1y, x, y) {
   return [cp1x, cp1y, cp2x, cp2y, x, y];
 }
 
-function subdivideBezierWithFlatness(
-  path,
-  flatness,
-  cx,
-  cy,
-  cp1x,
-  cp1y,
-  cp2x,
-  cp2y,
-  x,
-  y
-) {
+function subdivideBezierWithFlatness(path, flatness, cx, cy, cp1x, cp1y, cp2x, cp2y, x, y) {
   const dx1 = cp1x - cx;
   const dx2 = cp2x - cp1x;
   const dx3 = x - cp2x;
