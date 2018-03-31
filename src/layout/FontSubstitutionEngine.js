@@ -34,8 +34,14 @@ export default class FontSubstitutionEngine {
     let index = 0;
 
     for (const run of runs) {
+      let defaultFont;
       const defaultDescriptor = FontManager.findFontSync(run.attributes.fontDescriptor);
-      const defaultFont = this.getFont(defaultDescriptor);
+
+      if (typeof run.attributes.font === 'string') {
+        defaultFont = this.getFont(defaultDescriptor);
+      } else {
+        defaultFont = run.attributes.font;
+      }
 
       for (const char of string.slice(run.start, run.end)) {
         const codePoint = char.codePointAt();
