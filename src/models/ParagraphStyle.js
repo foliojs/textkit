@@ -7,14 +7,14 @@ export default class ParagraphStyle {
     this.marginLeft = attributes.marginLeft || attributes.margin || 0;
     this.marginRight = attributes.marginRight || attributes.margin || 0;
     this.align = attributes.align || 'left';
-    this.alignLastLine = attributes.alignLastLine || 'left';
+    this.alignLastLine =
+      attributes.alignLastLine || (this.align === 'justify' ? 'left' : this.align);
     this.justificationFactor = attributes.justificationFactor || 1;
     this.hyphenationFactor = attributes.hyphenationFactor || 0;
     this.shrinkFactor = attributes.shrinkFactor || 0;
     this.lineSpacing = attributes.lineSpacing || 0;
     this.hangingPunctuation = attributes.hangingPunctuation || false;
-    this.truncationMode =
-      attributes.truncationMode || (attributes.truncate ? 'right' : null);
+    this.truncationMode = attributes.truncationMode || (attributes.truncate ? 'right' : null);
     this.maxLines = attributes.maxLines || Infinity;
   }
 }
