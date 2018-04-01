@@ -20,14 +20,7 @@ export default class TextRenderer {
 
   renderBlock(block) {
     if (this.outlineBlocks) {
-      this.ctx
-        .rect(
-          block.bbox.minX,
-          block.bbox.minY,
-          block.bbox.width,
-          block.bbox.height
-        )
-        .stroke();
+      this.ctx.rect(block.bbox.minX, block.bbox.minY, block.bbox.width, block.bbox.height).stroke();
     }
 
     for (const line of block.lines) {
@@ -37,9 +30,7 @@ export default class TextRenderer {
 
   renderLine(line) {
     if (this.outlineLines) {
-      this.ctx
-        .rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height)
-        .stroke();
+      this.ctx.rect(line.rect.x, line.rect.y, line.rect.width, line.rect.height).stroke();
     }
 
     this.ctx.save();
@@ -48,12 +39,7 @@ export default class TextRenderer {
 
     for (const run of line.glyphRuns) {
       if (run.attributes.backgroundColor) {
-        const backgroundRect = new Rect(
-          0,
-          -line.ascent,
-          run.advanceWidth,
-          line.rect.height
-        );
+        const backgroundRect = new Rect(0, -line.ascent, run.advanceWidth, line.rect.height);
         this.renderBackground(backgroundRect, run.attributes.backgroundColor);
       }
 
@@ -73,13 +59,17 @@ export default class TextRenderer {
   }
 
   renderRun(run) {
+    const { font, fontSize, color, link } = run.attributes;
+
     if (this.outlineRuns) {
       this.ctx.rect(0, 0, run.advanceWidth, run.height).stroke();
     }
 
-    this.ctx.fillColor(run.attributes.color);
+    this.ctx.fillColor(color);
 
-    const { font } = run.attributes;
+    if (link) {
+      this.ctx.link(0, -run.height - run.descent, run.advanceWidth, run.height, link);
+    }
 
     if (font.sbix || (font.COLR && font.CPAL)) {
       this.ctx.save();
@@ -92,7 +82,7 @@ export default class TextRenderer {
         this.ctx.save();
         this.ctx.translate(position.xOffset, position.yOffset);
 
-        glyph.render(this.ctx, run.attributes.fontSize);
+        glyph.render(this.ctx, fontSize);
 
         this.ctx.restore();
         this.ctx.translate(position.xAdvance, position.yAdvance);
@@ -100,7 +90,7 @@ export default class TextRenderer {
 
       this.ctx.restore();
     } else {
-      this.ctx.font(run.attributes.font, run.attributes.fontSize);
+      this.ctx.font(font, fontSize);
       this.ctx._addGlyphs(run.glyphs, run.positions, 0, 0);
     }
 
@@ -159,14 +149,7 @@ export default class TextRenderer {
       this.ctx.moveTo(line.rect.x, line.rect.y);
 
       for (let i = 0; i < stepCount; i++) {
-        this.ctx.bezierCurveTo(
-          x + step,
-          cp1y,
-          x + step,
-          cp2y,
-          x + 2 * step,
-          line.rect.y
-        );
+        this.ctx.bezierCurveTo(x + step, cp1y, x + step, cp2y, x + 2 * step, line.rect.y);
         x += 2 * step;
       }
     } else {
