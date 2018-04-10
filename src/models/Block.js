@@ -15,6 +15,15 @@ export default class Block {
     return bbox;
   }
 
+  get height() {
+    let height = 0;
+    for (const line of this.lines) {
+      height += line.height;
+    }
+
+    return height;
+  }
+
   get stringLength() {
     let length = 0;
     for (const line of this.lines) {
