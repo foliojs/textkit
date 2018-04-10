@@ -36,7 +36,7 @@ describe('GlyphRun', () => {
     expect(glyphRun.end).toBe(11);
   });
 
-  test('should get correct end', () => {
+  test('should get correct end (non latin)', () => {
     const { glyphRun } = createKhmerRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន', start: 0 });
 
     expect(glyphRun.end).toBe(16);
