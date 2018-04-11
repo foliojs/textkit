@@ -116,7 +116,17 @@ class GlyphString {
   }
 
   runAtGlyphIndex(index) {
-    return this.glyphRuns[this.runIndexAtGlyphIndex(index)];
+    index += this.start;
+
+    for (let i = 0; i < this.glyphRuns.length; i++) {
+      const run = this.glyphRuns[i];
+
+      if (run.start <= index && run.end > index) {
+        return run;
+      }
+    }
+
+    return this.glyphRuns[this.glyphRuns.length - 1];
   }
 
   runIndexAtStringIndex(index) {

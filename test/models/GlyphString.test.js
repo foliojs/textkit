@@ -241,7 +241,7 @@ describe('GlyphString', () => {
     expect(string.runAtGlyphIndex(9).start).toBe(6);
   });
 
-  test('should return correct run at glyph index for sliced strings', () => {
+  test.only('should return correct run at glyph index for sliced strings', () => {
     const string = createLatinString({
       value: 'Lorem ipsum',
       runs: [[0, 6], [6, 11]]
@@ -253,6 +253,12 @@ describe('GlyphString', () => {
     expect(sliced.runAtGlyphIndex(1).start).toBe(4);
     expect(sliced.runAtGlyphIndex(2).start).toBe(6);
     expect(sliced.runAtGlyphIndex(5).start).toBe(6);
+
+    const sliced2 = string.slice(7, 11);
+
+    expect(sliced2.runAtGlyphIndex(0).start).toBe(7);
+    expect(sliced2.runAtGlyphIndex(1).start).toBe(7);
+    expect(sliced2.runAtGlyphIndex(2).start).toBe(7);
   });
 
   test('should return correct run index at string index', () => {
