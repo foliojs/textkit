@@ -46,10 +46,10 @@ export default class JustificationEngine {
     shrinkCharFactor = {},
     shrinkWhitespaceFactor = {}
   } = {}) {
-    this.expandCharFactor = merge(expandCharFactor, EXPAND_CHAR_FACTOR);
-    this.expandWhitespaceFactor = merge(expandWhitespaceFactor, EXPAND_WHITESPACE_FACTOR);
-    this.shrinkCharFactor = merge(shrinkCharFactor, SHRINK_CHAR_FACTOR);
-    this.shrinkWhitespaceFactor = merge(shrinkWhitespaceFactor, SHRINK_WHITESPACE_FACTOR);
+    this.expandCharFactor = merge(EXPAND_CHAR_FACTOR, expandCharFactor);
+    this.expandWhitespaceFactor = merge(EXPAND_WHITESPACE_FACTOR, expandWhitespaceFactor);
+    this.shrinkCharFactor = merge(SHRINK_CHAR_FACTOR, shrinkCharFactor);
+    this.shrinkWhitespaceFactor = merge(SHRINK_WHITESPACE_FACTOR, shrinkWhitespaceFactor);
   }
 
   justify(line, options = {}) {
