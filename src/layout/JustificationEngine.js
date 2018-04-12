@@ -1,4 +1,5 @@
 import clone from 'lodash.clone';
+import merge from 'lodash.merge';
 
 const KASHIDA_PRIORITY = 0;
 const WHITESPACE_PRIORITY = 1;
@@ -39,19 +40,23 @@ const SHRINK_CHAR_FACTOR = {
  * justification algorithm from a PDF in the Apple Font Tools package.
  */
 export default class JustificationEngine {
-  justify(line, options = {}) {
-    // if (line.length === 0) {
-    //   return;
-    // }
+  constructor({
+    expandCharFactor = {},
+    expandWhitespaceFactor = {},
+    shrinkCharFactor = {},
+    shrinkWhitespaceFactor = {}
+  } = {}) {
+    this.expandCharFactor = merge(expandCharFactor, EXPAND_CHAR_FACTOR);
+    this.expandWhitespaceFactor = merge(expandWhitespaceFactor, EXPAND_WHITESPACE_FACTOR);
+    this.shrinkCharFactor = merge(shrinkCharFactor, SHRINK_CHAR_FACTOR);
+    this.shrinkWhitespaceFactor = merge(shrinkWhitespaceFactor, SHRINK_WHITESPACE_FACTOR);
+  }
 
+  justify(line, options = {}) {
     const factor = options.factor || 1;
     if (factor < 0 || factor > 1) {
       throw new Error(`Invalid justification factor: ${factor}`);
     }
-
-    // if (width <= 0) {
-    //   throw new Error(`Invalid justification width: ${width}`);
-    // }
 
     const gap = line.rect.width - line.advanceWidth;
     if (gap === 0) {
@@ -61,7 +66,6 @@ export default class JustificationEngine {
     const factors = [];
     let start = 0;
     for (const run of line.glyphRuns) {
-      // let engine = run.font._justEngine;
       factors.push(...this.factor(line, start, run.glyphs, gap > 0 ? 'GROW' : 'SHRINK'));
       start += run.glyphs.length;
     }
@@ -70,8 +74,6 @@ export default class JustificationEngine {
     factors[factors.length - 1].after = 0;
 
     const distances = this.assign(gap, factors);
-
-    // let changed = this.postprocess(glyphs, advances, distances);
 
     let index = 0;
     for (const run of line.glyphRuns) {
@@ -86,11 +88,11 @@ export default class JustificationEngine {
     let whitespaceFactor;
 
     if (direction === 'GROW') {
-      charFactor = clone(EXPAND_CHAR_FACTOR);
-      whitespaceFactor = clone(EXPAND_WHITESPACE_FACTOR);
+      charFactor = clone(this.expandCharFactor);
+      whitespaceFactor = clone(this.expandWhitespaceFactor);
     } else {
-      charFactor = clone(SHRINK_CHAR_FACTOR);
-      whitespaceFactor = clone(SHRINK_WHITESPACE_FACTOR);
+      charFactor = clone(this.shrinkCharFactor);
+      whitespaceFactor = clone(this.shrinkWhitespaceFactor);
     }
 
     const factors = [];

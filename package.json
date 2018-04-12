@@ -25,6 +25,7 @@
     "iconv-lite": "^0.4.13",
     "linebreak": "^0.1.2",
     "lodash.clone": "^4.5.0",
+    "lodash.merge": "^4.6.1",
     "pdfkit": "^0.8.0",
     "svgpath": "^2.2.0",
     "unicode-properties": "^1.1.0"
