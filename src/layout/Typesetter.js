@@ -42,8 +42,8 @@ export default class Typesetter {
     }
 
     let pos = 0;
-    let lineHeight = 0;
     const lineFragments = [];
+    let lineHeight = paragraphStyle.lineHeight;
 
     for (const fragmentRect of fragmentRects) {
       const line = glyphString.slice(pos, glyphString.length);

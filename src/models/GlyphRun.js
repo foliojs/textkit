@@ -83,7 +83,7 @@ class GlyphRun extends Run {
   }
 
   get height() {
-    return this.ascent - this.descent + this.lineGap;
+    return this.attributes.lineHeight || this.ascent - this.descent + this.lineGap;
   }
 
   slice(start, end) {

@@ -7,6 +7,7 @@ export default class RunStyle {
     this.fontDescriptor = FontDescriptor.fromAttributes(attributes);
     this.font = attributes.font || null;
     this.fontSize = attributes.fontSize || 12;
+    this.lineHeight = attributes.lineHeight || null;
     this.underline = attributes.underline || false;
     this.underlineColor = attributes.underlineColor || this.color;
     this.underlineStyle = attributes.underlineStyle || 'solid';

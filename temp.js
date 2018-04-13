@@ -29,6 +29,7 @@ const string = AttributedString.fromFragments([
       hyphenationFactor: 0.9,
       hangingPunctuation: true,
       lineSpacing: 5,
+      lineHeight: 24,
       truncate: true
     }
   },
