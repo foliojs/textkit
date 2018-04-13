@@ -23,6 +23,14 @@ const FONT_WIDTHS = {
 };
 
 function parseFont(font) {
+  // When we pass a fontkit TTFFont directly to texkit
+  if (typeof font === 'object') {
+    return {
+      family: font.familyName,
+      postscriptName: font.postscriptName
+    };
+  }
+
   if (typeof font !== 'string') {
     return {};
   }
