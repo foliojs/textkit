@@ -115,4 +115,30 @@ describe('AttributedString', () => {
     expect(splittedString.runs[0]).toHaveProperty('end', 5);
     expect(splittedString.runs[0]).toHaveProperty('attributes', { attr: 1 });
   });
+
+  test('should trim string with no trailing spaces', () => {
+    const runs = [
+      new Run(0, 3, { attr: 1 }),
+      new Run(3, 6, { attr: 2 }),
+      new Run(6, 11, { attr: 3 })
+    ];
+    const string = new AttributedString(testString, runs).trim();
+
+    expect(string.length).toBe(11);
+    expect(string.string).toBe(testString);
+    expect(string.runs.length).toBe(3);
+  });
+
+  test('should trim string with trailing spaces', () => {
+    const runs = [
+      new Run(0, 3, { attr: 1 }),
+      new Run(3, 6, { attr: 2 }),
+      new Run(6, 11, { attr: 3 })
+    ];
+    const string = new AttributedString('Lorem     ', runs).trim();
+
+    expect(string.length).toBe(5);
+    expect(string.string).toBe('Lorem');
+    expect(string.runs.length).toBe(2);
+  });
 });

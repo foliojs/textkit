@@ -31,6 +31,17 @@ class AttributedString {
     return this.runs.length - 1;
   }
 
+  trim() {
+    let i;
+    for (i = this.string.length - 1; i >= 0; i--) {
+      if (this.string[i] !== ' ') {
+        break;
+      }
+    }
+
+    return this.slice(0, i + 1);
+  }
+
   slice(start, end) {
     const startRunIndex = this.runIndexAt(start);
     const endRunIndex = this.runIndexAt(end - 1);
