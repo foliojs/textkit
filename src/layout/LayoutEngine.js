@@ -28,7 +28,7 @@ import Typesetter from './Typesetter';
  */
 export default class LayoutEngine {
   constructor(engines) {
-    this.glyphGenerator = new GlyphGenerator();
+    this.glyphGenerator = new GlyphGenerator(engines);
     this.typesetter = new Typesetter(engines);
   }
 

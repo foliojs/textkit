@@ -15,11 +15,10 @@ import ScriptItemizer from './ScriptItemizer';
  * directionality properties, and creates GlyphRuns using fontkit.
  */
 export default class GlyphGenerator {
-  constructor() {
+  constructor(engines = {}) {
     this.resolvers = [
-      // new BidiEngine,
-      new FontSubstitutionEngine(),
-      new ScriptItemizer()
+      engines.fontSubstitutionEngine || new FontSubstitutionEngine(),
+      engines.scriptItemizer || new ScriptItemizer()
     ];
   }
 
