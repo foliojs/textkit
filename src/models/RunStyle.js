@@ -19,6 +19,7 @@ export default class RunStyle {
     this.stroke = attributes.stroke || false;
     this.features = attributes.features || [];
     this.wordSpacing = attributes.wordSpacing || 0;
+    this.yOffset = attributes.yOffset || 0;
     this.characterSpacing = attributes.characterSpacing || 0;
     this.attachment = attributes.attachment || null;
     this.script = attributes.script || null;

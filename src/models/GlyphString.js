@@ -313,7 +313,7 @@ class GlyphString {
       xAdvance: glyph.advanceWidth * scale,
       yAdvance: 0,
       xOffset: 0,
-      yOffset: 0
+      yOffset: run.attributes.yOffset * font.unitsPerEm
     });
 
     run.end += 1;

@@ -47,6 +47,7 @@ export default class GlyphGenerator {
       );
 
       this.resolveAttachments(res);
+      this.resolveYOffset(res);
 
       glyphIndex = end;
       return res;
@@ -99,6 +100,18 @@ export default class GlyphGenerator {
       if (glyph.codePoints[0] === Attachment.CODEPOINT) {
         position.xAdvance = attachment.width;
       }
+    }
+  }
+
+  resolveYOffset(glyphRun) {
+    const { font, yOffset } = glyphRun.attributes;
+
+    if (!yOffset) {
+      return;
+    }
+
+    for (let i = 0; i < glyphRun.length; i++) {
+      glyphRun.positions[i].yOffset += yOffset * font.unitsPerEm;
     }
   }
 }
