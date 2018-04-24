@@ -301,15 +301,15 @@ class GlyphString {
     const { font, fontSize } = run.attributes;
     const glyph = run.attributes.font.glyphForCodePoint(codePoint);
     const scale = fontSize / font.unitsPerEm;
-    const idx = this.start + index - run.start;
+    const glyphIndex = this.start + index - run.start;
 
     if (this._end) {
       this._end += 1;
     }
 
-    run.glyphs.splice(idx, 0, glyph);
-    run.stringIndices.splice(idx, 0, run.stringIndices[idx]);
-    run.positions.splice(idx, 0, {
+    run.glyphs.splice(glyphIndex, 0, glyph);
+    run.stringIndices.splice(glyphIndex, 0, run.stringIndices[glyphIndex]);
+    run.positions.splice(glyphIndex, 0, {
       xAdvance: glyph.advanceWidth * scale,
       yAdvance: 0,
       xOffset: 0,
@@ -337,8 +337,7 @@ class GlyphString {
 
     run.glyphs.splice(glyphIndex, 1);
     run.positions.splice(glyphIndex, 1);
-
-    // TODO: fix string indexes
+    run.stringIndices.splice(glyphIndex, 1);
 
     run.end--;
 
