@@ -64,6 +64,34 @@ class Range {
     this.start = Math.min(this.start, index);
     this.end = Math.max(this.end, index);
   }
+
+  /**
+   * Merge intersecting ranges
+   * @param {number} ranges array of valid Range objects
+   * @return {array}
+   */
+  static merge(ranges) {
+    ranges.sort((a, b) => a.start - b.start);
+
+    const merged = [ranges[0]];
+
+    for (let i = 1; i < ranges.length; i++) {
+      const last = merged[merged.length - 1];
+      const next = ranges[i];
+
+      if (next.start <= last.end && next.end <= last.end) {
+        // Ignore this range completely.
+        // Next is contained inside last
+        continue;
+      } else if (next.start <= last.end) {
+        last.end = next.end;
+      } else {
+        merged.push(next);
+      }
+    }
+
+    return merged;
+  }
 }
 
 export default Range;

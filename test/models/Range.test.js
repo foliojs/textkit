@@ -78,4 +78,64 @@ describe('Range', () => {
     expect(range).toHaveProperty('start', 5);
     expect(range).toHaveProperty('end', 12);
   });
+
+  test('should merge containing ranges', () => {
+    const rangeA = new Range(5, 10);
+    const rangeB = new Range(6, 9);
+
+    const merged = Range.merge([rangeA, rangeB]);
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].start).toBe(5);
+    expect(merged[0].end).toBe(10);
+  });
+
+  test('should merge containing ranges', () => {
+    const rangeA = new Range(5, 10);
+    const rangeB = new Range(6, 9);
+
+    const merged = Range.merge([rangeA, rangeB]);
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].start).toBe(5);
+    expect(merged[0].end).toBe(10);
+  });
+
+  test('should merge intersecting ranges', () => {
+    const rangeA = new Range(5, 10);
+    const rangeB = new Range(7, 12);
+
+    const merged = Range.merge([rangeA, rangeB]);
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].start).toBe(5);
+    expect(merged[0].end).toBe(12);
+  });
+
+  test('should merge non-intersecting ranges', () => {
+    const rangeA = new Range(5, 10);
+    const rangeB = new Range(15, 25);
+
+    const merged = Range.merge([rangeA, rangeB]);
+
+    expect(merged).toHaveLength(2);
+    expect(merged[0].start).toBe(5);
+    expect(merged[0].end).toBe(10);
+    expect(merged[1].start).toBe(15);
+    expect(merged[1].end).toBe(25);
+  });
+
+  test('should merge many unsorted ranges', () => {
+    const rangeA = new Range(8, 12);
+    const rangeB = new Range(5, 10);
+    const rangeC = new Range(0, 2);
+
+    const merged = Range.merge([rangeA, rangeB, rangeC]);
+
+    expect(merged).toHaveLength(2);
+    expect(merged[0].start).toBe(0);
+    expect(merged[0].end).toBe(2);
+    expect(merged[1].start).toBe(5);
+    expect(merged[1].end).toBe(12);
+  });
 });

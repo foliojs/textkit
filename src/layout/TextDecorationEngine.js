@@ -23,14 +23,22 @@ export default class TextDecorationEngine {
 
       if (run.attributes.underline) {
         const rect = new Rect(x, lineFragment.ascent, width, thickness);
-        const line = new DecorationLine(rect, run.attributes.underlineColor, run.attributes.underlineStyle);
+        const line = new DecorationLine(
+          rect,
+          run.attributes.underlineColor,
+          run.attributes.underlineStyle
+        );
         this.addDecorationLine(line, underlines);
       }
 
       if (run.attributes.strike) {
         const y = lineFragment.ascent - run.ascent / 3;
         const rect = new Rect(x, y, width, thickness);
-        const line = new DecorationLine(rect, run.attributes.strikeColor, run.attributes.strikeStyle);
+        const line = new DecorationLine(
+          rect,
+          run.attributes.strikeColor,
+          run.attributes.strikeStyle
+        );
         this.addDecorationLine(line, lineFragment.decorationLines);
       }
 
@@ -76,8 +84,8 @@ export default class TextDecorationEngine {
           const gy = y + position.yOffset;
 
           const path = run.glyphs[i].path.scale(run.scale, -run.scale).translate(gx, gy);
-
           const range = this.findPathIntersections(path, line.rect);
+
           if (range) {
             ranges.push(range);
           }
@@ -93,22 +101,7 @@ export default class TextDecorationEngine {
       return [line];
     }
 
-    ranges.sort((a, b) => a.start - b.start);
-
-    // Merge intersecting ranges
-    const merged = [ranges[0]];
-    for (let i = 1; i < ranges.length; i++) {
-      const last = merged[merged.length - 1];
-      const next = ranges[i];
-
-      if (next.start <= last.end && next.end <= last.end) {
-        // Ignore this range completely
-      } else if (next.start <= last.end) {
-        last.end = secondEnd;
-      } else {
-        merged.push(next);
-      }
-    }
+    const merged = Range.merge(ranges);
 
     // Generate underline segments omitting the intersections,
     // but only if the space warrents an underline.
