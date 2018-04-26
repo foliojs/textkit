@@ -31,6 +31,10 @@ class GlyphString {
   }
 
   get end() {
+    if (this._glyphRuns.length === 0) {
+      return 0;
+    }
+
     const glyphEnd = this._glyphRuns[this._glyphRuns.length - 1].end;
 
     if (this._end) {
@@ -63,6 +67,12 @@ class GlyphString {
   get glyphRuns() {
     if (this._glyphRunsCache && this._glyphRunsCacheEnd === this.end) {
       return this._glyphRunsCache;
+    }
+
+    if (this._glyphRuns.length === 0) {
+      this._glyphRunsCache = [];
+      this._glyphRunsCacheEnd = this.end;
+      return [];
     }
 
     const startRunIndex = this.runIndexAtGlyphIndex(0);

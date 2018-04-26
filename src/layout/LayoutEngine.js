@@ -120,8 +120,19 @@ export default class LayoutEngine {
       }
     }
 
-    const isTruncated = isLastContainer && pos < glyphString.length;
+    // Add empty line fragment for empty glyph strings
+    if (glyphString.length === 0) {
+      const newLineFragment = this.typesetter.layoutLineFragments(
+        lineRect,
+        glyphString,
+        container,
+        paragraphStyle
+      );
 
+      fragments.push(...newLineFragment);
+    }
+
+    const isTruncated = isLastContainer && pos < glyphString.length;
     fragments.forEach((fragment, i) => {
       const isLastFragment = i === fragments.length - 1 && pos === glyphString.length;
 
