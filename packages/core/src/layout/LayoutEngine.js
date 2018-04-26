@@ -3,6 +3,7 @@ import Rect from '../geom/Rect';
 import Block from '../models/Block';
 import GlyphGenerator from './GlyphGenerator';
 import Typesetter from './Typesetter';
+import injectEngines from './injectEngines';
 
 // 1. split into paragraphs
 // 2. get bidi runs and paragraph direction
@@ -28,8 +29,9 @@ import Typesetter from './Typesetter';
  */
 export default class LayoutEngine {
   constructor(engines) {
-    this.glyphGenerator = new GlyphGenerator(engines);
-    this.typesetter = new Typesetter(engines);
+    const injectedEngines = injectEngines(engines);
+    this.glyphGenerator = new GlyphGenerator(injectedEngines);
+    this.typesetter = new Typesetter(injectedEngines);
   }
 
   layout(attributedString, containers) {

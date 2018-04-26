@@ -6,7 +6,8 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel index.js --out-dir ./dist",
+    "build": "babel ./src --out-dir ./dist",
+    "build:watch": "babel ./src --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
   },
@@ -18,7 +19,8 @@
   "dependencies": {
     "cubic2quad": "^1.1.0",
     "iconv-lite": "^0.4.13",
-    "svgpath": "^2.2.0"
+    "svgpath": "^2.2.0",
+    "unicode-properties": "^1.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

@@ -6,6 +6,7 @@
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
     "build": "lerna run build",
+    "build:watch": "lerna run build:watch --concurrency=1000 --stream",
     "precommit": "lint-staged",
     "test": "jest"
   },

@@ -7,6 +7,7 @@
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
     "build": "babel index.js --out-dir ./dist",
+    "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
   },
@@ -16,6 +17,7 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@textkit/core": "^0.1.3",
     "@textkit/font-substitution-engine": "^0.1.3",
     "@textkit/justification-engine": "^0.1.3",
     "@textkit/line-fragment-generator": "^0.1.3",
