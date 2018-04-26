@@ -1,11 +1,12 @@
 {
+  "name": "@textkit/pdf-renderer",
   "version": "0.1.0",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "lerna run build",
+    "build": "babel ./ --out-dir ./dist",
     "precommit": "lint-staged",
     "test": "jest"
   },
@@ -14,31 +15,12 @@
   ],
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "pdfkit": "^0.8.0"
-  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-plugin-transform-class-properties": "^6.19.0",
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-preset-node6": "^11.0.0",
-    "eslint": "^4.18.2",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-jest": "^21.14.0",
-    "husky": "^0.14.3",
-    "jest": "^22.4.2",
-    "lerna": "^2.8.0",
-    "lint-staged": "^7.0.0",
-    "prettier": "^1.11.1",
     "rimraf": "^2.6.2"
-  },
-  "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }
