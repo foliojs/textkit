@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel ./ --out-dir ./dist",
+    "build": "babel index.js --out-dir ./dist",
     "precommit": "lint-staged",
     "test": "jest"
   },
