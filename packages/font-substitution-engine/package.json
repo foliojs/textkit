@@ -1,6 +1,6 @@
 {
   "name": "@textkit/font-substitution-engine",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
