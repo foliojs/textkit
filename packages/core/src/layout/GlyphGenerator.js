@@ -14,7 +14,6 @@ import flattenRuns from './flattenRuns';
  */
 export default class GlyphGenerator {
   constructor(engines = {}) {
-    console.log(engines);
     this.resolvers = [engines.fontSubstitutionEngine, engines.scriptItemizer];
   }
 

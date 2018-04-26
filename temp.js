@@ -1,6 +1,7 @@
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
-import { Path, LayoutEngine, AttributedString, Container, TextRenderer } from '@textkit/textkit';
+import PDFRenderer from '@textkit/pdf-renderer';
+import { Path, Rect, LayoutEngine, AttributedString, Container } from '@textkit/textkit';
 
 const path = new Path();
 
@@ -64,7 +65,8 @@ const container = new Container(path, {
 
 l.layout(string, [container]);
 
-const renderer = new TextRenderer(doc, { outlineLines: false });
-renderer.render(container);
+const Renderer = PDFRenderer({ Rect });
+const rendererInstance = new Renderer(doc, { outlineLines: false });
+rendererInstance.render(container);
 doc.strokeColor('green');
 doc.end();

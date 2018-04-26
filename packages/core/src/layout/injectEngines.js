@@ -1,23 +1,14 @@
-import Path from '../geom/Path';
-import Run from '../models/Run';
-import TabStop from '../models/TabStop';
-import Container from '../models/Container';
-import Attachment from '../models/Attachment';
-import AttributedString from '../models/AttributedString';
+import * as Geom from '../geom';
+import * as Models from '../models';
+
+const Textkit = Object.assign({}, Geom, Models);
 
 const generateEngine = callback => {
   if (!callback) {
     return null;
   }
 
-  const Engine = callback({
-    Run,
-    Path,
-    TabStop,
-    Container,
-    Attachment,
-    AttributedString
-  });
+  const Engine = callback(Textkit);
 
   return new Engine();
 };
