@@ -1,6 +1,34 @@
 import Run from '../models/Run';
 
 const flattenRuns = (runs = []) => {
+  const regularRuns = runs.filter(run => run.start !== run.end);
+  const emptyRuns = runs.filter(run => run.start === run.end);
+
+  const regularFlattenRuns = flattenRegularRuns(regularRuns);
+  const emptyFlattenRuns = flattenEmptyRuns(emptyRuns);
+  const sortRuns = (a, b) => a.start - b.start || a.end - b.end;
+
+  return [...regularFlattenRuns, ...emptyFlattenRuns].sort(sortRuns);
+};
+
+const flattenEmptyRuns = runs => {
+  const points = runs.reduce((acc, run) => {
+    if (!acc.includes(run.start)) {
+      return [...acc, run.start];
+    }
+
+    return acc;
+  }, []);
+
+  return points.map(point => {
+    const pointRuns = runs.filter(run => run.start === point);
+    const attrs = pointRuns.reduce((acc, run) => Object.assign({}, acc, run.attributes), {});
+
+    return new Run(point, point, attrs);
+  });
+};
+
+const flattenRegularRuns = runs => {
   const res = [];
   const points = [];
 
