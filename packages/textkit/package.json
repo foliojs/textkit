@@ -1,6 +1,6 @@
 {
   "name": "@textkit/textkit",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
@@ -18,14 +18,14 @@
   "license": "MIT",
   "dependencies": {
     "@textkit/core": "^0.1.4",
-    "@textkit/font-substitution-engine": "^0.1.4",
-    "@textkit/justification-engine": "^0.1.4",
-    "@textkit/line-fragment-generator": "^0.1.4",
-    "@textkit/linebreaker": "^0.1.4",
-    "@textkit/script-itemizer": "^0.1.4",
-    "@textkit/tab-engine": "^0.1.4",
-    "@textkit/text-decoration-engine": "^0.1.4",
-    "@textkit/truncation-engine": "^0.1.4"
+    "@textkit/font-substitution-engine": "^0.1.5",
+    "@textkit/justification-engine": "^0.1.5",
+    "@textkit/line-fragment-generator": "^0.1.5",
+    "@textkit/linebreaker": "^0.1.5",
+    "@textkit/script-itemizer": "^0.1.5",
+    "@textkit/tab-engine": "^0.1.5",
+    "@textkit/text-decoration-engine": "^0.1.5",
+    "@textkit/truncation-engine": "^0.1.5"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
