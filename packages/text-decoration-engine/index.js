@@ -4,7 +4,7 @@
  * and strikes.
  */
 
-export default ({ Rect, Range, DecorationLine }) => {
+export default () => ({ Rect, Range, DecorationLine }) => {
   // The base font size used for calculating underline thickness.
   const BASE_FONT_SIZE = 16;
 

@@ -16,7 +16,7 @@ const RIGHT = 1;
  * A LineFragmentGenerator splits line rectangles into fragments,
  * wrapping inside a container's polygon, and outside its exclusion polygon.
  */
-export default ({ Rect }) =>
+export default () => ({ Rect }) =>
   class LineFragmentGenerator {
     generateFragments(lineRect, container) {
       const rects = this.splitLineRect(lineRect, container.polygon, 'INTERIOR');

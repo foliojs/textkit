@@ -17,7 +17,7 @@ const ALIGN_TERMINATORS = {
  * with tab stops defined on a container. Text can be left, center,
  * right, or decimal point aligned with tab stops.
  */
-export default ({ TabStop }) =>
+export default () => ({ TabStop }) =>
   class TabEngine {
     processLineFragment(glyphString, container) {
       for (const { position, x, index } of glyphString) {

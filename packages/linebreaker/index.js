@@ -10,7 +10,7 @@ const SHRINK_FACTOR = 0.04;
  * A LineBreaker is used by the Typesetter to perform
  * Unicode line breaking and hyphenation.
  */
-export default () =>
+export default () => () =>
   class LineBreaker {
     suggestLineBreak(glyphString, width, hyphenationFactor = 0) {
       const glyphIndex = glyphString.glyphIndexAtOffset(width);

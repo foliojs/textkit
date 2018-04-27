@@ -39,14 +39,14 @@ const SHRINK_CHAR_FACTOR = {
  * justification. This implementation is based on a description of Apple's
  * justification algorithm from a PDF in the Apple Font Tools package.
  */
-export default () =>
+export default ({
+  expandCharFactor = {},
+  expandWhitespaceFactor = {},
+  shrinkCharFactor = {},
+  shrinkWhitespaceFactor = {}
+} = {}) => () =>
   class JustificationEngine {
-    constructor({
-      expandCharFactor = {},
-      expandWhitespaceFactor = {},
-      shrinkCharFactor = {},
-      shrinkWhitespaceFactor = {}
-    } = {}) {
+    constructor() {
       this.expandCharFactor = merge(EXPAND_CHAR_FACTOR, expandCharFactor);
       this.expandWhitespaceFactor = merge(EXPAND_WHITESPACE_FACTOR, expandWhitespaceFactor);
       this.shrinkCharFactor = merge(SHRINK_CHAR_FACTOR, shrinkCharFactor);
@@ -218,7 +218,7 @@ export default () =>
       return distances;
     }
 
-    postprocess(glyphs, advances) {
+    postprocess() {
       // do nothing by default
       return false;
     }

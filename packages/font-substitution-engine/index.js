@@ -6,7 +6,7 @@ import fontkit from 'fontkit';
  * font runs in an AttributedString, performing font substitution
  * where necessary.
  */
-export default ({ Run }) =>
+export default () => ({ Run }) =>
   class FontSubstitutionEngine {
     constructor() {
       this.fontCache = new Map();

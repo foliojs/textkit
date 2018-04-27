@@ -4,7 +4,7 @@ import unicode from 'unicode-properties';
  * A ScriptItemizer is used by a GlyphGenerator to resolve
  * Unicode script runs in an AttributedString.
  */
-export default ({ Run }) =>
+export default () => ({ Run }) =>
   class ScriptItemizer {
     getRuns(string) {
       let lastIndex = 0;

@@ -1,22 +1,22 @@
-import FontSubstitutionEngine from '@textkit/font-substitution-engine';
-import JustificationEngine from '@textkit/justification-engine';
-import LineFragmentGenerator from '@textkit/line-fragment-generator';
-import LineBreaker from '@textkit/linebreaker';
-import ScriptItemizer from '@textkit/script-itemizer';
-import TabEngine from '@textkit/tab-engine';
-import TextDecorationEngine from '@textkit/text-decoration-engine';
-import TruncationEngine from '@textkit/truncation-engine';
+import tabEngine from '@textkit/tab-engine';
+import lineBreaker from '@textkit/linebreaker';
+import scriptItemizer from '@textkit/script-itemizer';
+import truncationEngine from '@textkit/truncation-engine';
+import justificationEngine from '@textkit/justification-engine';
+import textDecorationEngine from '@textkit/text-decoration-engine';
+import lineFragmentGenerator from '@textkit/line-fragment-generator';
+import fontSubstitutionEngine from '@textkit/font-substitution-engine';
 import { LayoutEngine as BaseLayoutEngine } from '@textkit/core';
 
 const defaultEngines = {
-  lineBreaker: LineBreaker,
-  lineFragmentGenerator: LineFragmentGenerator,
-  justificationEngine: JustificationEngine,
-  truncationEngine: TruncationEngine,
-  decorationEngine: TextDecorationEngine,
-  tabEngine: TabEngine,
-  fontSubstitutionEngine: FontSubstitutionEngine,
-  scriptItemizer: ScriptItemizer
+  tabEngine: tabEngine(),
+  lineBreaker: lineBreaker(),
+  scriptItemizer: scriptItemizer(),
+  truncationEngine: truncationEngine(),
+  decorationEngine: textDecorationEngine(),
+  justificationEngine: justificationEngine(),
+  lineFragmentGenerator: lineFragmentGenerator(),
+  fontSubstitutionEngine: fontSubstitutionEngine()
 };
 
 export class LayoutEngine extends BaseLayoutEngine {

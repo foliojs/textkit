@@ -1,9 +1,9 @@
 import bidi from 'bidi';
 
-export default ({ Run }) =>
+export default () => () =>
   class BidiEngine {
     getRuns(string) {
-      let classes = bidi.getClasses(string);
+      const classes = bidi.getClasses(string);
       return bidi.getLevelRuns(classes);
     }
 

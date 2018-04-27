@@ -66,4 +66,4 @@ class TruncationEngine {
   }
 }
 
-export default () => TruncationEngine;
+export default () => () => TruncationEngine;
