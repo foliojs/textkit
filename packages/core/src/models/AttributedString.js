@@ -43,6 +43,8 @@ class AttributedString {
   }
 
   slice(start, end) {
+    if (this.string.length === 0) return this;
+
     const startRunIndex = this.runIndexAt(start);
     const endRunIndex = this.runIndexAt(end - 1);
     const startRun = this.runs[startRunIndex];
