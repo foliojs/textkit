@@ -1,19 +1,11 @@
 import Run from './Run';
 
 class GlyphRun extends Run {
-  constructor(
-    start,
-    end,
-    attributes = {},
-    glyphs = [],
-    positions = [],
-    stringIndices = [],
-    preScaled
-  ) {
+  constructor(start, end, attributes, glyphs, positions, stringIndices, preScaled) {
     super(start, end, attributes);
-    this.glyphs = glyphs;
-    this.positions = positions;
-    this.stringIndices = stringIndices;
+    this.glyphs = glyphs || [];
+    this.positions = positions || [];
+    this.stringIndices = stringIndices || [];
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
     this._glyphIndices = null;
 
