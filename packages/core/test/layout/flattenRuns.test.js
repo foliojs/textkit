@@ -1,5 +1,5 @@
 import Run from '../../src/models/Run';
-import flattenRuns from '../../src/generators/flattenRuns';
+import flattenRuns from '../../src/layout/flattenRuns';
 
 describe('flattenRuns', () => {
   test('should return empty array if no runs passed', () => {

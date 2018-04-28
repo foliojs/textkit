@@ -21,13 +21,5 @@
     "iconv-lite": "^0.4.13",
     "svgpath": "^2.2.0",
     "unicode-properties": "^1.1.0"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.2",
-    "babel-plugin-transform-class-properties": "^6.19.0",
-    "babel-plugin-transform-export-extensions": "^6.22.0",
-    "babel-preset-node6": "^11.0.0",
-    "rimraf": "^2.6.2"
   }
 }
