@@ -46,12 +46,12 @@ class AttributedString {
     if (this.string.length === 0) return this;
 
     const startRunIndex = this.runIndexAt(start);
-    const endRunIndex = this.runIndexAt(end - 1);
+    const endRunIndex = Math.max(this.runIndexAt(end - 1), startRunIndex);
     const startRun = this.runs[startRunIndex];
     const endRun = this.runs[endRunIndex];
     const runs = [];
 
-    runs.push(startRun.slice(start - startRun.start, end));
+    runs.push(startRun.slice(start - startRun.start, end - startRun.start));
 
     if (startRunIndex !== endRunIndex) {
       runs.push(...this.runs.slice(startRunIndex + 1, endRunIndex).map(r => r.copy()));

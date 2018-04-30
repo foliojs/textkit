@@ -126,7 +126,7 @@ describe('GlyphRun', () => {
     expect(sliced.end).toBe(10);
   });
 
-  test.only('should slice exceeding range when start not zero', () => {
+  test('should slice exceeding range when start not zero', () => {
     const glyphRun = createLatinTestRun({ value: 'Lorem Ipsum', start: 5 });
     const sliced = glyphRun.slice(2, 20);
 
