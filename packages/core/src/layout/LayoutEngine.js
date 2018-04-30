@@ -66,7 +66,7 @@ export default class LayoutEngine {
 
       rect.y += paragraphHeight;
       rect.height -= paragraphHeight;
-      start += block.stringLength;
+      start += paragraph.length;
 
       if (attributedString.string[start] === '\n') {
         start++;
