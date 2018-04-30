@@ -93,7 +93,7 @@ describe('LayoutEngine', () => {
     expect(layoutParagraphMock.mock.calls[1][0].string).toBe('ipsum');
   });
 
-  test.only('should layout two consecutive break lines', () => {
+  test('should layout two consecutive break lines', () => {
     // Mock layoutColumn class function
     LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
 
@@ -114,33 +114,20 @@ describe('LayoutEngine', () => {
     expect(layoutParagraphMock.mock.calls[2][0].runs).toHaveLength(1);
   });
 
-  test.only('should layout two consecutive break lines in different runs', () => {
+  test('should layout two consecutive break lines in different runs', () => {
     // Mock layoutColumn class function
     LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
 
     // Create instances
     const layout = new LayoutEngine({});
     const string = AttributedString.fromFragments([
-      { string: 'Republik:' },
-      { string: ' «Wer war Daphne Caruana Galizia?»' },
+      { string: 'Lorem' },
       { string: '\n' },
       { string: '\n' },
-      { string: 'Bedingfield:' },
-      {
-        string:
-          ' «Daphne Caruana Galizia wird als die ultimative Journalistin gegen Korruption dargestellt, aber sie hat Korruption nicht immer bekämpft. Sie hat Korruption nur dann bekämpft, wenn die Labour-Regierung an der Macht war.»'
-      },
+      { string: 'ipsum' },
       { string: '\n' },
       { string: '\n' },
-      { string: 'Republik:' },
-      { string: ' «Wer könnte hinter dem Mord stecken?»' },
-      { string: '\n' },
-      { string: '\n' },
-      { string: 'Bedingfield:' },
-      {
-        string:
-          ' «Sie hat über viele Leute geschrieben. Und hat über eine Menge Leute gelogen. Wir Politiker bekommen einen Schlag und noch einen Schlag: Wenn man uns beschuldigt, wehren wir uns. Aber sie schrieb auch über Menschen, die keine Politiker sind. Die nicht mit einer öffentlichen Stellungnahme antworten.»'
-      }
+      { string: 'dolor' }
     ]);
 
     const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
@@ -148,21 +135,17 @@ describe('LayoutEngine', () => {
     // Call layout
     layout.layout(string, [container]);
 
-    // expect(layoutParagraphMock.mock.calls).toHaveLength(7);
-    // expect(layoutParagraphMock.mock.calls[0][0].string).toBe('Republik: «Wer war Daphne Caruana Galizia?»');
-    // expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(2);
-    // expect(layoutParagraphMock.mock.calls[1][0].string).toBe('');
-    // expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
-    // expect(layoutParagraphMock.mock.calls[2][0].string).toBe('Bedingfield: «Daphne Caruana Galizia wird als die ultimative Journalistin gegen Korruption dargestellt, aber sie hat Korruption nicht immer bekämpft. Sie hat Korruption nur dann bekämpft, wenn die Labour-Regierung an der Macht war.»');
-    // expect(layoutParagraphMock.mock.calls[2][0].runs).toHaveLength(2);
-    // expect(layoutParagraphMock.mock.calls[3][0].string).toBe('');
-    // expect(layoutParagraphMock.mock.calls[3][0].runs).toHaveLength(1);
-    // expect(layoutParagraphMock.mock.calls[4][0].string).toBe('Republik: «Wer könnte hinter dem Mord stecken?»');
-    // expect(layoutParagraphMock.mock.calls[4][0].runs).toHaveLength(2);
-    // expect(layoutParagraphMock.mock.calls[5][0].string).toBe('');
-    // expect(layoutParagraphMock.mock.calls[5][0].runs).toHaveLength(1);
-    // expect(layoutParagraphMock.mock.calls[6][0].string).toBe('Bedingfield: «Sie hat über viele Leute geschrieben. Und hat über eine Menge Leute gelogen. Wir Politiker bekommen einen Schlag und noch einen Schlag: Wenn man uns beschuldigt, wehren wir uns. Aber sie schrieb auch über Menschen, die keine Politiker sind. Die nicht mit einer öffentlichen Stellungnahme antworten.»');
-    // expect(layoutParagraphMock.mock.calls[6][0].runs).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls).toHaveLength(5);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('Lorem');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[2][0].string).toBe('ipsum');
+    expect(layoutParagraphMock.mock.calls[2][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[3][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[3][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[4][0].string).toBe('dolor');
+    expect(layoutParagraphMock.mock.calls[4][0].runs).toHaveLength(1);
   });
 
   test('should be able to inject custom lineBreaker engine', () => {
