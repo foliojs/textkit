@@ -44,11 +44,7 @@ export default class Typesetter {
 
       this.tabEngine.processLineFragment(line, container);
 
-      const bk = this.lineBreaker.suggestLineBreak(
-        line,
-        fragmentRect.width,
-        paragraphStyle.hyphenationFactor
-      );
+      const bk = this.lineBreaker.suggestLineBreak(line, fragmentRect.width, paragraphStyle);
 
       if (bk) {
         bk.position += pos;

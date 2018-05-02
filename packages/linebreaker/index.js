@@ -12,7 +12,8 @@ const SHRINK_FACTOR = 0.04;
  */
 export default () => () =>
   class LineBreaker {
-    suggestLineBreak(glyphString, width, hyphenationFactor = 0) {
+    suggestLineBreak(glyphString, width, paragraphStyle) {
+      const hyphenationFactor = paragraphStyle.hyphenationFactor || 0;
       const glyphIndex = glyphString.glyphIndexAtOffset(width);
 
       if (glyphIndex === -1) return null;
