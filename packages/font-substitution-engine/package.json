@@ -9,7 +9,7 @@
     "build": "babel index.js --out-dir ./dist",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
-    "test": "jest"
+    "test": "jest --config ./jest.config.js"
   },
   "files": [
     "dist"
