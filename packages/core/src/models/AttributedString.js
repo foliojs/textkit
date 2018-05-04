@@ -46,7 +46,7 @@ class AttributedString {
     if (this.string.length === 0) return this;
 
     const startRunIndex = this.runIndexAt(start);
-    const endRunIndex = Math.max(this.runIndexAt(end - 1), startRunIndex);
+    const endRunIndex = Math.max(this.runIndexAt(Math.max(end - 1, 0)), startRunIndex);
     const startRun = this.runs[startRunIndex];
     const endRun = this.runs[endRunIndex];
     const runs = [];
