@@ -76,6 +76,46 @@ describe('LayoutEngine', () => {
     expect(layoutParagraphMock.mock.calls[0][0].string).toBe(lorem);
   });
 
+  test('should layout paragraph starting with \n', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: '\nLorem' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[0][0].runs[0].start).toBe(0);
+    expect(layoutParagraphMock.mock.calls[0][0].runs[0].end).toBe(0);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('Lorem');
+  });
+
+  test('should layout paragraph starting with \n on different runs', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: '\n' }, { string: 'Lorem' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[0][0].runs[0].start).toBe(0);
+    expect(layoutParagraphMock.mock.calls[0][0].runs[0].end).toBe(0);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('Lorem');
+  });
+
   test('should layout two paragraph strings', () => {
     // Mock layoutColumn class function
     LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
