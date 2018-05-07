@@ -19,9 +19,8 @@ export default ({ Rect }) =>
 
     renderBlock(block) {
       if (this.outlineBlocks) {
-        this.ctx
-          .rect(block.bbox.minX, block.bbox.minY, block.bbox.width, block.bbox.height)
-          .stroke();
+        const { minX, minY, width, height } = block.bbox;
+        this.ctx.rect(minX, minY, width, height).stroke();
       }
 
       for (const line of block.lines) {
@@ -36,7 +35,6 @@ export default ({ Rect }) =>
 
       this.ctx.save();
       this.ctx.translate(line.rect.x, line.rect.y + line.ascent);
-      // this.ctx.scale(1, -1, {});
 
       for (const run of line.glyphRuns) {
         if (run.attributes.backgroundColor) {
@@ -48,7 +46,6 @@ export default ({ Rect }) =>
       }
 
       this.ctx.restore();
-
       this.ctx.save();
       this.ctx.translate(line.rect.x, line.rect.y);
 
@@ -71,6 +68,8 @@ export default ({ Rect }) =>
       if (link) {
         this.ctx.link(0, -run.height - run.descent, run.advanceWidth, run.height, link);
       }
+
+      this.renderAttachments(run);
 
       if (font.sbix || (font.COLR && font.CPAL)) {
         this.ctx.save();
@@ -103,9 +102,32 @@ export default ({ Rect }) =>
       this.ctx.fill(backgroundColor);
     }
 
+    renderAttachments(run) {
+      this.ctx.save();
+
+      const { font } = run.attributes;
+      const space = font.glyphForCodePoint(0x20);
+      const objectReplacement = font.glyphForCodePoint(0xfffc);
+
+      for (let i = 0; i < run.glyphs.length; i++) {
+        const position = run.positions[i];
+        const glyph = run.glyphs[i];
+
+        this.ctx.translate(position.xAdvance, position.yOffset);
+
+        if (glyph === objectReplacement && run.attributes.attachment) {
+          this.renderAttachment(run.attributes.attachment);
+          run.glyphs[i] = space;
+        }
+      }
+
+      this.ctx.restore();
+    }
+
     renderAttachment(attachment) {
-      this.ctx.scale(1, -1, {});
-      this.ctx.translate(0, -attachment.height);
+      const { xOffset = 0, yOffset = 0 } = attachment;
+
+      this.ctx.translate(-attachment.width + xOffset, -attachment.height + yOffset);
 
       if (this.outlineAttachments) {
         this.ctx.rect(0, 0, attachment.width, attachment.height).stroke();

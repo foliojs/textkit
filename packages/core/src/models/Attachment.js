@@ -7,6 +7,8 @@ class Attachment {
     this.height = height;
     this.image = options.image || null;
     this.render = options.render || null;
+    this.xOffset = options.xOffset || 0;
+    this.yOffset = options.yOffset || 0;
   }
 }
 

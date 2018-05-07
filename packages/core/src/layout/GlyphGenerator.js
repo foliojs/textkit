@@ -83,17 +83,19 @@ export default class GlyphGenerator {
   }
 
   resolveAttachments(glyphRun) {
-    const { attachment } = glyphRun.attributes;
+    const { font, attachment } = glyphRun.attributes;
 
     if (!attachment) {
       return;
     }
 
+    const objectReplacement = font.glyphForCodePoint(0xfffc);
+
     for (let i = 0; i < glyphRun.length; i++) {
       const glyph = glyphRun.glyphs[i];
       const position = glyphRun.positions[i];
 
-      if (glyph.codePoints[0] === Attachment.CODEPOINT) {
+      if (glyph === objectReplacement) {
         position.xAdvance = attachment.width;
       }
     }
