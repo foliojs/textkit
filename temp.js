@@ -1,7 +1,14 @@
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import PDFRenderer from '@textkit/pdf-renderer';
-import { Path, Rect, LayoutEngine, AttributedString, Container } from '@textkit/textkit';
+import {
+  Path,
+  Rect,
+  LayoutEngine,
+  AttributedString,
+  Container,
+  Attachment
+} from '@textkit/textkit';
 
 const path = new Path();
 
@@ -21,31 +28,26 @@ doc.stroke();
 
 const string = AttributedString.fromFragments([
   {
-    string: '😀😃😁😄😆😅😂🤣😊😇🙂🙃😉😌😍😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🤩😏😒😞😔',
+    string: '“Lorem ipsum dolor sit \ufffc amet, ',
     attributes: {
-      font: 'Comic Sans MS',
+      font: 'Arial',
       fontSize: 14,
       bold: true,
       align: 'justify',
-      hyphenationFactor: 0.9,
-      hangingPunctuation: true,
-      lineSpacing: 5,
-      truncate: true
+      attachment: new Attachment(14, 14, {
+        yOffset: 3,
+        image: './grinning.png'
+      })
     }
   }
 ]);
 
 const l = new LayoutEngine();
-const container = new Container(path, {
-  // exclusionPaths: [exclusion]
-});
+const container = new Container(path);
 
 l.layout(string, [container]);
-
-// console.log(container.blocks[0].lines[0].glyphRuns[0].glyphs);
 
 const Renderer = PDFRenderer({ Rect });
 const rendererInstance = new Renderer(doc, { outlineLines: false });
 rendererInstance.render(container);
-// doc.strokeColor('green');
 doc.end();
