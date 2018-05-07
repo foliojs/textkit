@@ -126,6 +126,15 @@ describe('GlyphString', () => {
     expect(string.isWhiteSpace(3)).toBeFalsy();
   });
 
+  test('should slice exact range', () => {
+    const string = createLatinTestString({ value: 'Lorem ipsum' });
+    const sliced = string.slice(0, string.length);
+
+    expect(sliced.string).toBe('Lorem ipsum');
+    expect(sliced.glyphRuns[0].start).toBe(0);
+    expect(sliced.glyphRuns[0].end).toBe(string.length);
+  });
+
   test('should slice containing range', () => {
     const string = createLatinTestString({ value: 'Lorem ipsum' });
     const sliced = string.slice(2, 6);

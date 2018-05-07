@@ -17,7 +17,7 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@textkit/core": "^0.1.6",
+    "@textkit/core": "^0.1.8",
     "@textkit/font-substitution-engine": "^0.1.5",
     "@textkit/justification-engine": "^0.1.5",
     "@textkit/line-fragment-generator": "^0.1.5",
