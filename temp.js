@@ -7,24 +7,24 @@ const path = new Path();
 
 path.rect(30, 30, 300, 400);
 
-const exclusion = new Path();
-exclusion.circle(140, 160, 50);
+// const exclusion = new Path();
+// exclusion.circle(140, 160, 50);
 
 const doc = new PDFDocument();
 doc.pipe(fs.createWriteStream('out.pdf'));
 
 path.toFunction()(doc);
-exclusion.toFunction()(doc);
+// exclusion.toFunction()(doc);
 
 doc.stroke('green');
 doc.stroke();
 
 const string = AttributedString.fromFragments([
   {
-    string: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, ',
+    string: '😀😃😁😄😆😅😂🤣😊😇🙂🙃😉😌😍😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🤩😏😒😞😔',
     attributes: {
-      font: 'Helvetica',
-      fontSize: 10,
+      font: 'Comic Sans MS',
+      fontSize: 14,
       bold: true,
       align: 'justify',
       hyphenationFactor: 0.9,
@@ -37,13 +37,15 @@ const string = AttributedString.fromFragments([
 
 const l = new LayoutEngine();
 const container = new Container(path, {
-  exclusionPaths: [exclusion]
+  // exclusionPaths: [exclusion]
 });
 
 l.layout(string, [container]);
 
-// const Renderer = PDFRenderer({ Rect });
-// const rendererInstance = new Renderer(doc, { outlineLines: false });
-// rendererInstance.render(container);
+// console.log(container.blocks[0].lines[0].glyphRuns[0].glyphs);
+
+const Renderer = PDFRenderer({ Rect });
+const rendererInstance = new Renderer(doc, { outlineLines: false });
+rendererInstance.render(container);
 // doc.strokeColor('green');
-// doc.end();
+doc.end();

@@ -23,7 +23,8 @@ export default class GlyphGenerator {
 
     // Generate glyphs
     let glyphIndex = 0;
-    const glyphRuns = runs.map(run => {
+    const validRuns = runs.filter(run => !!run.attributes.font);
+    const glyphRuns = validRuns.map(run => {
       const str = attributedString.string.slice(run.start, run.end);
       const glyphRun = run.attributes.font.layout(
         str,
