@@ -1,7 +1,5 @@
-// import BidiEngine from './BidiEngine';
 import GlyphRun from '../models/GlyphRun';
 import GlyphString from '../models/GlyphString';
-import Attachment from '../models/Attachment';
 import Run from '../models/Run';
 import RunStyle from '../models/RunStyle';
 import flattenRuns from './flattenRuns';
@@ -23,8 +21,7 @@ export default class GlyphGenerator {
 
     // Generate glyphs
     let glyphIndex = 0;
-    const validRuns = runs.filter(run => !!run.attributes.font);
-    const glyphRuns = validRuns.map(run => {
+    const glyphRuns = runs.map(run => {
       const str = attributedString.string.slice(run.start, run.end);
       const glyphRun = run.attributes.font.layout(
         str,
