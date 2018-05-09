@@ -81,11 +81,14 @@ export default () => ({ Rect, Range, DecorationLine }) => {
             const gx = x + position.xOffset;
             const gy = y + position.yOffset;
 
-            const path = run.glyphs[i].path.scale(run.scale, -run.scale).translate(gx, gy);
-            const range = this.findPathIntersections(path, line.rect);
+            // Standard fonts may not have a path to intersect with
+            if (run.glyphs[i].path) {
+              const path = run.glyphs[i].path.scale(run.scale, -run.scale).translate(gx, gy);
+              const range = this.findPathIntersections(path, line.rect);
 
-            if (range) {
-              ranges.push(range);
+              if (range) {
+                ranges.push(range);
+              }
             }
           }
 
