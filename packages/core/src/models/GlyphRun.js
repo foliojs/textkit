@@ -3,11 +3,12 @@ import Run from './Run';
 class GlyphRun extends Run {
   constructor(start, end, attributes, glyphs, positions, stringIndices, glyphIndices, preScaled) {
     super(start, end, attributes);
+
     this.glyphs = glyphs || [];
     this.positions = positions || [];
+    this.glyphIndices = glyphIndices || [];
     this.stringIndices = stringIndices || [];
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
-    this.glyphIndices = glyphIndices;
 
     if (!preScaled) {
       for (const pos of this.positions) {
@@ -66,9 +67,9 @@ class GlyphRun extends Run {
     const glyphs = this.glyphs.slice(start, end);
     const positions = this.positions.slice(start, end);
     let stringIndices = this.stringIndices.slice(start, end);
-    let glyphIndices = this.glyphIndices.slice(this.stringIndices[start], this.stringIndices[end]);
+    let glyphIndices = this.glyphIndices.filter(i => i >= start && i < end);
 
-    glyphIndices = glyphIndices.map(index => index - this.glyphIndices[stringIndices[0]]);
+    glyphIndices = glyphIndices.map(index => index - start);
     stringIndices = stringIndices.map(index => index - this.stringIndices[start]);
 
     start += this.start;

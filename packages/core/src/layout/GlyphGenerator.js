@@ -55,11 +55,27 @@ export default class GlyphGenerator {
     const glyphIndices = [];
 
     for (let i = 0; i < string.length; i++) {
-      glyphIndices[i] = stringIndices[i];
+      for (let j = 0; j < stringIndices.length; j++) {
+        if (stringIndices[j] >= i) {
+          glyphIndices[i] = j;
+          break;
+        }
+
+        glyphIndices[i] = undefined;
+      }
     }
 
-    let lastValue = 0;
+    let lastValue = glyphIndices[glyphIndices.length - 1];
     for (let i = glyphIndices.length - 1; i >= 0; i--) {
+      if (glyphIndices[i] === undefined) {
+        glyphIndices[i] = lastValue;
+      } else {
+        lastValue = glyphIndices[i];
+      }
+    }
+
+    lastValue = glyphIndices[0];
+    for (let i = 0; i < glyphIndices.length; i++) {
       if (glyphIndices[i] === undefined) {
         glyphIndices[i] = lastValue;
       } else {

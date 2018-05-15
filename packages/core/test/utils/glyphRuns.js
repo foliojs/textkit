@@ -11,16 +11,51 @@ const getGlyphIndex = stringIndices => index => {
   return res;
 };
 
+const resolveGlyphIndices = (string, stringIndices) => {
+  const glyphIndices = [];
+
+  for (let i = 0; i < string.length; i++) {
+    for (let j = 0; j < stringIndices.length; j++) {
+      if (stringIndices[j] >= i) {
+        glyphIndices[i] = j;
+        break;
+      }
+
+      glyphIndices[i] = undefined;
+    }
+  }
+
+  let lastValue = glyphIndices[glyphIndices.length - 1];
+  for (let i = glyphIndices.length - 1; i >= 0; i--) {
+    if (glyphIndices[i] === undefined) {
+      glyphIndices[i] = lastValue;
+    } else {
+      lastValue = glyphIndices[i];
+    }
+  }
+
+  lastValue = glyphIndices[0];
+  for (let i = 0; i < glyphIndices.length; i++) {
+    if (glyphIndices[i] === undefined) {
+      glyphIndices[i] = lastValue;
+    } else {
+      lastValue = glyphIndices[i];
+    }
+  }
+
+  return glyphIndices;
+};
+
 /*
   Text layout generator.
   Calculates chars id based on the glyph code point only for testing purposes
   Calculates position with fixed value based on if it's white space or not
 */
-const layout = value => {
-  const chars = value.replace(/fs/, 'f').split('');
+export const layout = value => {
+  const chars = value.replace(/ft/, 'f').split('');
   const glyphs = chars.map(char => ({ id: char.charCodeAt(0) }));
-  const stringIndices = chars.map((_, index) => index);
-  const glyphIndices = chars.map((_, index) => index);
+  const stringIndices = chars.map((_, index) => value.indexOf(chars[index], index));
+  const glyphIndices = resolveGlyphIndices(value, stringIndices);
   const positions = chars.map(char => ({
     xAdvance: char === ' ' ? 512 : 1024
   }));
@@ -102,6 +137,6 @@ export const createCamboyanTestRun = ({
     layout(string).glyphs,
     positions.slice(startGlyphIndex, endGlyphIndex),
     stringIndices.slice(startGlyphIndex, endGlyphIndex),
-    glyphIndices.slice(start, end)
+    glyphIndices.slice(start, end).map(i => i - glyphIndices[start])
   );
 };
