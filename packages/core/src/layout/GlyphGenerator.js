@@ -29,6 +29,7 @@ export default class GlyphGenerator {
         run.attributes.script
       );
       const end = glyphIndex + glyphRun.glyphs.length;
+      const glyphIndices = this.resolveGlyphIndices(str, glyphRun.stringIndices);
 
       const res = new GlyphRun(
         glyphIndex,
@@ -36,7 +37,8 @@ export default class GlyphGenerator {
         run.attributes,
         glyphRun.glyphs,
         glyphRun.positions,
-        glyphRun.stringIndices
+        glyphRun.stringIndices,
+        glyphIndices
       );
 
       this.resolveAttachments(res);
@@ -47,6 +49,25 @@ export default class GlyphGenerator {
     });
 
     return new GlyphString(attributedString.string, glyphRuns);
+  }
+
+  resolveGlyphIndices(string, stringIndices) {
+    const glyphIndices = [];
+
+    for (let i = 0; i < string.length; i++) {
+      glyphIndices[i] = stringIndices[i];
+    }
+
+    let lastValue = 0;
+    for (let i = glyphIndices.length - 1; i >= 0; i--) {
+      if (glyphIndices[i] === undefined) {
+        glyphIndices[i] = lastValue;
+      } else {
+        lastValue = glyphIndices[i];
+      }
+    }
+
+    return glyphIndices;
   }
 
   resolveRuns(attributedString) {

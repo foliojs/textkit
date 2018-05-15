@@ -17,9 +17,10 @@ const getGlyphIndex = stringIndices => index => {
   Calculates position with fixed value based on if it's white space or not
 */
 const layout = value => {
-  const chars = value.split('');
+  const chars = value.replace(/fs/, 'f').split('');
   const glyphs = chars.map(char => ({ id: char.charCodeAt(0) }));
   const stringIndices = chars.map((_, index) => index);
+  const glyphIndices = chars.map((_, index) => index);
   const positions = chars.map(char => ({
     xAdvance: char === ' ' ? 512 : 1024
   }));
@@ -27,7 +28,8 @@ const layout = value => {
   return {
     glyphs,
     positions,
-    stringIndices
+    stringIndices,
+    glyphIndices
   };
 };
 
@@ -43,9 +45,17 @@ export const createLatinTestRun = ({
 } = {}) => {
   const string = value.slice(start, end);
   const attrs = new RunStyle(Object.assign({}, { font: testFont }, attributes));
-  const { glyphs, positions, stringIndices } = layout(string);
+  const { glyphs, positions, stringIndices, glyphIndices } = layout(string);
 
-  return new GlyphRun(start, start + glyphs.length, attrs, glyphs, positions, stringIndices);
+  return new GlyphRun(
+    start,
+    start + glyphs.length,
+    attrs,
+    glyphs,
+    positions,
+    stringIndices,
+    glyphIndices
+  );
 };
 
 /*
@@ -60,6 +70,7 @@ export const createCamboyanTestRun = ({
   end = value.length
 } = {}) => {
   const stringIndices = [0, 1, 3, 4, 5, 6, 7, 8, 12, 13, 14, 16, 17, 18, 19, 20];
+  const glyphIndices = [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 9, 10, 11, 11, 12, 13, 14, 15];
   const getIndex = getGlyphIndex(stringIndices);
   const startGlyphIndex = getIndex(start);
   const endGlyphIndex = getIndex(end);
@@ -90,6 +101,7 @@ export const createCamboyanTestRun = ({
     attrs,
     layout(string).glyphs,
     positions.slice(startGlyphIndex, endGlyphIndex),
-    stringIndices.slice(startGlyphIndex, endGlyphIndex)
+    stringIndices.slice(startGlyphIndex, endGlyphIndex),
+    glyphIndices.slice(start, end)
   );
 };
