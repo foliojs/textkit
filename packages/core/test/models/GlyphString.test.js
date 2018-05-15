@@ -1,4 +1,3 @@
-import path from 'path';
 import { createLatinTestString, createCamboyanTestString } from '../utils/glyphStrings';
 
 const round = num => Math.round(num * 100) / 100;
@@ -616,20 +615,17 @@ describe('GlyphString', () => {
     expect(string.glyphIndexForStringIndex(10)).toBe(10);
   });
 
-  test.only('should return correct glyph index for string index (not latin)', () => {
+  test('should return correct glyph index for string index (not latin)', () => {
     const string = createCamboyanTestString({
       value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
       runs: [[0, 8], [8, 21]]
     });
 
-    // console.log(string.string);
-    // console.log(string.glyphRuns);
-
-    // expect(string.glyphIndexForStringIndex(0)).toBe(0);
-    // expect(string.glyphIndexForStringIndex(4)).toBe(3);
-    // expect(string.glyphIndexForStringIndex(7)).toBe(6);
-    // expect(string.glyphIndexForStringIndex(8)).toBe(7);
-    // expect(string.glyphIndexForStringIndex(12)).toBe(8);
+    expect(string.glyphIndexForStringIndex(0)).toBe(0);
+    expect(string.glyphIndexForStringIndex(4)).toBe(3);
+    expect(string.glyphIndexForStringIndex(7)).toBe(6);
+    expect(string.glyphIndexForStringIndex(8)).toBe(7);
+    expect(string.glyphIndexForStringIndex(12)).toBe(8);
   });
 
   test('should return correct glyph index for string index for sliced strings', () => {

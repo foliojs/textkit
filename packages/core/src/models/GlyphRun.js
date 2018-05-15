@@ -24,11 +24,11 @@ class GlyphRun extends Run {
   }
 
   get stringStart() {
-    return 0;
+    return Math.min(...this.stringIndices);
   }
 
   get stringEnd() {
-    return this.glyphIndices.length - 1;
+    return Math.max(...this.stringIndices);
   }
 
   get advanceWidth() {
@@ -66,9 +66,9 @@ class GlyphRun extends Run {
     const glyphs = this.glyphs.slice(start, end);
     const positions = this.positions.slice(start, end);
     let stringIndices = this.stringIndices.slice(start, end);
-    let glyphIndices = this.glyphIndices.slice(this.stringIndices[start], this.stringIndices[end]);
+    let glyphIndices = this.glyphIndices.filter(i => i >= start && i < end);
 
-    glyphIndices = glyphIndices.map(index => index - this.glyphIndices[stringIndices[0]]);
+    glyphIndices = glyphIndices.map(index => index - start);
     stringIndices = stringIndices.map(index => index - this.stringIndices[start]);
 
     start += this.start;

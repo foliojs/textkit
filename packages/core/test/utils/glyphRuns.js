@@ -17,7 +17,7 @@ const getGlyphIndex = stringIndices => index => {
   Calculates position with fixed value based on if it's white space or not
 */
 const layout = value => {
-  const chars = value.replace(/fs/, 'f').split('');
+  const chars = value.split('');
   const glyphs = chars.map(char => ({ id: char.charCodeAt(0) }));
   const stringIndices = chars.map((_, index) => index);
   const glyphIndices = chars.map((_, index) => index);
@@ -102,6 +102,6 @@ export const createCamboyanTestRun = ({
     layout(string).glyphs,
     positions.slice(startGlyphIndex, endGlyphIndex),
     stringIndices.slice(startGlyphIndex, endGlyphIndex),
-    glyphIndices.slice(start, end)
+    glyphIndices.slice(start, end).map(i => i - glyphIndices[start])
   );
 };
