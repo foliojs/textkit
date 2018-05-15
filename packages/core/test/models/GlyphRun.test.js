@@ -239,11 +239,25 @@ describe('GlyphRun', () => {
     expect(stringIndices).toEqual([0, 1, 2, 3, 4, 5]);
   });
 
+  test('should correctly slice glyph indices', () => {
+    const glyphRun = createLatinTestRun({ value: 'Lorem Ipsum' });
+    const { glyphIndices } = glyphRun.slice(2, 8);
+
+    expect(glyphIndices).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+
   test('should correctly slice string indices (non latin)', () => {
     const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
     const { stringIndices } = glyphRun.slice(1, 8);
 
     expect(stringIndices).toEqual([0, 2, 3, 4, 5, 6, 7]);
+  });
+
+  test('should correctly slice glyph indices (non latin)', () => {
+    const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
+    const { glyphIndices } = glyphRun.slice(1, 8);
+
+    expect(glyphIndices).toEqual([0, 1, 1, 2, 3, 4, 5, 6]);
   });
 
   test('should exact slice return same string indices', () => {
@@ -253,10 +267,46 @@ describe('GlyphRun', () => {
     expect(stringIndices).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 
+  test('should exact slice return same glyph indices', () => {
+    const glyphRun = createLatinTestRun({ value: 'Lorem Ipsum' });
+    const { glyphIndices } = glyphRun.slice(0, 11);
+
+    expect(glyphIndices).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  });
+
   test('should exact slice return same string indices (non latin)', () => {
     const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
     const { stringIndices } = glyphRun.slice(0, 21);
 
     expect(stringIndices).toEqual([0, 1, 3, 4, 5, 6, 7, 8, 12, 13, 14, 16, 17, 18, 19, 20]);
+  });
+
+  test('should exact slice return same glyph indices (non latin)', () => {
+    const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
+    const { glyphIndices } = glyphRun.slice(0, 21);
+
+    expect(glyphIndices).toEqual([
+      0,
+      1,
+      2,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8,
+      8,
+      8,
+      9,
+      10,
+      11,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]);
   });
 });

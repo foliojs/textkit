@@ -222,10 +222,10 @@ class GlyphString {
       }
 
       offset += run.length;
-      count += run.stringEnd + 1;
+      count += run.glyphIndices.length;
     }
 
-    return count + run.stringIndices[run.stringIndices.length - 1];
+    return count;
   }
 
   glyphIndexForStringIndex(index) {
@@ -319,6 +319,13 @@ class GlyphString {
 
     run.glyphs.splice(glyphIndex, 0, glyph);
     run.stringIndices.splice(glyphIndex, 0, run.stringIndices[glyphIndex]);
+
+    for (let i = 0; i < run.glyphIndices.length; i++) {
+      if (run.glyphIndices[i] >= glyphIndex) {
+        run.glyphIndices[i] += 1;
+      }
+    }
+
     run.positions.splice(glyphIndex, 0, {
       xAdvance: glyph.advanceWidth * scale,
       yAdvance: 0,
@@ -348,6 +355,12 @@ class GlyphString {
     run.glyphs.splice(glyphIndex, 1);
     run.positions.splice(glyphIndex, 1);
     run.stringIndices.splice(glyphIndex, 1);
+
+    for (let i = 0; i < run.glyphIndices.length; i++) {
+      if (run.glyphIndices[i] >= glyphIndex) {
+        run.glyphIndices[i] -= 1;
+      }
+    }
 
     run.end--;
 

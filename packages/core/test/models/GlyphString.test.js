@@ -1,4 +1,3 @@
-import path from 'path';
 import { createLatinTestString, createCamboyanTestString } from '../utils/glyphStrings';
 
 const round = num => Math.round(num * 100) / 100;
@@ -560,6 +559,38 @@ describe('GlyphString', () => {
     expect(string.stringIndexForGlyphIndex(10)).toBe(10);
   });
 
+  test('should return correct string index for glyph index with ligatures (end)', () => {
+    const string = createLatinTestString({
+      value: 'Lorft ipsum',
+      runs: [[0, 5], [5, 11]]
+    });
+
+    expect(string.isWhiteSpace(3)).toBeFalsy();
+    expect(string.isWhiteSpace(4)).toBeTruthy();
+    expect(string.stringIndexForGlyphIndex(0)).toBe(0);
+    expect(string.stringIndexForGlyphIndex(2)).toBe(2);
+    expect(string.stringIndexForGlyphIndex(3)).toBe(3);
+    expect(string.stringIndexForGlyphIndex(4)).toBe(5);
+    expect(string.stringIndexForGlyphIndex(5)).toBe(6);
+    expect(string.stringIndexForGlyphIndex(9)).toBe(10);
+  });
+
+  test('should return correct string index for glyph index with ligatures (middle)', () => {
+    const string = createLatinTestString({
+      value: 'Lftem ipsum',
+      runs: [[0, 5], [5, 11]]
+    });
+
+    expect(string.isWhiteSpace(3)).toBeFalsy();
+    expect(string.isWhiteSpace(4)).toBeTruthy();
+    expect(string.stringIndexForGlyphIndex(0)).toBe(0);
+    expect(string.stringIndexForGlyphIndex(1)).toBe(1);
+    expect(string.stringIndexForGlyphIndex(2)).toBe(3);
+    expect(string.stringIndexForGlyphIndex(4)).toBe(5);
+    expect(string.stringIndexForGlyphIndex(5)).toBe(6);
+    expect(string.stringIndexForGlyphIndex(9)).toBe(10);
+  });
+
   test('should return correct string index for glyph index (non latin)', () => {
     const string = createCamboyanTestString({
       value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
@@ -811,6 +842,11 @@ describe('GlyphString', () => {
     // The new glyph shouldn't interfer with current indices
     expect(string.glyphRuns[0].stringIndices[2]).toBe(2);
     expect(string.glyphRuns[0].stringIndices[3]).toBe(2);
+
+    // Test glyph indices.
+    // Should increment glyph indices
+    expect(string.glyphRuns[0].glyphIndices[1]).toBe(1);
+    expect(string.glyphRuns[0].glyphIndices[2]).toBe(3);
   });
 
   test('should successfully insert glyph for sliced strings', () => {

@@ -42,7 +42,9 @@ export default class Typesetter {
     for (const fragmentRect of fragmentRects) {
       const line = glyphString.slice(pos, glyphString.length);
 
-      this.tabEngine.processLineFragment(line, container);
+      if (this.tabEngine) {
+        this.tabEngine.processLineFragment(line, container);
+      }
 
       const bk = this.lineBreaker.suggestLineBreak(line, fragmentRect.width, paragraphStyle);
 

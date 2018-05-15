@@ -29,6 +29,7 @@ export default class GlyphGenerator {
         run.attributes.script
       );
       const end = glyphIndex + glyphRun.glyphs.length;
+      const glyphIndices = this.resolveGlyphIndices(str, glyphRun.stringIndices);
 
       const res = new GlyphRun(
         glyphIndex,
@@ -36,7 +37,8 @@ export default class GlyphGenerator {
         run.attributes,
         glyphRun.glyphs,
         glyphRun.positions,
-        glyphRun.stringIndices
+        glyphRun.stringIndices,
+        glyphIndices
       );
 
       this.resolveAttachments(res);
@@ -47,6 +49,41 @@ export default class GlyphGenerator {
     });
 
     return new GlyphString(attributedString.string, glyphRuns);
+  }
+
+  resolveGlyphIndices(string, stringIndices) {
+    const glyphIndices = [];
+
+    for (let i = 0; i < string.length; i++) {
+      for (let j = 0; j < stringIndices.length; j++) {
+        if (stringIndices[j] >= i) {
+          glyphIndices[i] = j;
+          break;
+        }
+
+        glyphIndices[i] = undefined;
+      }
+    }
+
+    let lastValue = glyphIndices[glyphIndices.length - 1];
+    for (let i = glyphIndices.length - 1; i >= 0; i--) {
+      if (glyphIndices[i] === undefined) {
+        glyphIndices[i] = lastValue;
+      } else {
+        lastValue = glyphIndices[i];
+      }
+    }
+
+    lastValue = glyphIndices[0];
+    for (let i = 0; i < glyphIndices.length; i++) {
+      if (glyphIndices[i] === undefined) {
+        glyphIndices[i] = lastValue;
+      } else {
+        lastValue = glyphIndices[i];
+      }
+    }
+
+    return glyphIndices;
   }
 
   resolveRuns(attributedString) {
