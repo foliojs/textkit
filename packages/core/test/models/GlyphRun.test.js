@@ -239,11 +239,25 @@ describe('GlyphRun', () => {
     expect(stringIndices).toEqual([0, 1, 2, 3, 4, 5]);
   });
 
+  test('should correctly slice glyph indices', () => {
+    const glyphRun = createLatinTestRun({ value: 'Lorem Ipsum' });
+    const { glyphIndices } = glyphRun.slice(2, 8);
+
+    expect(glyphIndices).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+
   test('should correctly slice string indices (non latin)', () => {
     const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
     const { stringIndices } = glyphRun.slice(1, 8);
 
     expect(stringIndices).toEqual([0, 2, 3, 4, 5, 6, 7]);
+  });
+
+  test('should correctly slice glyph indices (non latin)', () => {
+    const glyphRun = createCamboyanTestRun({ value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន' });
+    const { glyphIndices } = glyphRun.slice(1, 8);
+
+    expect(glyphIndices).toEqual([0, 1, 1, 2, 3, 4, 5, 6]);
   });
 
   test('should exact slice return same string indices', () => {
