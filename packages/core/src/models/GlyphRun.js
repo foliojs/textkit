@@ -3,11 +3,12 @@ import Run from './Run';
 class GlyphRun extends Run {
   constructor(start, end, attributes, glyphs, positions, stringIndices, glyphIndices, preScaled) {
     super(start, end, attributes);
+
     this.glyphs = glyphs || [];
     this.positions = positions || [];
+    this.glyphIndices = glyphIndices || [];
     this.stringIndices = stringIndices || [];
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
-    this.glyphIndices = glyphIndices;
 
     if (!preScaled) {
       for (const pos of this.positions) {
