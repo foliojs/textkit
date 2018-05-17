@@ -98,10 +98,10 @@ class GlyphString {
 
   slice(start, end) {
     const stringStart = this.stringIndexForGlyphIndex(start);
-    const stringEnd = this.stringIndexForGlyphIndex(end - 1);
+    const stringEnd = this.stringIndexForGlyphIndex(end);
 
     return new GlyphString(
-      this.string.slice(stringStart, stringEnd + 1),
+      this.string.slice(stringStart, stringEnd),
       this._glyphRuns,
       start + this.start,
       end + this.start

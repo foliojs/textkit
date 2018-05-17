@@ -559,6 +559,19 @@ describe('GlyphString', () => {
     expect(string.stringIndexForGlyphIndex(10)).toBe(10);
   });
 
+  test('should slice with ligatures at the end', () => {
+    const string = createLatinTestString({
+      value: 'Lorft'
+    });
+
+    const sliced = string.slice(0, 4);
+
+    expect(sliced.string).toBe('Lorft');
+    expect(sliced.glyphRuns.length).toBe(1);
+    expect(sliced.glyphRuns[0].stringIndices).toEqual([0, 1, 2, 3]);
+    expect(sliced.glyphRuns[0].glyphIndices).toEqual([0, 1, 2, 3, 3]);
+  });
+
   test('should return correct string index for glyph index with ligatures (end)', () => {
     const string = createLatinTestString({
       value: 'Lorft ipsum',
@@ -647,7 +660,7 @@ describe('GlyphString', () => {
     expect(string.glyphIndexForStringIndex(10)).toBe(10);
   });
 
-  test.only('should return correct glyph index for string index (not latin)', () => {
+  test('should return correct glyph index for string index (not latin)', () => {
     const string = createCamboyanTestString({
       value: 'ខ្ញុំអាចញ៉ាំកញ្ចក់បាន',
       runs: [[0, 8], [8, 21]]
