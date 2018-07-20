@@ -1,11 +1,10 @@
 {
   "name": "@textkit/bidi-engine",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "prepublish": "npm run build",
     "build": "babel index.js --out-dir ./dist",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
