@@ -90,7 +90,7 @@ export default ({ Rect }) =>
 
         this.ctx.restore();
       } else {
-        this.ctx.font(font.constructor.name === 'StandardFont' ? font.name : font, fontSize);
+        this.ctx.font(typeof font.name === 'string' ? font.name : font, fontSize);
         this.ctx._addGlyphs(run.glyphs, run.positions, 0, 0);
       }
 
