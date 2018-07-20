@@ -1,6 +1,6 @@
 {
   "name": "@textkit/pdf-renderer",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
