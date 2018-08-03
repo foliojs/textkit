@@ -1,6 +1,6 @@
 {
   "name": "@textkit/textkit",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
@@ -17,14 +17,14 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@textkit/core": "^0.1.14",
-    "@textkit/font-substitution-engine": "^0.1.8",
-    "@textkit/justification-engine": "^0.1.8",
-    "@textkit/line-fragment-generator": "^0.1.8",
-    "@textkit/linebreaker": "^0.1.8",
-    "@textkit/script-itemizer": "^0.1.8",
-    "@textkit/tab-engine": "^0.1.8",
-    "@textkit/text-decoration-engine": "^0.1.9",
-    "@textkit/truncation-engine": "^0.1.8"
+    "@textkit/core": "^0.1.15",
+    "@textkit/font-substitution-engine": "^0.1.9",
+    "@textkit/justification-engine": "^0.1.9",
+    "@textkit/line-fragment-generator": "^0.1.9",
+    "@textkit/linebreaker": "^0.1.9",
+    "@textkit/script-itemizer": "^0.1.9",
+    "@textkit/tab-engine": "^0.1.9",
+    "@textkit/text-decoration-engine": "^0.1.10",
+    "@textkit/truncation-engine": "^0.1.9"
   }
 }
