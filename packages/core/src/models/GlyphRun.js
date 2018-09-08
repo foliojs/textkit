@@ -11,12 +11,17 @@ class GlyphRun extends Run {
     this.scale = attributes.fontSize / attributes.font.unitsPerEm;
 
     if (!preScaled) {
-      for (const pos of this.positions) {
-        pos.xAdvance *= this.scale;
+      this.positions.forEach((pos, index) => {
+        const xAdvance =
+          index === this.positions.length - 1
+            ? pos.xAdvance * this.scale
+            : pos.xAdvance * this.scale + attributes.characterSpacing;
+
+        pos.xAdvance = xAdvance;
         pos.yAdvance *= this.scale;
         pos.xOffset *= this.scale;
         pos.yOffset *= this.scale;
-      }
+      });
     }
   }
 
