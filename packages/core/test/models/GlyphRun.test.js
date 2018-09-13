@@ -94,6 +94,21 @@ describe('GlyphRun', () => {
     expect(glyphRun.height).toBe(expectedHeight);
   });
 
+  test('should get character spacing correctly', () => {
+    // xAdvances without character spacing:
+    //  L   o   r   e   m
+    //  10  10  10  10  10
+
+    const fontSize = 20;
+    const characterSpacing = 10;
+    const glyphRun = createLatinTestRun({
+      value: 'Lorem',
+      attributes: { fontSize, characterSpacing }
+    });
+
+    expect(glyphRun.positions.map(p => p.xAdvance)).toEqual([20, 20, 20, 20, 10]);
+  });
+
   test('should exact slice range return same run', () => {
     const glyphRun = createLatinTestRun({ value: 'Lorem Ipsum' });
     const sliced = glyphRun.slice(0, 11);
