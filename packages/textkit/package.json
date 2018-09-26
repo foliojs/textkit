@@ -1,6 +1,6 @@
 {
   "name": "@textkit/textkit",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@textkit/core": "^0.1.15",
+    "@textkit/core": "^0.1.16",
     "@textkit/font-substitution-engine": "^0.1.9",
     "@textkit/justification-engine": "^0.1.9",
     "@textkit/line-fragment-generator": "^0.1.9",
