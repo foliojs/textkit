@@ -133,7 +133,66 @@ describe('LayoutEngine', () => {
     expect(layoutParagraphMock.mock.calls[1][0].string).toBe('ipsum');
   });
 
-  test('should layout two consecutive break lines', () => {
+  test('should layout break lines at the beggining of fragment', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: '\nLorem ipsum' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('Lorem ipsum');
+    expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
+  });
+
+  test('should layout two consecutive break lines at the beggining of fragment', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: '\n\nLorem ipsum' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(3);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[2][0].string).toBe('Lorem ipsum');
+    expect(layoutParagraphMock.mock.calls[2][0].runs).toHaveLength(1);
+  });
+
+  test('should layout break lines in between fragment', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: 'Lorem\nipsum' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('Lorem');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('ipsum');
+    expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
+  });
+
+  test('should layout two consecutive break lines in between fragment', () => {
     // Mock layoutColumn class function
     LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
 
@@ -152,6 +211,42 @@ describe('LayoutEngine', () => {
     expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
     expect(layoutParagraphMock.mock.calls[2][0].string).toBe('ipsum');
     expect(layoutParagraphMock.mock.calls[2][0].runs).toHaveLength(1);
+  });
+
+  test('should ignore break line at the end of fragment', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: 'Lorem ipsum\n' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('Lorem ipsum');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+  });
+
+  test('should layout two consecutive break lines at the end of fragment', () => {
+    // Mock layoutColumn class function
+    LayoutEngine.prototype.layoutParagraph = layoutParagraphMock;
+
+    // Create instances
+    const layout = new LayoutEngine({});
+    const string = AttributedString.fromFragments([{ string: 'Lorem ipsum\n\n' }]);
+    const container = createRectContainer(0, 0, 300, 200, { columns: 1, columnGap: 20 });
+
+    // Call layout
+    layout.layout(string, [container]);
+
+    expect(layoutParagraphMock.mock.calls).toHaveLength(2);
+    expect(layoutParagraphMock.mock.calls[0][0].string).toBe('Lorem ipsum');
+    expect(layoutParagraphMock.mock.calls[0][0].runs).toHaveLength(1);
+    expect(layoutParagraphMock.mock.calls[1][0].string).toBe('');
+    expect(layoutParagraphMock.mock.calls[1][0].runs).toHaveLength(1);
   });
 
   test('should layout two consecutive break lines in different runs', () => {
