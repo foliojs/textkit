@@ -107,11 +107,8 @@ export default class GlyphGenerator {
       return new Run(run.start, run.end, attrs);
     });
 
-    // Ignore null runs
-    const nonNullRuns = runs.filter(run => run.start !== run.end);
-
     // Flatten runs
-    const resolvedRuns = flattenRuns([...styles, ...nonNullRuns]);
+    const resolvedRuns = flattenRuns([...styles, ...runs]);
     for (const run of resolvedRuns) {
       run.attributes = new RunStyle(run.attributes);
     }

@@ -66,16 +66,10 @@ export default class LayoutEngine {
 
       rect.y += paragraphHeight;
       rect.height -= paragraphHeight;
-      start += paragraph.length;
-
-      if (attributedString.string[start] === '\n') {
-        start++;
-      }
+      start += paragraph.length + 1;
 
       // If entire paragraph did not fit, move on to the next column or container.
-      if (start < next) {
-        break;
-      }
+      if (start < next) break;
     }
 
     return start;
@@ -101,6 +95,7 @@ export default class LayoutEngine {
     while (lineRect.y < rect.maxY && pos < glyphString.length && lines < maxLines) {
       const lineString = glyphString.slice(pos, glyphString.length);
       const lineFragments = this.typesetter.layoutLineFragments(
+        pos,
         lineRect,
         lineString,
         container,
