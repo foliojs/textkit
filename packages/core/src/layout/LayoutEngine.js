@@ -54,12 +54,10 @@ export default class LayoutEngine {
   layoutColumn(attributedString, start, container, rect, isLastContainer) {
     while (start < attributedString.length && rect.height > 0) {
       let next = attributedString.string.indexOf('\n', start);
-      if (next === -1) {
-        next = attributedString.string.length;
-      }
+      if (next === -1) next = attributedString.string.length;
 
       const paragraph = attributedString.slice(start, next);
-      const block = this.layoutParagraph(paragraph, container, rect, isLastContainer);
+      const block = this.layoutParagraph(paragraph, container, rect, start, isLastContainer);
       const paragraphHeight = block.bbox.height + block.style.paragraphSpacing;
 
       container.blocks.push(block);
@@ -75,7 +73,7 @@ export default class LayoutEngine {
     return start;
   }
 
-  layoutParagraph(attributedString, container, rect, isLastContainer) {
+  layoutParagraph(attributedString, container, rect, stringOffset, isLastContainer) {
     const glyphString = this.glyphGenerator.generateGlyphs(attributedString);
     const paragraphStyle = new ParagraphStyle(attributedString.runs[0].attributes);
     const { marginLeft, marginRight, indent, maxLines, lineSpacing } = paragraphStyle;
@@ -93,13 +91,13 @@ export default class LayoutEngine {
     const fragments = [];
 
     while (lineRect.y < rect.maxY && pos < glyphString.length && lines < maxLines) {
-      const lineString = glyphString.slice(pos, glyphString.length);
       const lineFragments = this.typesetter.layoutLineFragments(
         pos,
         lineRect,
-        lineString,
+        glyphString,
         container,
-        paragraphStyle
+        paragraphStyle,
+        stringOffset
       );
 
       lineRect.y += lineRect.height + lineSpacing;
@@ -120,6 +118,7 @@ export default class LayoutEngine {
     // Add empty line fragment for empty glyph strings
     if (glyphString.length === 0) {
       const newLineFragment = this.typesetter.layoutLineFragments(
+        pos,
         lineRect,
         glyphString,
         container,

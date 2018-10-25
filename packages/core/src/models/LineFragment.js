@@ -7,5 +7,7 @@ export default class LineFragment extends GlyphString {
     this.decorationLines = [];
     this.overflowLeft = 0;
     this.overflowRight = 0;
+    this.stringStart = null;
+    this.stringEnd = null;
   }
 }
