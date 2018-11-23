@@ -1,3 +1,4 @@
+import FontDescriptor from '../models/FontDescriptor';
 import AttributedString from '../models/AttributedString';
 
 const applyDefaultStyles = () => attributedString => {
@@ -17,6 +18,7 @@ const applyDefaultStyles = () => attributedString => {
       features: attributes.features || [],
       fill: attributes.fill !== false,
       font: attributes.font || null,
+      fontDescriptor: FontDescriptor.fromAttributes(attributes),
       fontSize: attributes.fontSize || 12,
       hangingPunctuation: attributes.hangingPunctuation || false,
       hyphenationFactor: attributes.hyphenationFactor || 0,

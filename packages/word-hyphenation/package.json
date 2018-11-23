@@ -1,13 +1,13 @@
 {
-  "name": "@textkit/core",
-  "version": "0.1.23",
+  "name": "@textkit/word-hyphenation",
+  "version": "0.1.0",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel ./src --out-dir ./dist --source-maps",
-    "build:watch": "babel ./src --out-dir ./dist --watch",
+    "build": "babel index.js --out-dir ./dist --source-maps",
+    "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
   },
@@ -20,7 +20,7 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "cubic2quad": "^1.1.0",
-    "unicode-properties": "^1.1.0"
+    "hyphenation.en-us": "^0.2.1",
+    "hypher": "^0.2.4"
   }
 }
