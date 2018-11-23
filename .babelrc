@@ -1,10 +1,9 @@
 {
-  "presets": [
-    ["env", { "loose": true }]
-  ],
+  "presets": [["env", { "loose": true }]],
   "plugins": [
     "transform-runtime",
     "transform-export-extensions",
+    "transform-object-rest-spread",
     ["transform-class-properties", { "loose": true }]
   ]
 }

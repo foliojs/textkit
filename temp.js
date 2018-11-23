@@ -1,30 +1,7 @@
-import fs from 'fs';
-import PDFDocument from 'pdfkit';
-import PDFRenderer from '@textkit/pdf-renderer';
-import {
-  Path,
-  Rect,
-  LayoutEngine,
-  AttributedString,
-  Container,
-  Attachment
-} from '@textkit/textkit';
+import { Path, LayoutEngine, AttributedString, Container } from '@textkit/textkit';
 
 const path = new Path();
-
 path.rect(30, 30, 300, 400);
-
-// const exclusion = new Path();
-// exclusion.circle(140, 160, 50);
-
-const doc = new PDFDocument();
-doc.pipe(fs.createWriteStream('out.pdf'));
-
-path.toFunction()(doc);
-// exclusion.toFunction()(doc);
-
-doc.stroke('green');
-doc.stroke();
 
 const string = AttributedString.fromFragments([
   {
@@ -68,8 +45,3 @@ const l = new LayoutEngine();
 const container = new Container(path);
 
 l.layout(string, [container]);
-
-const Renderer = PDFRenderer({ Rect });
-const rendererInstance = new Renderer(doc, { outlineLines: false });
-rendererInstance.render(container);
-doc.end();

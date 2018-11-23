@@ -14,9 +14,7 @@ export default () => ({ Run }) =>
       let index = 0;
       const runs = [];
 
-      if (!string) {
-        return [];
-      }
+      if (!string) return [];
 
       for (const char of string) {
         const codePoint = char.codePointAt();

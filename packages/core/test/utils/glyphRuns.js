@@ -1,4 +1,3 @@
-import RunStyle from '../../src/models/RunStyle';
 import GlyphRun from '../../src/models/GlyphRun';
 import testFont from './font';
 
@@ -56,9 +55,7 @@ export const layout = value => {
   const glyphs = chars.map(char => ({ id: char.charCodeAt(0) }));
   const stringIndices = chars.map((_, index) => value.indexOf(chars[index], index));
   const glyphIndices = resolveGlyphIndices(value, stringIndices);
-  const positions = chars.map(char => ({
-    xAdvance: char === ' ' ? 512 : 1024
-  }));
+  const positions = chars.map(char => ({ xAdvance: char === ' ' ? 512 : 1024 }));
 
   return {
     glyphs,
@@ -79,7 +76,7 @@ export const createLatinTestRun = ({
   end = value.length
 } = {}) => {
   const string = value.slice(start, end);
-  const attrs = new RunStyle(Object.assign({}, { font: testFont }, attributes));
+  const attrs = { font: testFont, fontSize: 12, characterSpacing: 0, ...attributes };
   const { glyphs, positions, stringIndices, glyphIndices } = layout(string);
 
   return new GlyphRun(
@@ -110,7 +107,7 @@ export const createCamboyanTestRun = ({
   const startGlyphIndex = getIndex(start);
   const endGlyphIndex = getIndex(end);
   const string = value.slice(startGlyphIndex, endGlyphIndex);
-  const attrs = new RunStyle(Object.assign({}, { font: testFont }, attributes));
+  const attrs = { font: testFont, fontSize: 12, characterSpacing: 0, ...attributes };
   const positions = [
     { xAdvance: 1549 },
     { xAdvance: 0 },

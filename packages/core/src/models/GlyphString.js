@@ -20,28 +20,71 @@ const HANGING_PUNCTUATION_END_CODEPOINTS = new Set([
   0x002d // HYPHEN
 ]);
 
+const runIndexAtGlyphIndex = (glyphRuns, index) => {
+  let count = 0;
+
+  for (let i = 0; i < glyphRuns.length; i++) {
+    const run = glyphRuns[i];
+
+    if (count <= index && index < count + run.glyphs.length) {
+      return i;
+    }
+
+    count += run.glyphs.length;
+  }
+
+  return glyphRuns.length - 1;
+};
+
+const sliceRuns = (glyphRuns, start, end) => {
+  if (glyphRuns.length === 0) return [];
+
+  const startRunIndex = runIndexAtGlyphIndex(glyphRuns, start);
+  const endRunIndex = runIndexAtGlyphIndex(glyphRuns, end);
+  const startRun = glyphRuns[startRunIndex];
+  const endRun = glyphRuns[endRunIndex];
+  const runs = [];
+
+  runs.push(startRun.slice(start - startRun.start, end - startRun.start));
+
+  if (endRunIndex !== startRunIndex) {
+    runs.push(...glyphRuns.slice(startRunIndex + 1, endRunIndex));
+
+    if (end - endRun.start !== 0) {
+      runs.push(endRun.slice(0, end - endRun.start));
+    }
+  }
+
+  for (const run of runs) {
+    run.start -= start;
+    run.end -= start;
+    run.stringIndices = run.stringIndices.map(s => s - start);
+  }
+
+  return runs;
+};
+
+const normalizeStringIndices = glyphRuns => {
+  glyphRuns.forEach(run => {
+    run.stringIndices = run.stringIndices.map(index => index - run.stringIndices[0]);
+  });
+  return glyphRuns;
+};
+
 class GlyphString {
-  constructor(string, glyphRuns, start, end) {
+  constructor(string, glyphRuns = []) {
     this.string = string;
-    this._glyphRuns = glyphRuns;
-    this.start = start || 0;
-    this._end = end;
-    this._glyphRunsCache = null;
-    this._glyphRunsCacheEnd = null;
+    this.glyphRuns = normalizeStringIndices(glyphRuns);
+  }
+
+  get start() {
+    if (this.glyphRuns.length === 0) return 0;
+    return this.glyphRuns[0].start;
   }
 
   get end() {
-    if (this._glyphRuns.length === 0) {
-      return 0;
-    }
-
-    const glyphEnd = this._glyphRuns[this._glyphRuns.length - 1].end;
-
-    if (this._end) {
-      return Math.min(this._end, glyphEnd);
-    }
-
-    return this._glyphRuns.length > 0 ? glyphEnd : 0;
+    if (this.glyphRuns.length === 0) return 0;
+    return this.glyphRuns[this.glyphRuns.length - 1].end;
   }
 
   get length() {
@@ -64,70 +107,37 @@ class GlyphString {
     return this.glyphRuns.reduce((acc, run) => Math.min(acc, run.descent), 0);
   }
 
-  get glyphRuns() {
-    if (this._glyphRunsCache && this._glyphRunsCacheEnd === this.end) {
-      return this._glyphRunsCache;
-    }
-
-    if (this._glyphRuns.length === 0) {
-      this._glyphRunsCache = [];
-      this._glyphRunsCacheEnd = this.end;
-      return [];
-    }
-
-    const startRunIndex = this.runIndexAtGlyphIndex(0);
-    const endRunIndex = this.runIndexAtGlyphIndex(this.length);
-    const startRun = this._glyphRuns[startRunIndex];
-    const endRun = this._glyphRuns[endRunIndex];
-    const runs = [];
-
-    runs.push(startRun.slice(this.start - startRun.start, this.end - startRun.start));
-
-    if (endRunIndex !== startRunIndex) {
-      runs.push(...this._glyphRuns.slice(startRunIndex + 1, endRunIndex));
-
-      if (this.end - endRun.start !== 0) {
-        runs.push(endRun.slice(0, this.end - endRun.start));
-      }
-    }
-
-    this._glyphRunsCache = runs;
-    this._glyphRunsCacheEnd = this.end;
-    return runs;
-  }
-
   slice(start, end) {
     const stringStart = this.stringIndexForGlyphIndex(start);
     const stringEnd = this.stringIndexForGlyphIndex(end);
+    const glyphRuns = sliceRuns(this.glyphRuns, start, end);
 
-    return new GlyphString(
-      this.string.slice(stringStart, stringEnd),
-      this._glyphRuns,
-      start + this.start,
-      end + this.start
-    );
+    const result = new GlyphString(this.string.slice(stringStart, stringEnd), glyphRuns);
+
+    // Ligature splitting. If happens to slice in a ligature, we split create
+    const previousGlyph = this.glyphAtIndex(start - 1);
+    const lastGlyph = this.glyphAtIndex(end - 1);
+
+    if (lastGlyph && lastGlyph.isLigature) {
+      result.deleteGlyph(result.length - 1);
+      result.insertGlyph(result.length, lastGlyph.codePoints[0]);
+    }
+
+    // Add the ligature remaining chars to result
+    if (previousGlyph && previousGlyph.isLigature) {
+      for (let i = 1; i < previousGlyph.codePoints.length; i++) {
+        result.insertGlyph(i - 1, previousGlyph.codePoints[i]);
+      }
+    }
+
+    return result;
   }
 
   runIndexAtGlyphIndex(index) {
-    index += this.start;
-    let count = 0;
-
-    for (let i = 0; i < this._glyphRuns.length; i++) {
-      const run = this._glyphRuns[i];
-
-      if (count <= index && index < count + run.glyphs.length) {
-        return i;
-      }
-
-      count += run.glyphs.length;
-    }
-
-    return this._glyphRuns.length - 1;
+    return runIndexAtGlyphIndex(this.glyphRuns, index);
   }
 
   runAtGlyphIndex(index) {
-    index += this.start;
-
     for (let i = 0; i < this.glyphRuns.length; i++) {
       const run = this.glyphRuns[i];
 
@@ -152,7 +162,7 @@ class GlyphString {
       offset += run.stringEnd;
     }
 
-    return this._glyphRuns.length - 1;
+    return this.glyphRuns.length - 1;
   }
 
   runAtStringIndex(index) {
@@ -210,15 +220,14 @@ class GlyphString {
   }
 
   stringIndexForGlyphIndex(index) {
-    let run;
     let count = 0;
     let offset = 0;
 
     for (let i = 0; i < this.glyphRuns.length; i++) {
-      run = this.glyphRuns[i];
+      const run = this.glyphRuns[i];
 
       if (offset <= index && offset + run.length > index) {
-        return count + run.stringIndices[index + this.start - run.start];
+        return count + run.stringIndices[index - run.start];
       }
 
       offset += run.length;
@@ -277,9 +286,7 @@ class GlyphString {
     const stringIndex = this.stringIndexForGlyphIndex(index);
     const nextIndex = this.string.indexOf(string, stringIndex);
 
-    if (nextIndex === -1) {
-      return -1;
-    }
+    if (nextIndex === -1) return -1;
 
     return this.glyphIndexForStringIndex(nextIndex);
   }
@@ -307,15 +314,13 @@ class GlyphString {
 
   insertGlyph(index, codePoint) {
     const runIndex = this.runIndexAtGlyphIndex(index);
-    const run = this._glyphRuns[runIndex];
+    const run = this.glyphRuns[runIndex];
     const { font, fontSize } = run.attributes;
     const glyph = run.attributes.font.glyphForCodePoint(codePoint);
     const scale = fontSize / font.unitsPerEm;
     const glyphIndex = this.start + index - run.start;
 
-    if (this._end) {
-      this._end += 1;
-    }
+    if (this._end) this._end += 1;
 
     run.glyphs.splice(glyphIndex, 0, glyph);
     run.stringIndices.splice(glyphIndex, 0, run.stringIndices[glyphIndex]);
@@ -335,22 +340,22 @@ class GlyphString {
 
     run.end += 1;
 
-    for (let i = runIndex + 1; i < this._glyphRuns.length; i++) {
-      this._glyphRuns[i].start += 1;
-      this._glyphRuns[i].end += 1;
+    for (let i = runIndex + 1; i < this.glyphRuns.length; i++) {
+      this.glyphRuns[i].start += 1;
+      this.glyphRuns[i].end += 1;
     }
 
-    this._glyphRunsCache = null;
+    this.glyphRunsCache = null;
   }
 
   deleteGlyph(index) {
-    if (index < 0 || index >= this.length) {
-      return;
-    }
+    if (index < 0 || index >= this.length) return;
 
     const runIndex = this.runIndexAtGlyphIndex(index);
-    const run = this._glyphRuns[runIndex];
+    const run = this.glyphRuns[runIndex];
     const glyphIndex = this.start + index - run.start;
+
+    if (this._end) this._end -= 1;
 
     run.glyphs.splice(glyphIndex, 1);
     run.positions.splice(glyphIndex, 1);
@@ -364,12 +369,12 @@ class GlyphString {
 
     run.end--;
 
-    for (let i = runIndex + 1; i < this._glyphRuns.length; i++) {
-      this._glyphRuns[i].start--;
-      this._glyphRuns[i].end--;
+    for (let i = runIndex + 1; i < this.glyphRuns.length; i++) {
+      this.glyphRuns[i].start--;
+      this.glyphRuns[i].end--;
     }
 
-    this._glyphRunsCache = null;
+    this.glyphRunsCache = null;
   }
 
   *[Symbol.iterator]() {
