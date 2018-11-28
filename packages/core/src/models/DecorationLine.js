@@ -9,7 +9,9 @@ export default class DecorationLine {
 
   merge(line) {
     if (this.rect.maxX === line.rect.x && this.rect.y === line.rect.y) {
-      this.rect.height = line.rect.height = Math.max(this.rect.height, line.rect.height);
+      const height = Math.max(this.rect.height, line.rect.height);
+      this.rect.height = height;
+      line.rect.height = height;
 
       if (this.color === line.color) {
         this.rect.width += line.rect.width;

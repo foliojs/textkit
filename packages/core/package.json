@@ -1,15 +1,18 @@
 {
   "name": "@textkit/core",
-  "version": "0.1.16",
+  "version": "0.1.23",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel ./src --out-dir ./dist",
+    "build": "babel ./src --out-dir ./dist --source-maps",
     "build:watch": "babel ./src --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"
@@ -18,8 +21,6 @@
   "license": "MIT",
   "dependencies": {
     "cubic2quad": "^1.1.0",
-    "iconv-lite": "^0.4.13",
-    "svgpath": "^2.2.0",
     "unicode-properties": "^1.1.0"
   }
 }

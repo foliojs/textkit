@@ -1,15 +1,18 @@
 {
   "name": "@textkit/script-itemizer",
-  "version": "0.1.9",
+  "version": "0.1.12",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel index.js --out-dir ./dist",
+    "build": "babel index.js --out-dir ./dist --source-maps",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"

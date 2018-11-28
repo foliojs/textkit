@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel index.js --out-dir ./dist",
+    "build": "babel index.js --out-dir ./dist --source-maps",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest --config ./jest.config.js"
@@ -17,7 +17,7 @@
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "font-manager": "^0.2.2",
+    "font-manager": "^0.3.0",
     "fontkit": "^1.7.7"
   }
 }

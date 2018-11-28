@@ -1,8 +1,5 @@
 import LineBreak from 'linebreak';
-import Hyphenator from 'hypher';
-import enUS from 'hyphenation.en-us';
 
-const hyphenator = new Hyphenator(enUS);
 const HYPHEN = 0x002d;
 const SHRINK_FACTOR = 0.04;
 
@@ -12,95 +9,113 @@ const SHRINK_FACTOR = 0.04;
  */
 export default () => () =>
   class LineBreaker {
-    suggestLineBreak(glyphString, width, paragraphStyle) {
+    suggestLineBreak(glyphString, syllables, availableWidths, paragraphStyle) {
+      const width = availableWidths[0];
       const hyphenationFactor = paragraphStyle.hyphenationFactor || 0;
-      const glyphIndex = glyphString.glyphIndexAtOffset(width);
+      const lines = [];
 
-      if (glyphIndex === -1) return null;
+      // let string = glyphString;
+      // let bk = this.findLineBreak(string, width, hyphenationFactor);
 
-      if (glyphIndex === glyphString.length) {
-        return { position: glyphString.length, required: true };
-      }
+      // while (bk && bk.position !== 0) {
+      //   lines.push(string.slice(0, bk.position));
+      //   string = string.slice(bk.position, string.length);
+      //   bk = this.findLineBreak(string, width, hyphenationFactor);
+      // }
 
-      let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
-      const bk = this.findBreakPreceeding(glyphString.string, stringIndex);
+      // console.log(lines);
 
-      if (bk) {
-        let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
-
-        if (
-          bk.next != null &&
-          this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
-        ) {
-          const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
-          const shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
-
-          const shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
-          stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
-
-          const point = this.findHyphenationPoint(
-            glyphString.string.slice(bk.position, bk.next),
-            stringIndex - bk.position
-          );
-
-          if (point > 0) {
-            bk.position += point;
-            breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
-
-            if (bk.position < bk.next) {
-              glyphString.insertGlyph(breakIndex++, HYPHEN);
-            }
-          }
-        }
-
-        bk.position = breakIndex;
-      }
-
-      return bk;
+      return [glyphString];
     }
 
-    findBreakPreceeding(string, index) {
-      const breaker = new LineBreak(string);
-      let last = null;
-      let bk = null;
+    // findLineBreak(glyphString, width, hyphenationFactor) {
+    //   const glyphIndex = glyphString.glyphIndexAtOffset(width);
 
-      while ((bk = breaker.nextBreak())) {
-        // console.log(bk);
-        if (bk.position > index) {
-          if (last) {
-            last.next = bk.position;
-          }
+    //   if (glyphIndex === -1) return null;
 
-          return last;
-        }
+    //   if (glyphIndex === glyphString.length) {
+    //     return { position: glyphString.length, required: true };
+    //   }
 
-        if (bk.required) {
-          return bk;
-        }
+    //   let stringIndex = glyphString.stringIndexForGlyphIndex(glyphIndex);
+    //   const bk = this.findBreakPreceeding(glyphString.string, stringIndex);
 
-        last = bk;
-      }
+    //   if (bk) {
+    //     let breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
 
-      return null;
-    }
+    //     if (
+    //       bk.next != null &&
+    //       this.shouldHyphenate(glyphString, breakIndex, width, hyphenationFactor)
+    //     ) {
+    //       const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
+    //       const shrunk = lineWidth + lineWidth * SHRINK_FACTOR;
 
-    shouldHyphenate(glyphString, glyphIndex, width, hyphenationFactor) {
-      const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
-      return lineWidth / width < hyphenationFactor;
-    }
+    //       const shrunkIndex = glyphString.glyphIndexAtOffset(shrunk);
+    //       stringIndex = Math.min(bk.next, glyphString.stringIndexForGlyphIndex(shrunkIndex));
 
-    findHyphenationPoint(string, index) {
-      const parts = hyphenator.hyphenate(string);
-      let count = 0;
+    //       const point = this.findHyphenationPoint(
+    //         glyphString.string.slice(bk.position, bk.next),
+    //         stringIndex - bk.position
+    //       );
 
-      for (const part of parts) {
-        if (count + part.length > index) {
-          break;
-        }
+    //       if (point > 0) {
+    //         bk.position += point;
+    //         breakIndex = glyphString.glyphIndexForStringIndex(bk.position);
 
-        count += part.length;
-      }
+    //         if (bk.position < bk.next) {
+    //           glyphString.insertGlyph(breakIndex++, HYPHEN);
+    //         }
+    //       }
+    //     }
 
-      return count;
-    }
+    //     bk.position = breakIndex;
+    //   }
+
+    //   return bk;
+    // }
+
+    // findBreakPreceeding(string, index) {
+    //   const breaker = new LineBreak(string);
+    //   let last = null;
+    //   let bk = null;
+
+    //   while ((bk = breaker.nextBreak())) {
+    //     // console.log(bk);
+    //     if (bk.position > index) {
+    //       if (last) {
+    //         last.next = bk.position;
+    //       }
+
+    //       return last;
+    //     }
+
+    //     if (bk.required) {
+    //       return bk;
+    //     }
+
+    //     last = bk;
+    //   }
+
+    //   return null;
+    // }
+
+    // shouldHyphenate(glyphString, glyphIndex, width, hyphenationFactor) {
+    //   const lineWidth = glyphString.offsetAtGlyphIndex(glyphIndex);
+    //   return lineWidth / width < hyphenationFactor;
+    // }
+
+    // findHyphenationPoint(string, index) {
+    //   const parts = hyphenator.hyphenate(string);
+    //   let count = 0;
+
+    //   for (const part of parts) {
+    //     if (count + part.length > index) {
+    //       break;
+    //     }
+
+    //     count += part.length;
+    //   }
+
+    //   return count;
+    // }
   };

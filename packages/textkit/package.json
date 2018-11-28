@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel index.js --out-dir ./dist",
+    "build": "babel index.js --out-dir ./dist --source-maps",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
@@ -20,7 +20,7 @@
     "@textkit/core": "^0.1.16",
     "@textkit/font-substitution-engine": "^0.1.9",
     "@textkit/justification-engine": "^0.1.9",
-    "@textkit/line-fragment-generator": "^0.1.9",
+    "@textkit/word-hyphenation": "^0.1.0",
     "@textkit/linebreaker": "^0.1.9",
     "@textkit/script-itemizer": "^0.1.9",
     "@textkit/tab-engine": "^0.1.9",

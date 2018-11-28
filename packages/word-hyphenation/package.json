@@ -1,19 +1,26 @@
 {
-  "name": "@textkit/line-fragment-generator",
-  "version": "0.1.9",
+  "name": "@textkit/word-hyphenation",
+  "version": "0.1.0",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "babel index.js --out-dir ./dist",
+    "build": "babel index.js --out-dir ./dist --source-maps",
     "build:watch": "babel index.js --out-dir ./dist --watch",
     "precommit": "lint-staged",
     "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"
   ],
   "author": "Devon Govett <devongovett@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "hyphenation.en-us": "^0.2.1",
+    "hypher": "^0.2.4"
+  }
 }

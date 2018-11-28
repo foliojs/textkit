@@ -3,12 +3,12 @@ import Path from '../geom/Path';
 export default class Container {
   constructor(path, options = {}) {
     this.path = path;
-    this.exclusionPaths = options.exclusionPaths || [];
-    this.tabStops = options.tabStops || [];
-    this.tabStopInterval = options.tabStopInterval || 80;
-    this.columns = options.columns || 1;
-    this.columnGap = options.columnGap || 18; // 1/4 inch
     this.blocks = [];
+    this.columns = options.columns || 1;
+    this.tabStops = options.tabStops || [];
+    this.columnGap = options.columnGap || 18; // 1/4 inch
+    this.exclusionPaths = options.exclusionPaths || [];
+    this.tabStopInterval = options.tabStopInterval || 80;
   }
 
   get bbox() {

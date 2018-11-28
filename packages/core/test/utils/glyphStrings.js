@@ -1,4 +1,3 @@
-import RunStyle from '../../src/models/RunStyle';
 import GlyphRun from '../../src/models/GlyphRun';
 import GlyphString from '../../src/models/GlyphString';
 import { layout, createCamboyanTestRun } from './glyphRuns';
@@ -9,7 +8,7 @@ export const createLatinTestString = ({
   runs = [[0, value.length]]
 } = {}) => {
   let glyphIndex = 0;
-  const attrs = new RunStyle(Object.assign({}, { font: testFont }));
+  const attrs = { font: testFont, fontSize: 12, characterSpacing: 0 };
 
   const glyphRuns = runs.map(run => {
     const { glyphs, positions, stringIndices, glyphIndices } = layout(value.slice(run[0], run[1]));
@@ -29,7 +28,7 @@ export const createLatinTestString = ({
     return glyphRun;
   });
 
-  return new GlyphString(value, glyphRuns, 0, value.length);
+  return new GlyphString(value, glyphRuns);
 };
 
 export const createCamboyanTestString = ({

@@ -1,5 +1,8 @@
+import generateFragments from './fragmentGenerator';
+import Block from '../models/Block';
 import LineFragment from '../models/LineFragment';
 
+const NEW_LINE = 10;
 const ALIGNMENT_FACTORS = {
   left: 0,
   center: 0.5,
@@ -7,129 +10,117 @@ const ALIGNMENT_FACTORS = {
   justify: 0
 };
 
-/**
- * A Typesetter performs glyph line layout, including line breaking,
- * hyphenation, justification, truncation, hanging punctuation,
- * and text decoration. It uses several underlying objects to perform
- * these tasks, which could be overridden in order to customize the
- * typesetter's behavior.
- */
-export default class Typesetter {
-  constructor(engines = {}) {
-    this.lineBreaker = engines.lineBreaker;
-    this.lineFragmentGenerator = engines.lineFragmentGenerator;
-    this.justificationEngine = engines.justificationEngine;
-    this.truncationEngine = engines.truncationEngine;
-    this.decorationEngine = engines.decorationEngine;
-    this.tabEngine = engines.tabEngine;
+const finalizeLineFragment = engines => (line, style, isLastFragment, isTruncated) => {
+  const align = isLastFragment && !isTruncated ? style.alignLastLine : style.align;
+
+  if (isLastFragment && isTruncated && style.truncationMode) {
+    engines.truncationEngine.truncate(line, style.truncationMode);
   }
 
-  layoutLineFragments(start, lineRect, glyphString, container, paragraphStyle, stringOffset) {
-    const lineString = glyphString.slice(start, glyphString.length);
+  let start = 0;
+  let end = line.length;
 
-    // Guess the line height using the full line before intersecting with the container.
-    lineRect.height = lineString.slice(0, lineString.glyphIndexAtOffset(lineRect.width)).height;
+  // Remove new line char at the end of line
+  if (line.codePointAtGlyphIndex(line.length - 1) === NEW_LINE) {
+    line.deleteGlyph(line.length - 1);
+  }
 
-    // Generate line fragment rectangles by intersecting with the container.
-    const fragmentRects = this.lineFragmentGenerator.generateFragments(lineRect, container);
+  // Ignore whitespace at the start and end of a line for alignment
+  while (line.isWhiteSpace(start)) {
+    line.overflowLeft += line.getGlyphWidth(start++);
+  }
 
-    if (fragmentRects.length === 0) return [];
+  while (line.isWhiteSpace(end - 1)) {
+    line.overflowRight += line.getGlyphWidth(--end);
+  }
 
-    let pos = 0;
-    const lineFragments = [];
-    let lineHeight = paragraphStyle.lineHeight;
-
-    for (const fragmentRect of fragmentRects) {
-      const line = lineString.slice(pos, lineString.length);
-
-      if (this.tabEngine) {
-        this.tabEngine.processLineFragment(line, container);
-      }
-
-      const bk = this.lineBreaker.suggestLineBreak(line, fragmentRect.width, paragraphStyle);
-
-      if (bk) {
-        bk.position += pos;
-
-        const lineFragment = new LineFragment(fragmentRect, lineString.slice(pos, bk.position));
-
-        lineFragment.stringStart =
-          stringOffset + glyphString.stringIndexForGlyphIndex(lineFragment.start);
-        lineFragment.stringEnd =
-          stringOffset + glyphString.stringIndexForGlyphIndex(lineFragment.end);
-
-        lineFragments.push(lineFragment);
-        lineHeight = Math.max(lineHeight, lineFragment.height);
-
-        pos = bk.position;
-        if (pos >= lineString.length) {
-          break;
-        }
+  // Adjust line rect for hanging punctuation
+  if (style.hangingPunctuation) {
+    if (align === 'left' || align === 'justify') {
+      if (line.isHangingPunctuationStart(start)) {
+        line.overflowLeft += line.getGlyphWidth(start++);
       }
     }
 
-    // Update the fragments on this line with the computed line height
-    if (lineHeight !== 0) lineRect.height = lineHeight;
-
-    for (const fragment of lineFragments) {
-      fragment.rect.height = lineHeight;
-    }
-
-    return lineFragments;
-  }
-
-  finalizeLineFragment(lineFragment, paragraphStyle, isLastFragment, isTruncated) {
-    const align =
-      isLastFragment && !isTruncated ? paragraphStyle.alignLastLine : paragraphStyle.align;
-
-    if (isLastFragment && isTruncated && paragraphStyle.truncationMode) {
-      this.truncationEngine.truncate(lineFragment, paragraphStyle.truncationMode);
-    }
-
-    this.adjustLineFragmentRectangle(lineFragment, paragraphStyle, align);
-
-    if (align === 'justify' || lineFragment.advanceWidth > lineFragment.rect.width) {
-      this.justificationEngine.justify(lineFragment, {
-        factor: paragraphStyle.justificationFactor
-      });
-    }
-
-    this.decorationEngine.createDecorationLines(lineFragment);
-  }
-
-  adjustLineFragmentRectangle(lineFragment, paragraphStyle, align) {
-    let start = 0;
-    let end = lineFragment.length;
-
-    // Ignore whitespace at the start and end of a line for alignment
-    while (lineFragment.isWhiteSpace(start)) {
-      lineFragment.overflowLeft += lineFragment.getGlyphWidth(start++);
-    }
-
-    while (lineFragment.isWhiteSpace(end - 1)) {
-      lineFragment.overflowRight += lineFragment.getGlyphWidth(--end);
-    }
-
-    // Adjust line rect for hanging punctuation
-    if (paragraphStyle.hangingPunctuation) {
-      if (align === 'left' || align === 'justify') {
-        if (lineFragment.isHangingPunctuationStart(start)) {
-          lineFragment.overflowLeft += lineFragment.getGlyphWidth(start++);
-        }
-      }
-
-      if (align === 'right' || align === 'justify') {
-        if (lineFragment.isHangingPunctuationEnd(end - 1)) {
-          lineFragment.overflowRight += lineFragment.getGlyphWidth(--end);
-        }
+    if (align === 'right' || align === 'justify') {
+      if (line.isHangingPunctuationEnd(end - 1)) {
+        line.overflowRight += line.getGlyphWidth(--end);
       }
     }
-
-    lineFragment.rect.x -= lineFragment.overflowLeft;
-    lineFragment.rect.width += lineFragment.overflowLeft + lineFragment.overflowRight;
-
-    // Adjust line offset for alignment
-    const remainingWidth = lineFragment.rect.width - lineFragment.advanceWidth;
-    lineFragment.rect.x += remainingWidth * ALIGNMENT_FACTORS[align];
   }
-}
+
+  line.rect.x -= line.overflowLeft;
+  line.rect.width += line.overflowLeft + line.overflowRight;
+
+  // Adjust line offset for alignment
+  const remainingWidth = line.rect.width - line.advanceWidth;
+  line.rect.x += remainingWidth * ALIGNMENT_FACTORS[align];
+
+  if (align === 'justify' || line.advanceWidth > line.rect.width) {
+    engines.justificationEngine.justify(line, {
+      factor: style.justificationFactor
+    });
+  }
+
+  engines.decorationEngine.createDecorationLines(line);
+};
+
+const layoutParagraph = engines => (paragraph, container, lineRect) => {
+  const { value, syllables } = paragraph;
+  const style = value.glyphRuns[0].attributes;
+
+  // Guess the line height using the full line before intersecting with the container.
+  // Generate line fragment rectangles by intersecting with the container.
+  const lineHeight = value.slice(0, value.glyphIndexAtOffset(lineRect.width)).height;
+  const fragmentRects = generateFragments(lineRect, lineHeight, container);
+  const wrappingWidths = fragmentRects.map(rect => rect.width);
+  const lines = engines.lineBreaker.suggestLineBreak(value, syllables, wrappingWidths, style);
+
+  let currentY = lineRect.y;
+  const lineFragments = lines.map((line, i) => {
+    const lineBox = fragmentRects[Math.min(i, fragmentRects.length - 1)].copy();
+    const fragmentHeight = Math.max(line.height, style.lineHeight);
+
+    lineBox.y = currentY;
+    lineBox.height = fragmentHeight;
+    currentY += fragmentHeight;
+
+    return new LineFragment(lineBox, line);
+  });
+
+  lineFragments.forEach((lineFragment, i) => {
+    finalizeLineFragment(engines)(lineFragment, style, i === lineFragments.length - 1);
+  });
+
+  return new Block(lineFragments);
+};
+
+const typesetter = engines => containers => glyphStrings => {
+  const paragraphs = [...glyphStrings];
+
+  const layoutContainer = (rect, container) => {
+    let paragraphRect = rect.copy();
+    let nextParagraph = paragraphs.shift();
+
+    while (nextParagraph) {
+      const block = layoutParagraph(engines)(nextParagraph, container, paragraphRect);
+
+      if (paragraphRect.height >= block.height) {
+        container.blocks.push(block);
+        paragraphRect = paragraphRect.copy();
+        paragraphRect.y += block.height;
+        paragraphRect.height -= block.height;
+        nextParagraph = paragraphs.shift();
+      } else {
+        paragraphs.unshift(nextParagraph);
+        break;
+      }
+    }
+  };
+
+  return containers.forEach(container => {
+    layoutContainer(container.bbox.toRect(), container);
+  });
+};
+
+export default typesetter;

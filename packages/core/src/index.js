@@ -3,7 +3,6 @@ export {
   Run,
   Block,
   Range,
-  TabStop,
   RunStyle,
   GlyphRun,
   Container,
