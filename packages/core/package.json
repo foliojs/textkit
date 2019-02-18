@@ -1,6 +1,6 @@
 {
   "name": "@textkit/core",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "An advanced text layout framework",
   "main": "dist/index.js",
   "scripts": {
