@@ -115,7 +115,7 @@ export default ({ Rect }) =>
 
         this.ctx.translate(position.xAdvance, position.yOffset);
 
-        if (glyph === objectReplacement && run.attributes.attachment) {
+        if (glyph.id === objectReplacement.id && run.attributes.attachment) {
           this.renderAttachment(run.attributes.attachment);
           run.glyphs[i] = space;
         }
