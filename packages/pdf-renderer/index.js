@@ -57,13 +57,14 @@ export default ({ Rect }) =>
     }
 
     renderRun(run) {
-      const { font, fontSize, color, link } = run.attributes;
+      const { font, fontSize, color, link, opacity } = run.attributes;
 
       if (this.outlineRuns) {
         this.ctx.rect(0, 0, run.advanceWidth, run.height).stroke();
       }
 
       this.ctx.fillColor(color);
+      this.ctx.fillOpacity(opacity);
 
       if (link) {
         this.ctx.link(0, -run.height - run.descent, run.advanceWidth, run.height, link);
